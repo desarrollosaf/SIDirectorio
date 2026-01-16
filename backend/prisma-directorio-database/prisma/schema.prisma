@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model extensiones {
+  id                    BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  extension             String?      @db.VarChar(255)
+  deleted_at            DateTime?    @db.Timestamp(0)
+  created_at            DateTime?    @db.Timestamp(0)
+  updated_at            DateTime?    @db.Timestamp(0)
+  ubicacion_id          BigInt?      @db.UnsignedBigInt
+  servidor_publico_id   BigInt?      @db.UnsignedBigInt
+  personal_operativo_id BigInt?      @db.UnsignedBigInt
+  extension_privada     String?      @db.VarChar(255)
+  ubicaciones           ubicaciones? @relation(fields: [ubicacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "extensiones_ubicacion_id_foreign")
+
+  @@index([ubicacion_id], map: "extensiones_ubicacion_id_foreign")
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model password_resets {
+  email      String    @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+
+  @@index([email], map: "password_resets_email_index")
+  @@ignore
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model servicios {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  nombre     String    @db.VarChar(255)
+  extension  String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  deleted_at DateTime? @db.Timestamp(0)
+}
+
+model ubicaciones {
+  id                       BigInt                     @id @default(autoincrement()) @db.UnsignedBigInt
+  nombre                   String                     @db.VarChar(255)
+  calle                    String                     @db.VarChar(255)
+  num_ext                  String                     @db.VarChar(255)
+  num_int                  String?                    @db.VarChar(255)
+  colonia                  String                     @db.VarChar(255)
+  codigo_postal            String                     @db.VarChar(255)
+  municipio                String                     @db.VarChar(255)
+  deleted_at               DateTime?                  @db.Timestamp(0)
+  created_at               DateTime?                  @db.Timestamp(0)
+  updated_at               DateTime?                  @db.Timestamp(0)
+  extensiones              extensiones[]
+  ubicaciones_dependencias ubicaciones_dependencias[]
+}
+
+model ubicaciones_dependencias {
+  id             BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  ubicacion_id   BigInt      @db.UnsignedBigInt
+  dependencia_id BigInt      @db.UnsignedBigInt
+  deleted_at     DateTime?   @db.Timestamp(0)
+  created_at     DateTime?   @db.Timestamp(0)
+  updated_at     DateTime?   @db.Timestamp(0)
+  ubicaciones    ubicaciones @relation(fields: [ubicacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ubicaciones_dependencias_ubicacion_id_foreign")
+
+  @@index([dependencia_id], map: "ubicaciones_dependencias_dependencia_id_index")
+  @@index([ubicacion_id], map: "ubicaciones_dependencias_ubicacion_id_foreign")
+}
+
+model users {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name              String    @db.VarChar(255)
+  email             String    @unique(map: "users_email_unique") @db.VarChar(255)
+  email_verified_at DateTime? @db.Timestamp(0)
+  password          String    @db.VarChar(255)
+  remember_token    String?   @db.VarChar(100)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+}
