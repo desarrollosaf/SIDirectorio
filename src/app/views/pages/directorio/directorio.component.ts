@@ -6,11 +6,11 @@ import { CommonModule } from '@angular/common';
 type Dependencia = { id: string; nombre: string };
 
 export type DirectoryRow = {
-  area: string;           // Área / Dirección (encabezado del acordeón)
-  areaDetalle?: string;   // Ej. Subdirección / Departamento (opcional)
-  puesto?: string;        // Ej. Titular / Puesto (opcional)
-  nombre?: string;        // Persona (opcional)
-  extension: string;      // Extensión
+  area: string;           
+  areaDetalle?: string;  
+  puesto?: string;        
+  nombre?: string;        
+  extension: string;      
 };
 
 type Grouped = { area: string; items: DirectoryRow[] };
@@ -36,30 +36,30 @@ export class DirectorioComponent {
     });
   }
 
-  // UI
+  
   toast = { show: false, message: '' };
   private toastTimer: any;
 
-  // Orden
+ 
   sortBy: 'area' | 'nombre' | 'ext' = 'area';
 
-  // Data
+  
   dependencias: Dependencia[] = [
     { id: 'LEGISLATURA', nombre: 'Legislatura' },
     { id: 'ADMIN', nombre: 'Administración' },
     { id: 'COM_SOCIAL', nombre: 'Comunicación Social' },
   ];
 
-  // resultados base (de API)
+  
   private rows: DirectoryRow[] = [];
 
-  // resultados filtrados por q
+  
   private filteredRows: DirectoryRow[] = [];
 
-  // agrupado para el acordeón
+  
   grouped: Grouped[] = [];
 
-  // contador total de resultados filtrados
+  
   totalFiltered = 0;
 
   
@@ -82,7 +82,7 @@ export class DirectorioComponent {
 
     try {
       const dep = this.form.value.dependencia!;
-      // ✅ aquí iría tu API real; por ahora demo:
+      
       this.rows = await this.mockApi(dep);
 
       this.applyFilterAndSort();
@@ -119,7 +119,7 @@ export class DirectorioComponent {
   }
 
   applyFilterAndSort(): void {
-    // Si aún no hay data, no hacemos nada
+   
     if (!this.rows.length) {
       this.filteredRows = [];
       this.grouped = [];
@@ -130,7 +130,7 @@ export class DirectorioComponent {
     const q = (this.form.value.q ?? '').toLowerCase().trim();
     const norm = (s?: string) => (s ?? '').toLowerCase().trim();
 
-    // 1) filtrar
+    
     this.filteredRows = this.rows.filter(r => {
       if (!q) return true;
 
@@ -143,12 +143,12 @@ export class DirectorioComponent {
       );
     });
 
-    // 2) ordenar
+    
     const sorted = [...this.filteredRows].sort((a, b) => {
       if (this.sortBy === 'area') return norm(a.area).localeCompare(norm(b.area));
 
       if (this.sortBy === 'nombre') {
-        // si no hay nombre, caen al final
+       
         const an = norm(a.nombre);
         const bn = norm(b.nombre);
         if (!an && bn) return 1;
@@ -156,14 +156,14 @@ export class DirectorioComponent {
         return an.localeCompare(bn);
       }
 
-      // ext
+     
       const ax = parseInt(a.extension, 10);
       const bx = parseInt(b.extension, 10);
       if (!Number.isNaN(ax) && !Number.isNaN(bx)) return ax - bx;
       return norm(a.extension).localeCompare(norm(b.extension));
     });
 
-    // 3) agrupar por "area" (para acordeón)
+    
     const map = new Map<string, DirectoryRow[]>();
     for (const r of sorted) {
       const key = r.area || 'Sin área';
@@ -179,14 +179,14 @@ export class DirectorioComponent {
   async copy(text: string): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
-      this.showToast('Extensión copiada ✅');
+      this.showToast('Extensión copiada ');
     } catch {
-      this.showToast('No se pudo copiar ❌');
+      this.showToast('No se pudo copiar ');
     }
   }
 
   onDownloadPdf(): void {
-    // cambia por tu endpoint real
+   
     window.open('/api/directorio/pdf', '_blank');
   }
 
@@ -197,16 +197,13 @@ export class DirectorioComponent {
     this.toastTimer = setTimeout(() => (this.toast.show = false), 1600);
   }
 
-  // -------------------------
-  // DEMO: simula respuesta de API
-  // -------------------------
+  
   private async mockApi(dependencia: string): Promise<DirectoryRow[]> {
-    // simula latencia
+    
     await new Promise(res => setTimeout(res, 450));
 
     if (!dependencia) return [];
 
-    // ejemplo basado en tu screenshot
     return [
       {
         area: 'Junta de Coordinación Política',
