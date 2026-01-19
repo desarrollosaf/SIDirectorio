@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { prisma } from '../../prisma-users-database/prisma/prisma'
+import { prismaDirectorio } from '../../prisma-directorio-database/prisma/prisma'
 
 @Injectable()
 export class UsersService {
@@ -12,8 +13,9 @@ export class UsersService {
   async findAll() {
     // return `This action returns all users`;
     const allUsers = await  prisma.users_safs.findMany();
+    const extesionesAll = await prismaDirectorio.extensiones.findMany();
     return JSON.parse(
-      JSON.stringify(allUsers, (_, value) =>
+      JSON.stringify(extesionesAll, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ),
     );
