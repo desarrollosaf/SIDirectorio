@@ -7,6 +7,14 @@ export const routes: Routes = [
     path: 'landing',
     loadComponent: () => import('./views/pages/landing/landing.component').then(c => c.LandingComponent),
   },
+  {
+    path: 'directorio',
+    loadComponent: () => import('./views/pages/directorio/directorio.component').then(c => c.DirectorioComponent),
+  },
+  {
+    path: 'landing',
+    loadComponent: () => import('./views/pages/landing/landing.component').then(c => c.LandingComponent),
+  },
   { path: 'auth', loadChildren: () => import('./views/pages/auth/auth.routes')},
   {
     path: '',

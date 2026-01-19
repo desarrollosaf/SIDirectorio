@@ -1,0 +1,145 @@
+:root {
+  --primary: #7b1e3a;
+  --primary-soft: #f7eef1;
+  --text-main: #1f2933;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --radius: 12px;
+}
+
+/* Layout base */
+.directory-page {
+  min-height: 100vh;
+  background: #f9fafb;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-main);
+}
+
+/* Topbar */
+.topbar {
+  height: 72px;
+  padding: 0 48px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Hero */
+.hero {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 20% 20%, #eceff3 0%, transparent 40%),
+    radial-gradient(circle at 80% 30%, #f2f4f8 0%, transparent 45%),
+    #f9fafb;
+}
+
+/* Card */
+.search-card {
+  background: #fff;
+  width: 100%;
+  max-width: 720px;
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+}
+
+/* Header card */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.card-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.pdf-btn {
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+/* Texto */
+.description {
+  margin: 16px 0 24px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Form */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.875rem;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+}
+
+.field select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+/* Botón */
+.search-btn {
+  height: 44px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+
+.search-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(123,30,58,.3);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .search-card {
+    margin: 16px;
+    padding: 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+}
