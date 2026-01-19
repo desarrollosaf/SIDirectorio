@@ -1,7 +1,7 @@
 /* Splash screen */
 
 .splash-screen {
-  --primary: #6571ff;
+  --primary: #96134b;
   --bg: #f9fafb;
 
   background: var(--bg);

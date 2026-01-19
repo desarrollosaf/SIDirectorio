@@ -1,34 +1,190 @@
-<div class="directory-page">
-  <header class="topbar">
-    <div class="brand">
-      <img src="assets/logo.svg" alt="Congreso Estado de México" />
+<!-- Top header con logos -->
+<header class="dir-topbar">
+  <div class="dir-topbar__inner">
+    <div class="dir-logos">
+      <!-- Cambia src por tus assets -->
+      <img class="dir-logo" src="assets/logos/edomex.png" alt="Logo Gobierno" />
+      <img class="dir-logo" src="assets/logos/congreso.png" alt="Logo Congreso" />
     </div>
-    <a class="login-link" href="#">Login</a>
-  </header>
 
-  <section class="hero">
-    <div class="search-card">
-      <div class="card-header">
-        <h1>Directorio telefónico interno</h1>
-        <a class="pdf-btn">Directorio PDF</a>
-      </div>
+    <div class="dir-top-actions">
+      <a class="dir-login" href="#" (click)="$event.preventDefault()">Login</a>
 
-      <p class="description">
-        Consulta direcciones, números telefónicos y extensiones del Poder Legislativo.
-      </p>
+    
+    </div>
+  </div>
+</header>
 
-      <div class="form-grid">
-        <div class="field">
-          <label>Dependencia</label>
-          <select>
-            <option>LEGISLATURA</option>
-          </select>
+<!-- Fondo / contenedor -->
+<main class="dir-page">
+  <div class="container dir-container">
+    <!-- Card principal -->
+    <section class="dir-shell">
+      <div class="dir-shell__header">
+        <div>
+          <h1 class="dir-title">Directorio telefónico interno</h1>
+          <p class="dir-desc">
+            Consulta aquí las direcciones, números telefónicos y extensiones de las dependencias que integran el Poder Legislativo. 
+            Para iniciar la búsqueda da clic sobre el nombre de la dependencia seguido del botón buscar. Para una búsqueda más puntual, selecciona la dirección y departamento.
+          </p>
         </div>
 
-        <button class="search-btn">
-          🔍 Buscar
+        <button type="button" class="btn btn-primary btn-sm dir-primary" (click)="onSearch()">
+          PDF
         </button>
       </div>
-    </div>
-  </section>
-</div>
+
+      <!-- Layout responsive (sin duplicar HTML) -->
+      <div class="dir-layout">
+        <!-- Panel filtros -->
+        <aside class="dir-filters">
+          <div class="dir-card">
+            <div class="dir-card__title">Filtros</div>
+
+            <form [formGroup]="form" class="dir-form" (ngSubmit)="onSearch()">
+              <label class="form-label mb-1">Dependencia</label>
+              <select class="form-select dir-control" formControlName="dependencia" [class.is-invalid]="depInvalid">
+                <option value="" disabled>Selecciona…</option>
+                <option *ngFor="let d of dependencias" [value]="d.id">{{ d.nombre }}</option>
+              </select>
+              <div class="invalid-feedback">Selecciona una dependencia.</div>
+
+              <!-- <div class="mt-3">
+                <label class="form-label mb-1">Buscar (opcional)</label>
+                <div class="input-group">
+                  <span class="input-group-text dir-addon">🔎</span>
+                  <input
+                    type="text"
+                    class="form-control dir-control"
+                    formControlName="q"
+                    placeholder="Ej. Comunicación social, Ernesto, 2591…"
+                    (input)="applyFilterAndSort()"
+                  />
+                  <button class="btn btn-outline-secondary dir-clear" type="button" (click)="clearQuery()" [disabled]="!(form.value.q?.length)">
+                    ✕
+                  </button>
+                </div>
+                <div class="dir-help">Filtra por área, nombre o extensión.</div>
+              </div> -->
+
+              <div class="mt-3 d-grid gap-2">
+                <button class="btn btn-primary dir-primary" type="submit" [disabled]="loading || form.invalid">
+                  Buscar
+                </button>
+
+                <button class="btn btn-outline-secondary" type="button" (click)="onClear()" [disabled]="loading">
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </div>
+        </aside>
+
+        <!-- Resultados -->
+        <section class="dir-results">
+          <!-- Estados -->
+          <div *ngIf="loading" class="dir-card dir-state">
+            <div class="placeholder-glow mb-2">
+              <span class="placeholder col-4"></span>
+            </div>
+            <div class="progress dir-progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated w-100"></div>
+            </div>
+            <div class="dir-muted mt-2">Cargando resultados…</div>
+          </div>
+
+          <div *ngIf="!loading && error" class="alert alert-danger dir-alert">
+            <div><strong>Error:</strong> {{ error }}</div>
+            <button class="btn btn-sm btn-light mt-2" type="button" (click)="onSearch()">Reintentar</button>
+          </div>
+
+          <div *ngIf="!loading && searched && !error && grouped.length === 0" class="alert alert-warning dir-alert">
+            <strong>Sin resultados.</strong> Prueba otra dependencia o ajusta el filtro.
+          </div>
+
+          <!-- Header resultados -->
+          <div *ngIf="!loading && !error && grouped.length > 0" class="dir-resultsbar">
+            <div class="dir-count">
+              <span>a</span> resultado(s)
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+              <span class="dir-muted small">Ordenar</span>
+              <select class="form-select form-select-sm dir-control dir-sort" [value]="sortBy" (change)="setSort($any($event.target).value)">
+                <option value="area">Área</option>
+                <option value="nombre">Nombre</option>
+                <option value="ext">Extensión</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Acordeón de áreas -->
+          <div class="accordion dir-accordion" id="dirAccordion" *ngIf="!loading && !error && grouped.length > 0">
+            <div class="accordion-item dir-acc-item" *ngFor="let g of grouped; let i = index">
+              <h2 class="accordion-header" [id]="'heading'+i">
+                <button
+                  class="accordion-button dir-acc-btn"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapse'+i"
+                  [attr.aria-controls]="'collapse'+i"
+                  [attr.aria-expanded]="i === 0 ? 'true' : 'false'"
+                  [class.collapsed]="i !== 0"
+                >
+                  <div class="dir-acc-title">
+                    <div class="dir-acc-name">{{ g.area }}</div>
+                    <div class="dir-acc-meta">{{ g.items.length }} extensión(es)</div>
+                  </div>
+                </button>
+              </h2>
+
+              <div
+                [id]="'collapse'+i"
+                class="accordion-collapse collapse"
+                [class.show]="i === 0"
+                [attr.aria-labelledby]="'heading'+i"
+                data-bs-parent="#dirAccordion"
+              >
+                <div class="accordion-body dir-acc-body">
+                  <!-- “tabla” con grid: mismo HTML para móvil/desktop -->
+                  <div class="dir-grid">
+                    <div class="dir-grid__head">
+                      <div>Titular / Puesto</div>
+                      <div class="text-end">Extensión</div>
+                    </div>
+
+                    <div class="dir-row" *ngFor="let r of g.items">
+                      <div class="dir-row__left">
+                        <div class="dir-role">{{ r.puesto || r.areaDetalle || '—' }}</div>
+                        <div class="dir-person">{{ r.nombre || '—' }}</div>
+                      </div>
+
+                      <div class="dir-row__right">
+                        <span class="badge text-bg-dark dir-ext">{{ r.extension }}</span>
+                        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="copy(r.extension)">
+                          Copiar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Toast -->
+          <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+            <div class="toast text-bg-dark border-0 dir-toast" [class.show]="toast.show" role="alert">
+              <div class="d-flex">
+                <div class="toast-body">{{ toast.message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" aria-label="Close" (click)="toast.show=false"></button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </section>
+  </div>
+</main>
