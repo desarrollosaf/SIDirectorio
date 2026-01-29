@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -15,6 +15,11 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('dependencias')
+  getDependencias() {
+    return this.usersService.getdependencias();
   }
 
   @Get(':id')

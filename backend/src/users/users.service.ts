@@ -12,13 +12,22 @@ export class UsersService {
 
   async findAll() {
     // return `This action returns all users`;
-    const allUsers = await  prisma.users_safs.findMany();
+    const allUsers = await prisma.users_safs.findMany();
     const extesionesAll = await prismaDirectorio.extensiones.findMany();
     return JSON.parse(
-      JSON.stringify(extesionesAll, (_, value) =>
+      JSON.stringify(allUsers, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ),
     );
+  }
+
+  async getdependencias() {
+    return prisma.t_dependencia.findMany({
+      select: {
+        id_Dependencia: true,
+        Nombre: true,
+      },
+    });
   }
 
   findOne(id: number) {

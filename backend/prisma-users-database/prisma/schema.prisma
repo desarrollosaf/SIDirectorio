@@ -2867,19 +2867,20 @@ model s_reg_encuesta {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model s_users {
-  id       Int     @default(autoincrement())
-  username String? @db.VarChar(100)
-  password String? @db.VarChar(100)
-  salt     String? @db.VarChar(7)
-  email    String? @db.VarChar(50)
-  id_user  Int?
-  Level    String? @db.VarChar(100)
-  rango    Int?
-  cursoweb Int?
-  pass     Int?
+  id        Int        @id @default(autoincrement())
+  username  String?    @db.VarChar(100)
+  password  String?    @db.VarChar(100)
+  salt      String?    @db.VarChar(7)
+  email     String?    @db.VarChar(50)
+  id_user   Int?
+  Level     String?    @db.VarChar(100)
+  rango     Int?
+  cursoweb  Int?
+  pass      Int?
+  s_usuario s_usuario? @relation(fields: [id_user], references: [id_Usuario], map: "usuario_users")
 
   @@index([id], map: "id")
-  @@ignore
+  @@index([id_user], map: "usuario_users")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2900,7 +2901,7 @@ model s_users21 {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model s_usuario {
-  id_Usuario              Int       @default(autoincrement())
+  id_Usuario              Int       @id @default(autoincrement())
   N_Usuario               String?   @db.VarChar(100)
   id_Dependencia          Int?
   id_Direccion            Int?
@@ -2921,9 +2922,9 @@ model s_usuario {
   created_at              DateTime? @db.Timestamp(0)
   updated_at              DateTime? @db.Timestamp(0)
   deleted_at              DateTime? @db.Timestamp(0)
+  s_users                 s_users[]
 
   @@index([id_Usuario], map: "id_Usuario")
-  @@ignore
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -3461,53 +3462,55 @@ model t_ctrfolio {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model t_departamento {
-  id_Departamento Int      @default(autoincrement())
+  id_Departamento Int          @id @default(autoincrement())
   C_presupDepto   Int
-  Nombre          String   @db.VarChar(100)
+  Nombre          String       @db.VarChar(100)
   Creado          Int
-  F_Creacion      DateTime @db.Date
-  U_Modificacion  DateTime @db.Date
+  F_Creacion      DateTime     @db.Date
+  U_Modificacion  DateTime     @db.Date
   Estado          Int
   id_Dependencia  Int?
   id_Direccion    Int?
   c_presup        Int
-  nombre_completo String?  @db.VarChar(500)
-  nom_cap         String?  @db.LongText
+  nombre_completo String?      @db.VarChar(500)
+  nom_cap         String?      @db.LongText
+  t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], map: "fk_departamento_direccion")
 
   @@index([id_Departamento], map: "id_Departamento")
-  @@ignore
+  @@index([id_Direccion], map: "fk_departamento_direccion")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model t_dependencia {
-  id_Dependencia  Int
+  id_Dependencia  Int           @id @default(autoincrement())
   C_presupDep     Int
-  Nombre          String    @db.VarChar(100)
+  Nombre          String        @db.VarChar(100)
   Creado          Int
-  F_Creacion      DateTime  @db.Date
-  U_Modificacion  DateTime? @db.Date
+  F_Creacion      DateTime      @db.Date
+  U_Modificacion  DateTime?     @db.Date
   Estado          Int
   orden           Int?
-  nombre_completo String?   @db.VarChar(250)
-
-  @@ignore
+  nombre_completo String?       @db.VarChar(250)
+  t_direccion     t_direccion[]
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model t_direccion {
-  id_Direccion    Int      @default(autoincrement())
+  id_Direccion    Int              @id @default(autoincrement())
   C_presupDir     Int
-  Nombre          String   @db.VarChar(100)
-  F_Creacion      DateTime @db.Date
-  U_Modificacion  DateTime @db.Date
+  Nombre          String           @db.VarChar(100)
+  F_Creacion      DateTime         @db.Date
+  U_Modificacion  DateTime         @db.Date
   Estado          Int
   Creado          Int
   id_Dependencia  Int?
   c_presup        Int?
-  nombre_completo String?  @db.VarChar(250)
+  nombre_completo String?          @db.VarChar(250)
+  t_departamento  t_departamento[]
+  t_dependencia   t_dependencia?   @relation(fields: [id_Dependencia], references: [id_Dependencia], map: "fk_direccion_dependencia")
 
   @@index([id_Direccion], map: "id_Direccion")
-  @@ignore
+  @@index([id_Dependencia], map: "fk_direccion_dependencia")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
