@@ -2879,8 +2879,8 @@ model s_users {
   pass      Int?
   s_usuario s_usuario? @relation(fields: [id_user], references: [id_Usuario], map: "usuario_users")
 
-  @@index([id], map: "id")
   @@index([id_user], map: "usuario_users")
+  @@index([id], map: "id")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -3474,7 +3474,7 @@ model t_departamento {
   c_presup        Int
   nombre_completo String?      @db.VarChar(500)
   nom_cap         String?      @db.LongText
-  t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], map: "fk_departamento_direccion")
+  t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], onDelete: NoAction, map: "fk_departamento_direccion")
 
   @@index([id_Departamento], map: "id_Departamento")
   @@index([id_Direccion], map: "fk_departamento_direccion")
@@ -3507,7 +3507,7 @@ model t_direccion {
   c_presup        Int?
   nombre_completo String?          @db.VarChar(250)
   t_departamento  t_departamento[]
-  t_dependencia   t_dependencia?   @relation(fields: [id_Dependencia], references: [id_Dependencia], map: "fk_direccion_dependencia")
+  t_dependencia   t_dependencia?   @relation(fields: [id_Dependencia], references: [id_Dependencia], onDelete: NoAction, map: "fk_direccion_dependencia")
 
   @@index([id_Direccion], map: "id_Direccion")
   @@index([id_Dependencia], map: "fk_direccion_dependencia")
