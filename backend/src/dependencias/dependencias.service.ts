@@ -117,10 +117,10 @@ export class DependenciasService {
     const usuariosPorDepartamento = new Map<number, any[]>();
 
     usuarios.forEach(u => {
-      if (!u.id_Departamento) return; // 👈 evita null
+      if (!u.id_Departamento) return;
 
       const extension = extensionesMap.get(u.id_Usuario);
-      if (!extension) return; // solo usuarios con extensión
+      if (!extension) return;
 
       if (!usuariosPorDepartamento.has(u.id_Departamento)) {
         usuariosPorDepartamento.set(u.id_Departamento, []);
