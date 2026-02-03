@@ -19,11 +19,15 @@
   align-items:center;
   gap: 14px;
 }
-.dir-logo{
-  height: 34px;
-  width:auto;
-  object-fit: contain;
-  opacity: .92;
+.dir-logo {
+  width: 250px;  /* Ajusta el tamaño que necesites */
+  height: auto;  /* Mantiene la proporción */
+}
+
+/* O también puedes usar */
+.dir-logo {
+  max-width: 300px;
+  height: auto;
 }
 .dir-top-actions{
   display:flex;

@@ -17,7 +17,7 @@ model extensiones {
   servidor_publico_id   BigInt?      @db.UnsignedBigInt
   personal_operativo_id BigInt?      @db.UnsignedBigInt
   extension_privada     String?      @db.VarChar(255)
-  ubicaciones           ubicaciones? @relation(fields: [ubicacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "extensiones_ubicacion_id_foreign")
+  ubicaciones           ubicaciones? @relation(fields: [ubicacion_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "extensiones_ubicacion_id_foreign")
 
   @@index([ubicacion_id], map: "extensiones_ubicacion_id_foreign")
 }
@@ -94,7 +94,7 @@ model ubicaciones_dependencias {
   deleted_at     DateTime?   @db.Timestamp(0)
   created_at     DateTime?   @db.Timestamp(0)
   updated_at     DateTime?   @db.Timestamp(0)
-  ubicaciones    ubicaciones @relation(fields: [ubicacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ubicaciones_dependencias_ubicacion_id_foreign")
+  ubicaciones    ubicaciones @relation(fields: [ubicacion_id], references: [id], onUpdate: Restrict, map: "ubicaciones_dependencias_ubicacion_id_foreign")
 
   @@index([dependencia_id], map: "ubicaciones_dependencias_dependencia_id_index")
   @@index([ubicacion_id], map: "ubicaciones_dependencias_ubicacion_id_foreign")

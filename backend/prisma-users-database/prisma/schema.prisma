@@ -7,366 +7,6 @@ datasource db {
   provider = "mysql"
 }
 
-model A_entradas {
-  id          Int      @id
-  fecha       DateTime @db.Date
-  cb          String   @db.VarChar(20)
-  hora        DateTime @db.Time(0)
-  crequerida  Int
-  precio      Float    @db.Float
-  id_contrato Int
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model DI_participa {
-  id     Int     @db.UnsignedInt
-  codigo String? @db.VarChar(5)
-  valor  String? @db.VarChar(30)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model DI_tipo_institucion {
-  id     Int     @db.UnsignedInt
-  codigo String? @db.VarChar(5)
-  valor  String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model DS_generosp {
-  clave String @db.Text
-  valor String @db.Text
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model DS_tipoDocumento {
-  idDoc Int
-  clave String? @db.Text
-  valor String? @db.Text
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model DS_tipo_falta {
-  clave String @db.Text
-  valor String @db.Text
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model DS_tipo_sancion {
-  clave String @db.Text
-  valor String @db.Text
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model I_entradas {
-  id          Int
-  fecha       DateTime @db.Date
-  cb          String   @db.VarChar(20)
-  hora        DateTime @db.Time(0)
-  crequerida  Int
-  precio      Float    @db.Float
-  id_contrato Int
-  id_pedido   String   @db.VarChar(6)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model I_salidas {
-  id          Int
-  fecha       DateTime @db.Date
-  cb          String   @db.VarChar(20)
-  hora        DateTime @db.Time(0)
-  crequerida  Int
-  precio      Float    @db.Float
-  id_contrato Int
-  id_pedido   String   @db.VarChar(6)
-
-  @@ignore
-}
-
-model LXI_clima_laboral_resp {
-  ID         Int       @id @default(autoincrement()) @db.UnsignedInt
-  id_usuario Int?
-  fecha      DateTime? @db.Date
-}
-
-model LXI_clima_laboral_resp_2023 {
-  ID         Int       @id @default(autoincrement()) @db.UnsignedInt
-  id_usuario Int?
-  fecha      DateTime? @db.Date
-}
-
-model LXI_clima_laboral_resp_detail {
-  ID           Int     @id @default(autoincrement()) @db.UnsignedInt
-  id_preg      Int
-  id_respuesta Int?
-  respuesta    String? @db.VarChar(1)
-}
-
-model LXI_clima_laboral_resp_detail_2023 {
-  ID           Int     @id @default(autoincrement()) @db.UnsignedInt
-  id_preg      Int
-  id_respuesta Int?
-  respuesta    String? @db.VarChar(1)
-}
-
-model LXI_climalaboral_preguntas {
-  id               Int      @id
-  texto            String?  @db.VarChar(1000)
-  valA             String?  @db.Text
-  valB             String?  @db.Text
-  valC             String?  @db.Text
-  valD             String?  @db.Text
-  tipo_ponderacion Boolean?
-  id_factor        Int?
-}
-
-model LXI_climalaboral_preguntas_2023 {
-  id               Int      @id
-  texto            String?  @db.VarChar(1000)
-  valA             String?  @db.Text
-  valB             String?  @db.Text
-  valC             String?  @db.Text
-  valD             String?  @db.Text
-  tipo_ponderacion Boolean?
-  id_factor        Int?
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_clima_laboral_resp {
-  id         Int
-  id_usuario Int?
-  fecha      DateTime? @db.Date
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_clima_laboral_resp_detail {
-  id           Int     @db.UnsignedInt
-  id_preg      Int
-  id_respuesta Int?
-  respuesta    String? @db.VarChar(1)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_climalaboral_preguntas {
-  id               Int
-  texto            String?  @db.VarChar(1000)
-  valA             String?  @db.Text
-  valB             String?  @db.Text
-  valC             String?  @db.Text
-  valD             String?  @db.Text
-  tipo_ponderacion Boolean?
-  id_factor        Int?
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_factores {
-  id       Int
-  factores String @db.VarChar(100)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_genero_generales {
-  id                 Int
-  id_usuario         Int
-  sexo               Int?
-  edad               Int?
-  estado_civil       Int?
-  tiene_discapacidad Int?
-  antiguedad_poder   Int?
-  antiguedad_puesto  Int?
-  nivel_puesto       Int?
-  tipo_contratacion  Int?
-  fecha              DateTime @db.Date
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_genero_preguntas {
-  id               Int
-  texto            String?  @db.VarChar(1000)
-  valA             String?  @db.Text
-  valB             String?  @db.Text
-  valC             String?  @db.Text
-  valD             String?  @db.Text
-  tipo_ponderacion Boolean?
-  id_factor        Int?
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_genero_resp {
-  id         Int
-  id_usuario Int?
-  fecha      DateTime? @db.Date
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model LX_genero_resp_detail {
-  id           Int     @db.UnsignedInt
-  id_preg      Int
-  id_respuesta Int?
-  respuesta    String? @db.VarChar(1)
-
-  @@ignore
-}
-
-model QRCODE {
-  id          Int       @id @default(autoincrement())
-  RFC         String    @db.Text
-  Nombre      String    @db.Text
-  Direccion   String?   @db.Text
-  Adscripcion String?   @db.Text
-  Puesto      String    @db.Text
-  F_Alta      DateTime? @db.Date
-  C_Corta     String    @default("") @db.VarChar(45)
-  estatus     String    @db.Text
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model R_entrega {
-  id           Int
-  id_Usuario   Int
-  info         Int
-  rm           Int
-  personal     Int
-  uippe        Int
-  finanzas     Int
-  estado       Int
-  Random       String? @db.VarChar(9)
-  id_historial Int?
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model R_entrega2 {
-  id          Int
-  id_diputado Int
-  nombre      String @db.Text
-  tipo        String @db.Text
-  info        Int
-  rm          Int
-  personal    Int
-  uippe       Int
-  finanzas    Int
-  estado      Int
-
-  @@ignore
-}
-
-model Random {
-  Id        Int     @id @default(autoincrement())
-  Grupo     Int
-  Documento String? @db.VarChar(100)
-  Random    String  @db.VarChar(9)
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model ST_asuntosSAF {
-  fecha_r    DateTime @db.Date
-  fecha_d    DateTime @db.Date
-  fecha_a    DateTime @db.Date
-  folio      String   @db.VarChar(30)
-  referencia String   @db.VarChar(100)
-  turnado    String   @db.VarChar(100)
-  asunto     String   @db.VarChar(100)
-  comentario String   @db.VarChar(300)
-
-  @@ignore
-}
-
-model Visita_doc {
-  id             Int      @id @default(autoincrement())
-  id_usuario     Int
-  Fecha_Consulta DateTime @db.Date
-  Hora_Consulta  DateTime @db.Time(0)
-  Bandera        Int
-  Path           String   @db.VarChar(300)
-  Fdocumento     String?  @db.Text
-  Numenvio       String   @db.VarChar(15)
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Visita_docAD {
-  id             Int
-  id_usuario     String   @db.VarChar(13)
-  Fecha_Consulta DateTime @db.Date
-  Hora_Consulta  DateTime @db.Time(0)
-  Bandera        Int
-  Path           String   @db.VarChar(300)
-  Fdocumento     String?  @db.Text
-  Numenvio       String   @db.VarChar(15)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Visitas_gral {
-  id             Int
-  id_usuario     Int
-  Fecha_Consulta DateTime @db.Date
-  Hora_Consulta  DateTime @db.Time(0)
-  bandera        Int
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model XL_climaresp {
-  id      Int
-  RFC     String @db.VarChar(1000)
-  id_resp Int
-  respA   Int
-  respB   Int
-  respC   Int
-  respD   Int
-
-  @@ignore
-}
-
-model a_Areas {
-  id_area    Int     @id
-  nombreArea String? @db.VarChar(50)
-}
-
-model a_Comedor {
-  idComedor             Int     @id
-  claveArticulo         Int?
-  nombreArticulo        String? @db.VarChar(100)
-  unidadMedida          String? @db.VarChar(50)
-  puntoMaximo           Int?
-  puntoMinimo           Int?
-  puntoReOrden          Int?
-  ClasificacionArticulo Int?
-  existencia            Int?
-  naturalezaGasto       Int?
-}
-
 model a_adquisiciones {
   idAdqui         Int       @id
   folio           String?   @db.VarChar(50)
@@ -421,32 +61,15 @@ model a_adquisiciones {
   comentario      String?   @db.VarChar(200)
 }
 
-model a_bComedorTipo {
-  idBienComedor   Int     @id
-  TipoBien        String? @db.VarChar(50)
-  id_departamento Int?
-}
-
 model a_tipo {
   id_tipoAdqui Int     @id
   tipoAdqui    String? @db.VarChar(50)
-}
-
-model a_tiposMedida {
-  id_tipoMed   Int     @id
-  unidadMedida String? @db.VarChar(50)
 }
 
 model ad_series {
   idSerie      Int     @id
   serie        String? @db.Text
   departamento Int
-}
-
-model ad_subSeries {
-  idSubSerie Int     @id
-  subSerie   String? @db.Text
-  idSerie    Int
 }
 
 model adquisiciones {
@@ -537,34 +160,6 @@ model adquisiciones {
   comentario       String?   @db.VarChar(500)
 }
 
-model arpoleTicket {
-  id                       Int       @id @default(autoincrement())
-  idTicket                 String?   @db.VarChar(9)
-  lugar                    String?   @db.Text
-  piso                     String?   @db.VarChar(11)
-  email                    String?   @db.VarChar(50)
-  fechaSugerida            DateTime? @db.Date
-  horaSugerida             DateTime? @db.Time(0)
-  numeroAsistentes         String?   @db.Text
-  observaciones            String?   @db.Text
-  fechaRegistro            DateTime? @db.Date
-  horaRegistro             DateTime? @db.Time(0)
-  idUsuario                String?   @db.VarChar(11)
-  tipoTicket               Int?
-  flag                     Int?
-  hora_pausa               DateTime? @db.Time(0)
-  id_tecnico               String?   @db.Text
-  lugarConfirmado          String?   @db.Text
-  fechaConfirmada          DateTime? @db.Date
-  horaConfirmada           DateTime? @db.Time(0)
-  observacionesConfirmadas String?   @db.Text
-  horaConfirmadaRegistro   DateTime? @db.Time(0)
-  fechaConfirmadaRegistro  DateTime? @db.Date
-  tiempo_s                 Int?
-  observacionesFinales     String?   @db.Text
-  observacionesFormato     Int?
-}
-
 model autores {
   id_autor     Int     @id @default(autoincrement())
   tipo_autor   String? @db.VarChar(50)
@@ -602,18 +197,6 @@ model c_adeudo {
   Random            String?   @db.VarChar(9)
   nombreSolicitante String?   @db.Text
   rePersonal        Int
-}
-
-model c_adeudoDireccion {
-  id_direccion    Int     @id @db.UnsignedInt
-  id_usuario      Int?
-  cua             Int?
-  nombreDireccion String? @db.Text
-  rubro           String? @db.Text
-  iniciales       String? @db.Text
-  piso            Int?
-  Cargo           String? @db.Text
-  editCampos      String? @db.Text
 }
 
 model cat_puestos {
@@ -833,11 +416,6 @@ model edificios {
   @@ignore
 }
 
-model edificiosLegis {
-  idEdificio Int     @id @default(autoincrement())
-  direccion  String? @db.Text
-}
-
 model encargados {
   id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   usuario_id      BigInt?   @db.UnsignedBigInt
@@ -916,15 +494,6 @@ model eservice_detalle {
   id_detalle Int
   tipo       Int
   detalle    String @db.Text
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model eservice_detalle_RM {
-  id_detalle Int
-  tipo       Int?
-  detalle    String? @db.Text
 
   @@ignore
 }
@@ -1179,22 +748,6 @@ model estados {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model gta_adminPerson {
-  id          Int
-  user_s      String?   @db.VarChar(10)
-  rfc         String?   @db.VarChar(10)
-  user_tec    String?   @db.VarChar(10)
-  h_registro  DateTime? @db.Time(0)
-  f_registro  DateTime? @db.Date
-  descripcion String?   @db.LongText
-  h_inicio    DateTime? @db.Time(0)
-  id_servicio Int?
-  tiempo_s    DateTime? @db.Time(0)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model gta_caja_ahorro {
   id          Int
   user_s      String?   @db.VarChar(10)
@@ -1352,16 +905,6 @@ model gta_seguridad {
   h_inicio    DateTime? @db.Time(0)
   id_servicio Int?
   tiempo_s    DateTime? @db.Time(0)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model horasCitas {
-  idHoraCita Int
-  hora       DateTime? @db.Time(0)
-  estatus    Int?      @default(1)
-  fechaCita  DateTime  @db.Date
 
   @@ignore
 }
@@ -1527,17 +1070,6 @@ model lxleg_documentos {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model lxleg_temasVotacion {
-  idVotacion    Int
-  votacion      String?  @db.Text
-  temaVotacion  String?  @db.Text
-  status        Int?
-  fechaVotacion DateTime @db.Date
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model lxleg_users {
   id       Int
   username String?   @db.VarChar(100)
@@ -1653,32 +1185,6 @@ model nivel_gobierno {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_Documentos {
-  id_documentos          Int
-  id_servidor            Int?
-  R_INE1                 String? @db.VarChar(50)
-  R_INE2                 String? @db.VarChar(50)
-  R_cMedico              String? @db.VarChar(50)
-  R_curp                 String? @db.VarChar(50)
-  R_aNacimiento          String? @db.VarChar(50)
-  R_antecedentes         String? @db.VarChar(50)
-  R_cerEstudias          String? @db.VarChar(50)
-  R_comprobanteDomicilio String? @db.VarChar(50)
-  R_contratoB            String? @db.VarChar(50)
-  rfc_s                  String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_areaConocimiento {
-  id_areaCon       Int
-  areaConocimiento String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model p_colonias {
   id_colonia    Int
   nombreColonia String? @db.VarChar(50)
@@ -1745,45 +1251,6 @@ model p_escolaridad {
   IdiomaCertificado     Int?
   IdiomaTitulo          Int?
   IdiomaGrado           Int?
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_estadoCivil {
-  id_estadoCivil Int
-  estadoCivil    String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_experienciaEn {
-  idExperienciaEn Int
-  rfcS            String? @db.VarChar(50)
-  curpS           String? @db.VarChar(50)
-  administracion  Int?
-  economia        Int?
-  rPublicas       Int?
-  contabilidad    Int?
-  publicidad      Int?
-  otro            Int?
-  especifique     String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_experienciaLaboral {
-  idExperiencia    Int?
-  rfcS             String?   @db.VarChar(50)
-  curpS            String?   @db.VarChar(50)
-  lugarEmpleo      String?   @db.VarChar(50)
-  fechaInicio      DateTime? @db.Date
-  fechaFin         DateTime? @db.Date
-  cargo            String?   @db.VarChar(50)
-  motivoSeparacion String?   @db.VarChar(50)
-  telefonoContacto Int?
 
   @@ignore
 }
@@ -1870,22 +1337,6 @@ model p_servidores {
 model p_sexo {
   id_sexo Int
   sexo    String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_tipoContratacion {
-  id_tipoContrato Int
-  tipoContrato    String? @db.VarChar(50)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model p_tipoPlaza {
-  id_tipoPlaza Int
-  tipo         String? @db.VarChar(50)
 
   @@ignore
 }
@@ -1999,12 +1450,6 @@ model registro {
   otros         String   @db.VarChar(300)
 
   @@ignore
-}
-
-model remitentesArchivoD {
-  id     Int      @id @default(autoincrement())
-  nombre String?  @db.VarChar(50)
-  status Boolean? @default(true)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2244,25 +1689,6 @@ model s_cursos22_24 {
   updated_at DateTime? @db.DateTime(0)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model s_cursos22_RES {
-  id         Int
-  nombre     String    @db.Text
-  domicilio  String    @db.Text
-  tipo       Int
-  lugares    String    @db.Text
-  duracion   Int
-  hora       Int
-  f_inicio   DateTime  @db.Date
-  f_termino  DateTime  @db.Date
-  grupo      Int?
-  privado    Int?
-  instructor String?   @db.VarChar(100)
-  updated_at DateTime? @db.DateTime(0)
-
-  @@ignore
-}
-
 model s_cursos_t {
   id               Int     @id @default(autoincrement())
   nombre           String? @db.VarChar(100)
@@ -2274,16 +1700,6 @@ model s_cursos_t {
   calificacion     String? @db.VarChar(10)
   constancia       String? @db.VarChar(10)
   periodo          Int?
-}
-
-model s_datosGeneralesUsr {
-  id          Int       @id @default(autoincrement())
-  rfc_usuario String?   @db.VarChar(10)
-  celular     String?   @db.VarChar(10)
-  telefono    String?   @db.VarChar(10)
-  email       String?   @db.VarChar(50)
-  updated_at  DateTime? @db.DateTime(0)
-  created_at  DateTime? @db.DateTime(0)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2428,35 +1844,6 @@ model s_evaluacion2022 {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model s_evaluacionR {
-  id_eva          Int
-  id_usuario      Int?
-  id_evaluador    Int?
-  id_cuestionario Int?
-  id_ponderacion  Int?
-  c1              Int?
-  c2              Int?
-  c3              Int?
-  c4              Int?
-  c5              Int?
-  c6              Int?
-  c7              Int?
-  c8              Int?
-  c9              Int?
-  c10             Int?
-  c11             Int?
-  c12             Int?
-  c13             Int?
-  c14             Int?
-  promedio        Float?
-  fecha           DateTime? @db.Date
-  comentarios     String?   @db.VarChar(300)
-  compromisos     String?   @db.VarChar(250)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model s_evaluacion_2023 {
   id_eva          Int       @default(autoincrement())
   id_usuario      Int?
@@ -2554,22 +1941,6 @@ model s_incripcion21 {
   @@index([id], map: "id")
 }
 
-model s_incripcion21_Resp {
-  id          Int     @id @default(autoincrement())
-  id_usuario  String? @db.VarChar(13)
-  c_uno       Int?
-  c_uno_est   Int?
-  c_dos       Int?
-  c_dos_est   Int?
-  c_tres      Int?
-  c_tres_est  Int?
-  total_curso Int?
-  total_aprov Int?
-  Bandera     Int?
-
-  @@index([id], map: "id")
-}
-
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model s_incripcion22 {
   id          Int
@@ -2635,20 +2006,6 @@ model s_incripcion_dos21 {
   Bandera_dos Int?
   created_at  DateTime? @db.Timestamp(0)
   updated_at  DateTime? @db.Timestamp(0)
-}
-
-model s_incripcion_dos21_Resp {
-  id          Int  @id @default(autoincrement())
-  id_usuario  Int
-  c_uno       Int?
-  c_uno_est   Int?
-  c_dos       Int?
-  c_dos_est   Int?
-  c_tres      Int?
-  c_tres_est  Int?
-  total_curso Int?
-  total_aprov Int?
-  Bandera_dos Int?
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -3474,7 +2831,7 @@ model t_departamento {
   c_presup        Int
   nombre_completo String?      @db.VarChar(500)
   nom_cap         String?      @db.LongText
-  t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], onDelete: NoAction, map: "fk_departamento_direccion")
+  t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], onDelete: Restrict, map: "fk_departamento_direccion")
 
   @@index([id_Departamento], map: "id_Departamento")
   @@index([id_Direccion], map: "fk_departamento_direccion")
@@ -3507,7 +2864,7 @@ model t_direccion {
   c_presup        Int?
   nombre_completo String?          @db.VarChar(250)
   t_departamento  t_departamento[]
-  t_dependencia   t_dependencia?   @relation(fields: [id_Dependencia], references: [id_Dependencia], onDelete: NoAction, map: "fk_direccion_dependencia")
+  t_dependencia   t_dependencia?   @relation(fields: [id_Dependencia], references: [id_Dependencia], onDelete: Restrict, map: "fk_direccion_dependencia")
 
   @@index([id_Direccion], map: "id_Direccion")
   @@index([id_Dependencia], map: "fk_direccion_dependencia")
@@ -4017,6 +3374,2172 @@ model usuarios {
   Idusuario String  @db.VarChar(50)
   clave     String  @db.VarChar(75)
   estado    Boolean
+
+  @@ignore
+}
+
+model a_areas {
+  id_area    Int     @id
+  nombreArea String? @db.VarChar(50)
+}
+
+model a_bcomedortipo {
+  idBienComedor   Int     @id
+  TipoBien        String? @db.VarChar(50)
+  id_departamento Int?
+}
+
+model a_comedor {
+  idComedor             Int     @id
+  claveArticulo         Int?
+  nombreArticulo        String? @db.VarChar(100)
+  unidadMedida          String? @db.VarChar(50)
+  puntoMaximo           Int?
+  puntoMinimo           Int?
+  puntoReOrden          Int?
+  ClasificacionArticulo Int?
+  existencia            Int?
+  naturalezaGasto       Int?
+}
+
+model a_entradas {
+  id          Int      @id
+  fecha       DateTime @db.Date
+  cb          String   @db.VarChar(20)
+  hora        DateTime @db.Time(0)
+  crequerida  Int
+  precio      Float    @db.Float
+  id_contrato Int
+}
+
+model a_tiposmedida {
+  id_tipoMed   Int     @id
+  unidadMedida String? @db.VarChar(50)
+}
+
+model ad_subseries {
+  idSubSerie Int     @id
+  subSerie   String? @db.Text
+  idSerie    Int
+}
+
+model arpoleticket {
+  id                       Int       @id @default(autoincrement())
+  idTicket                 String?   @db.VarChar(9)
+  lugar                    String?   @db.Text
+  piso                     String?   @db.VarChar(11)
+  email                    String?   @db.VarChar(50)
+  fechaSugerida            DateTime? @db.Date
+  horaSugerida             DateTime? @db.Time(0)
+  numeroAsistentes         String?   @db.Text
+  observaciones            String?   @db.Text
+  fechaRegistro            DateTime? @db.Date
+  horaRegistro             DateTime? @db.Time(0)
+  idUsuario                String?   @db.VarChar(11)
+  tipoTicket               Int?
+  flag                     Int?
+  hora_pausa               DateTime? @db.Time(0)
+  id_tecnico               String?   @db.Text
+  lugarConfirmado          String?   @db.Text
+  fechaConfirmada          DateTime? @db.Date
+  horaConfirmada           DateTime? @db.Time(0)
+  observacionesConfirmadas String?   @db.Text
+  horaConfirmadaRegistro   DateTime? @db.Time(0)
+  fechaConfirmadaRegistro  DateTime? @db.Date
+  tiempo_s                 Int?
+  observacionesFinales     String?   @db.Text
+  observacionesFormato     Int?
+}
+
+model c_adeudodireccion {
+  id_direccion    Int     @id @db.UnsignedInt
+  id_usuario      Int?
+  cua             Int?
+  nombreDireccion String? @db.Text
+  rubro           String? @db.Text
+  iniciales       String? @db.Text
+  piso            Int?
+  Cargo           String? @db.Text
+  editCampos      String? @db.Text
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_actividadlaboral {
+  id    Int
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_afores {
+  id_afores Int
+  clave     String? @db.Text
+  valor     String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_ambitopublico {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_ambitopublicocut {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_ambitosector {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_ano {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_bancaria {
+  id_bancaria Int
+  clave       String? @db.Text
+  valor       String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_beneficiariosprogramapublico {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_documentoobtenido {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_entidades {
+  cve_agee String? @db.VarChar(255)
+  clave    String? @db.VarChar(255)
+  nom_agem String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_estatus {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_extranjero {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_fondosinversion {
+  id_fondoInversion Int
+  clave             String? @db.Text
+  valor             String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_formaadquisicion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_formapago {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_formarecepcion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_lugardondereside {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_mes {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_moneda {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_monedametales {
+  id_monedaMetaless Int
+  clave             String? @db.Text
+  valor             String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_motivobaja {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_municipios {
+  cve_agee String? @db.VarChar(255)
+  nom_agee String? @db.VarChar(255)
+  cve_agem String? @db.VarChar(255)
+  nom_agem String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_nacionalidades {
+  clave String @db.Text
+  valor String @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_nivel {
+  id    Int
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_nivelordengobierno {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_nivelordengobiernocut {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_organizacionesprivadas {
+  id_organizaciones Int
+  clave             String? @db.Text
+  valor             String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_paises {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_parentescorelacion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_preguntaseguridad {
+  clave Int
+  valor String? @db.VarChar(250)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_regimenmatrimonial {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_relacioncondeclarante {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_sector {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_seguros {
+  id_seguros Int
+  clave      String? @db.Text
+  valor      String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_situacionpersonalestadocivil {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_subtipoinversion {
+  tipoInversion String? @db.VarChar(255)
+  clave         String? @db.VarChar(255)
+  valor         String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoadeudo {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoapoyo {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipobeneficio {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipobienbienesmuebles {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipobienenajenacionbienes {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipofideicomiso {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoinmueble {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoinstitucion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoinstrumento {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoinversion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipomovimiento {
+  id    Int     @db.UnsignedInt
+  clave String? @db.Text
+  valor String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipooperacion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoparticipacion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipoparticipacionfideicomiso {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipopesona {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tiporelacion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tiporepresentacion {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_tipovehiculo {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_titular {
+  clave String? @db.VarChar(250)
+  valor String? @db.VarChar(250)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_titularbien {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_valorconformea {
+  clave String? @db.VarChar(255)
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model d_valoresbursatiles {
+  id_valoresBursatiles Int
+  clave                String? @db.Text
+  valor                String? @db.Text
+
+  @@ignore
+}
+
+model decl_adeudospasivo {
+  id_adeudosPasivo             Int       @id
+  folio                        Int?
+  titularAdeudo                String?   @db.Text
+  tipoAdeudo                   String?   @db.Text
+  otroTipoAdeudo               String?   @db.Text
+  numeroCuentaContrato         String?   @db.VarChar(16)
+  fechaAdquision               DateTime? @db.Date
+  montoOriginal                Int?
+  tipoMoneda                   String?   @db.Text
+  saldoInsolutoSituacionActual Int?
+  tipotercero                  String?   @db.Text
+  nombreTercero                String?   @db.Text
+  rfcTercero                   String?   @db.VarChar(13)
+  tipoOtorgante                String?   @db.Text
+  nombreOtorgante              String?   @db.Text
+  rfcOtorgante                 String?   @db.VarChar(13)
+  localizacionAdeudo           String?   @db.Text
+  entidadlocalizacionAdeudo    String?   @db.Text
+  paislocalizacionAdeudo       String?   @db.Text
+  aclaracionesObservaciones    String?   @db.Text
+  tipoMovimiento               String?   @db.Text
+  fecha                        DateTime? @db.Date
+  hora                         DateTime? @db.Time(0)
+}
+
+model decl_anioanterior {
+  id_anioAnterior          Int       @id @db.UnsignedInt
+  folio                    Int?
+  fechaRegistro            DateTime? @db.Date
+  TipoOperacion            String?   @db.Text
+  servidor_anio_anterior   String?   @db.Text
+  deSerPu_fecha_inicio     DateTime? @db.Date
+  deSerPu_fecha_conclusion DateTime? @db.Date
+  tipoMovimiento           String?   @db.Text
+  fecha                    DateTime? @db.Date
+  hora                     DateTime? @db.Time(0)
+}
+
+model decl_apoyosbeneficios {
+  id_apoyosBeneficios       Int       @id
+  folio                     Int?
+  tipoBeneficiario          String?   @db.Text
+  otroBeneficiario          String?   @db.Text
+  nombrePrograma            String?   @db.Text
+  institucionApoyo          String?   @db.Text
+  nivelOrdenGobierno        String?   @db.Text
+  tipoApoyo                 String?   @db.Text
+  otroApoyo                 String?   @db.Text
+  formaRecepcionApoyo       String?   @db.Text
+  montoApoyoMensual         Int?
+  especifiqueApoyo          String?   @db.Text
+  tipoMoneda                String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+}
+
+model decl_beneficiosprivados {
+  id_beneficiosPrivados     Int       @id
+  folio                     Int?
+  tipoBeneficio             String?   @db.Text
+  otroBeneficio             String?   @db.Text
+  beneficiario              String?   @db.Text
+  otroBeneficiario          String?   @db.Text
+  tipoPersona               String?   @db.Text
+  nombreRazonSocial         String?   @db.Text
+  rfc                       String?   @db.VarChar(10)
+  formaRecepcion            String?   @db.Text
+  especifiqueBeneficio      String?   @db.Text
+  montoMensualAproximado    Int?
+  tipoModena                String?   @db.Text
+  sector                    String?   @db.Text
+  otroSector                String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+}
+
+model decl_bienesinmuebles {
+  id_bienesInmuebles         Int       @id
+  folio                      Int?
+  tipoInmueble               String?   @db.Text
+  titular                    String?   @db.Text
+  bieni_especifica           String?   @db.Text
+  tercero                    String?   @db.Text
+  nombreTercero              String?   @db.Text
+  rfcTercero                 String?   @db.VarChar(13)
+  porcentajePropiedad        Int?
+  superficieTerreno          Int?
+  superficieConstruccion     Int?
+  formaAdquisicion           String?   @db.Text
+  formaPago                  String?   @db.Text
+  transmisor                 String?   @db.Text
+  nombreTransmisor           String?   @db.Text
+  rfcTransmisor              String?   @default("") @db.VarChar(13)
+  relacionConTitular         String?   @db.Text
+  valorAdquisicion           Int?
+  valorConforme              String?   @db.Text
+  tipoMoneda                 String?   @db.Text
+  FechaAdquisicionTransmisor DateTime? @db.Date
+  datosFolioRegistro         String?   @db.VarChar(25)
+  domicilio                  String?   @db.Text
+  calle                      String?   @db.Text
+  numeroExterior             String?   @db.VarChar(11)
+  numeroInterior             String?   @db.VarChar(11)
+  coloniaLocalidad           String?   @db.Text
+  municipioAlcaldia          String?   @db.Text
+  entidadFederativa          String?   @db.Text
+  codigoPostal               Int?
+  aclaracionesObservaciones  String?   @db.Text
+  tipoMovimiento             String?   @db.Text
+  fecha                      DateTime? @db.Date
+  hora                       DateTime? @db.Time(0)
+  motivoBaja                 String    @db.Text
+  bieni_especificaBaja       String    @db.Text
+}
+
+model decl_bienesmuebles {
+  id_bienesMuebles          Int       @id
+  folio                     Int?
+  titular                   String?   @db.Text
+  tipoBien                  String?   @db.Text
+  descripcionBien           String    @db.Text
+  tipoPersonaTra            String?   @db.Text
+  nombreRazonSocialTra      String?   @db.Text
+  rfcTra                    String?   @db.Text
+  relacion                  String?   @db.Text
+  relacionOtro              String    @db.Text
+  tipoPersonaTer            String?   @db.Text
+  nombreRazonSocialTer      String?   @db.Text
+  rfcTer                    String?   @db.Text
+  descripcionGeneralBien    String?   @db.Text
+  formaAdquisicion          String?   @db.Text
+  formaPago                 String?   @db.Text
+  valorAdquisicion          String?   @db.Text
+  fechaAdquisicion          DateTime? @db.Date
+  tipoMoneda                String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+  motivoBaja                String    @db.Text
+  bieni_especificaBaja      String    @db.Text
+}
+
+model decl_clientes {
+  id_clientes               Int       @id @db.UnsignedInt
+  folio                     Int?
+  actividadLucrativa        String?   @db.Text
+  titularActividadLucrativa String?   @db.Text
+  nombreEmpresa             String?   @db.Text
+  rfcEmpresa                String?   @db.VarChar(11)
+  tipoPersona               String?   @db.Text
+  nombreRazonSocial         String?   @db.VarChar(11)
+  rfcCliente                String?   @db.VarChar(11)
+  sector                    String?   @db.Text
+  montoAproximado           Int?
+  lugar                     String?   @db.Text
+  entidad                   String?   @db.Text
+  pais                      String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  otroSector                String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model decl_codecontrol {
+  id    Int     @id @db.UnsignedInt
+  clave String? @db.Text
+  valor Int?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model decl_codecontroluser {
+  id    Int     @id @db.UnsignedInt
+  clave String? @db.Text
+  valor Int?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model decl_codecontrolusermcg {
+  id    Int     @id @db.UnsignedInt
+  clave String? @db.Text
+  valor Int?
+}
+
+model decl_datoscurricularesdeclarante {
+  id_datosCurriculares          Int       @id
+  folio                         Int?
+  escolaridad_clave             String    @db.Text
+  institucionEducativa          String    @db.Text
+  institucionEducativaUbicacion String    @db.Text
+  carreraAreaConocimiento       String    @db.Text
+  estatus                       String    @db.Text
+  documentoObtenido             String    @db.Text
+  fechaObtencion                DateTime  @db.Date
+  aclaracionesObservaciones     String    @db.Text
+  tipoMovimiento                String?   @db.Text
+  fecha                         DateTime? @db.Date
+  hora                          DateTime? @db.Time(0)
+}
+
+model decl_datosempleocargocomision {
+  id_datosGenerales         Int       @id @db.UnsignedInt
+  folio                     Int?
+  nivelOrdenGobierno        String?   @db.Text
+  ambitoPublico             String?   @db.Text
+  nombreEntePublico         String?   @db.Text
+  areaAdscripcion           String?   @db.Text
+  empleoCargoComision       String?   @db.Text
+  contratadoPorHonorarios   String?   @db.Text
+  nivelEmpleoCargoComision  String?   @db.VarChar(11)
+  funcionPrincipal          String?   @db.Text
+  fechaTomaPosesion         DateTime? @db.Date
+  telefonoOficina           BigInt?
+  telefonoOficinaExtension  BigInt?
+  domicilio                 String?   @db.Text
+  calle                     String?   @db.Text
+  numeroExterior            String?   @db.Text
+  numeroInterior            String?   @db.Text
+  coloniaLocalidad          String?   @db.Text
+  municipioAlcaldia         String?   @db.Text
+  entidadFederativa         String?   @db.Text
+  codigoPostal              Int?
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+}
+
+model decl_datosgenerales {
+  id_datosGenerales                 Int       @id
+  folio                             Int?
+  idusuario                         String?   @db.VarChar(13)
+  numeroUsuario                     String?   @db.VarChar(13)
+  tipoMovimiento                    String?   @db.Text
+  fechaAlta                         DateTime? @db.Date
+  nombreCargo                       String?   @db.Text
+  nivelCargo                        String?   @db.Text
+  honorarios                        String?   @db.Text
+  adscripcion                       Int?
+  direccion                         Int?
+  departamentoUnidad                Int?
+  nombre                            String?   @db.Text
+  primerApellido                    String?   @db.Text
+  segundoApellido                   String?   @db.Text
+  curp                              String?   @default("") @db.VarChar(18)
+  rfc                               String?   @default("") @db.VarChar(10)
+  homoclave                         String?   @db.VarChar(3)
+  correoElectronicoInstitucional    String?   @default("") @db.VarChar(50)
+  correoElectronicoPersonal         String?   @db.VarChar(50)
+  telefonoCasa                      BigInt?
+  celularPersonal                   BigInt?
+  situacionPersonalEstadoCivilClave String?   @db.Text
+  regimenMatrimonialClave           String?   @db.Text
+  otroRegimen                       String?   @db.Text
+  paisNacimiento                    String?   @db.Text
+  nacionalidad                      String?   @db.Text
+  aclaracionesObservaciones         String?   @db.Text
+  tipoEnvio                         Int?
+  fechaEnvio                        DateTime? @db.Date
+  tipoOperacion                     String?   @db.Text
+  fecha                             DateTime? @db.Date
+  hora                              DateTime? @db.Time(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_datosgenerales_2 {
+  id_datosGenerales                 Int
+  folio                             Int?
+  idusuario                         String?   @db.VarChar(13)
+  numeroUsuario                     String?   @db.VarChar(13)
+  tipoMovimiento                    String?   @db.Text
+  fechaAlta                         DateTime? @db.Date
+  nombreCargo                       String?   @db.Text
+  nivelCargo                        String?   @db.Text
+  honorarios                        String?   @db.Text
+  adscripcion                       Int?
+  direccion                         Int?
+  departamentoUnidad                Int?
+  nombre                            String?   @db.Text
+  primerApellido                    String?   @db.Text
+  segundoApellido                   String?   @db.Text
+  curp                              String?   @default("") @db.VarChar(18)
+  rfc                               String?   @default("") @db.VarChar(10)
+  homoclave                         String?   @db.VarChar(3)
+  correoElectronicoInstitucional    String?   @default("") @db.VarChar(50)
+  correoElectronicoPersonal         String?   @db.VarChar(50)
+  telefonoCasa                      BigInt?
+  celularPersonal                   BigInt?
+  situacionPersonalEstadoCivilClave String?   @db.Text
+  regimenMatrimonialClave           String?   @db.Text
+  otroRegimen                       String?   @db.Text
+  paisNacimiento                    String?   @db.Text
+  nacionalidad                      String?   @db.Text
+  aclaracionesObservaciones         String?   @db.Text
+  tipoEnvio                         Int?
+  fechaEnvio                        DateTime? @db.Date
+
+  @@map("decl_datosgenerales 2")
+  @@ignore
+}
+
+model decl_datosgeneralesad {
+  id_datosGenerales Int     @id
+  folio             Int?
+  idusuario         String? @db.VarChar(13)
+  numeroUsuario     String? @db.VarChar(13)
+  nombre            String? @db.Text
+  primerApellido    String? @db.Text
+  segundoApellido   String? @db.Text
+  nombreDireccion   String? @db.Text
+  id_Dependencia    Int
+  id_Direccion      Int
+  id_Departamento   Int
+  Estado            Int
+  rango             Int
+  clpr              Int
+  showAll           Int
+  C_Electronico     String  @db.VarChar(150)
+  f_reenvio         Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_datosgeneralessancionados {
+  id_datosGenerales Int
+  folio             Int?
+  idusuario         String? @db.VarChar(13)
+  numeroUsuario     String? @db.VarChar(13)
+  nombre            String? @db.Text
+  primerApellido    String? @db.Text
+  segundoApellido   String? @db.Text
+  nombreDireccion   String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_datospareja {
+  id_datosPareja                  Int
+  folio                           Int?
+  nombre                          String?   @db.Text
+  primerApellido                  String?   @db.Text
+  segundoApellido                 String?   @db.Text
+  fechaNacimiento                 DateTime? @db.Date
+  rfc                             String?   @db.VarChar(13)
+  relacionConDeclarante           String?   @db.Text
+  ciudadanoExtranjero             String?   @db.Text
+  curp                            String?   @db.VarChar(18)
+  dependienteEconomico            String?   @db.Text
+  habitaDomicilioDeclarante       String?   @db.Text
+  lugarDondeReside                String?   @db.Text
+  domicilio                       String?   @db.Text
+  calle                           String?   @db.Text
+  numeroExterior                  String?   @db.VarChar(11)
+  numeriInterior                  String?   @db.VarChar(11)
+  coloniaLocalidad                String?   @db.Text
+  municipioAlcaldia               String?   @db.Text
+  entidadFederativa               String?   @db.Text
+  pais                            String?   @db.Text
+  estadoProvincia                 String?   @db.Text
+  codigoPostal                    Int?
+  actividadLaboral                String?   @db.Text
+  nivelOrdenGobierno              String?   @db.Text
+  ambitoPublico                   String?   @db.Text
+  nombreEntePublico               String?   @db.Text
+  areaAdscripcion                 String?   @db.Text
+  empleoCargoComisionPub          String?   @db.Text
+  funcionPrincipal                String?   @db.Text
+  salarioMensualNetoPub           Int?
+  fechaIngresoPub                 DateTime? @db.Date
+  nombreEmpresaSociedadAsociacion String?   @db.Text
+  empleoCargoComision             String?   @db.Text
+  rfcEmpresaSociedadAsociacion    String?   @db.VarChar(13)
+  fechaIngresoPriv                DateTime? @db.Date
+  sector                          String?   @db.Text
+  otro                            String?   @db.Text
+  salarioMensualNetoPriv          Int?
+  proveedorContratistaGobierto    String?   @db.Text
+  aclaracionesObservaciones       String?   @db.Text
+  tipoMovimiento                  String?   @db.Text
+  fecha                           DateTime? @db.Date
+  hora                            DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_dependienteseconomicos {
+  id_dependientesEconimicos    Int
+  folio                        Int?
+  nombre                       String?   @db.Text
+  primerApellido               String?   @db.Text
+  segundoApellido              String?   @db.Text
+  fechaNacimiento              String?   @db.Text
+  rfc                          String?   @db.VarChar(13)
+  parentescoDeclarante         String?   @db.Text
+  parentezcoOtro               String?   @db.Text
+  ciudadanoExtranjero          String?   @db.Text
+  curp                         String?   @db.VarChar(18)
+  habitaDomicilioDeclarante    String?   @db.Text
+  lugarReside                  String?   @db.Text
+  calle                        String?   @db.Text
+  numExterior                  Int?
+  numInterior                  String?   @db.Text
+  coloniaLocalidad             String?   @db.Text
+  municipioAlcaldia            String?   @db.Text
+  entidadFederativa            String?   @db.Text
+  codigoPostal                 String?   @db.Text
+  actividadLaboral             String?   @db.Text
+  nombreEmpresa                String?   @db.Text
+  rfcEmpresaSociedadAsociacion String?   @db.VarChar(13)
+  empleoCargo                  String?   @db.Text
+  fechaIngresoPriv             DateTime? @db.Date
+  sectorPertenece              String?   @db.Text
+  sectorOtro                   String?   @db.Text
+  salarioMensualNetoPriv       Int?
+  proveedorContratista         String?   @db.Text
+  nivelOrdenGobierno           String?   @db.Text
+  ambitoPublico                String?   @db.Text
+  nombreEntePublico            String?   @db.Text
+  areaAdscripcion              String?   @db.Text
+  empleoCargoComision          String?   @db.Text
+  funcionPrincipal             String?   @db.Text
+  salarioMensualNetoPub        Int?
+  fechaIngresoPub              DateTime? @db.Date
+  aclaracionesObservaciones    String?   @db.Text
+  otroSectorLaboral            String?   @db.Text
+  tipoMovimiento               String?   @db.Text
+  fecha                        DateTime? @db.Date
+  hora                         DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_domiciliodeclarante {
+  id_datosGenerales         Int
+  folio                     Int?
+  domicilio                 String?   @db.Text
+  calle                     String?   @default("") @db.VarChar(250)
+  numeroExterior            String?   @default("") @db.VarChar(5)
+  numeroInterior            String?   @default("") @db.VarChar(5)
+  coloniaLocalidad          String?   @db.Text
+  municipioAlcaldia         String?   @default("") @db.VarChar(11)
+  entidadFederativa         String?   @default("") @db.VarChar(11)
+  codigoPostal              Int?
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_experiencialaboral {
+  id_experienciaLaboral               Int       @db.UnsignedInt
+  folio                               Int?
+  ambitoSector                        String    @db.Text
+  nivelOrdenGobierno                  String    @db.Text
+  ambitoPublico                       String    @db.Text
+  nombreEntePublico                   String    @db.Text
+  areaAdscripcion                     String    @db.Text
+  empleoCargoComision                 String    @db.Text
+  funcionPrincipal                    String    @db.Text
+  fechaIngreso_pu                     DateTime  @db.Date
+  fechaEgreso_pu                      DateTime  @db.Date
+  ubicacion_pu                        String    @db.Text
+  nombreEmpresaSociedadAsociacion_pri String    @db.Text
+  rfc                                 String    @default("") @db.VarChar(12)
+  area                                String    @db.Text
+  puesto                              String    @db.Text
+  sector                              String    @db.Text
+  otro                                String?   @db.Text
+  fechaIngreso_pri                    DateTime  @db.Date
+  fechaEgreso_pri                     DateTime  @db.Date
+  ubicacion_pri                       String    @db.Text
+  aclaracionesObservaciones           String    @db.Text
+  tipoMovimiento                      String?   @db.Text
+  fecha                               DateTime? @db.Date
+  hora                                DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_fideicomisos {
+  id_fideicomiso                  Int
+  folio                           Int?
+  fechaRegistro                   DateTime? @db.Date
+  tipoOperacion                   String?   @db.Text
+  tipoRelacion                    String?   @db.Text
+  tipoFideicomiso                 String?   @db.Text
+  tipoParticipacion               String?   @db.Text
+  tipoPersonaFideicomiso          String?   @db.Text
+  rfcFideicomiso                  String?   @db.Text
+  nombreRazonSocialFideicomiso    String?   @db.Text
+  tipoPersonaFideicomitente       String?   @db.Text
+  rfcFideicomitente               String?   @db.Text
+  nombreRazonSocialFideicomitente String?   @db.Text
+  tipoPersonaFiduciario           String?   @db.Text
+  rfcFiduciario                   String?   @db.Text
+  nombreRazonSocialFiduciario     String?   @db.Text
+  tipoPersonaFideicomisario       String?   @db.Text
+  rfcFideicomisario               String?   @db.Text
+  nombreRazonSocialFideicomisario String?   @db.Text
+  sector                          String?   @db.Text
+  otro_sector                     String?   @db.Text
+  extranjero                      String?   @db.Text
+  entidad                         String?   @db.Text
+  pais                            String?   @db.Text
+  aclaracionesObservaciones       String?   @db.Text
+  tipoMovimiento                  String?   @db.Text
+  fecha                           DateTime? @db.Date
+  hora                            DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_ingresos {
+  id_ingresos                            Int
+  folio                                  Int?
+  remuneracionMensualCargoPublico        Int?
+  otrosIngresosMensualesTotal            Int?
+  actividadIndustialComercialEmpresarial Int?
+  tipoNegocio                            String? @db.Text
+  actividadFinanciera                    String? @db.Text
+  tipoInstrumento                        String? @db.Text
+  serviciosProfesionales                 String? @db.Text
+  tipoServicio                           String? @db.Text
+  otrosIngresos                          Int?
+  tipoIngreso                            String? @db.Text
+  ingresoMensualNetoDeclarante           Int?
+  ingresoMensualNetoParejaDependiente    Int?
+  totalIngresosAnualesNetos              Int?
+  aclaracionesObservaciones              String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_ingresosnetos {
+  id_ingreso                              Int
+  folio                                   Int?
+  remuneracionMensualCargoPublico         Int?
+  actividadIndustrialComercialEmpresarial Int?
+  nombreRazonSocialIndustrial             String?   @db.Text
+  tipoNegocioIndustrial                   String?   @db.Text
+  actividadFinanciera                     Int?
+  tipoInstrumento                         String?   @db.Text
+  serviciosProfesionales                  Int?
+  tipoServicioProfesional                 String?   @db.Text
+  otrosIngresos                           Int?
+  tipoIngresoOtros                        String?   @db.Text
+  ingresoMensualNetoDeclarante            Int?
+  otrosIngresosMensualesTotal             Int?
+  ingresoMensualNEtoParejaDependiente     Int?
+  totalIngresosMensualNetos               Int?
+  aclaracionesObservaciones               String?   @db.Text
+  tipoMovimiento                          String?   @db.Text
+  fecha                                   DateTime? @db.Date
+  hora                                    DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_intereses {
+  id_intereses  Int       @db.UnsignedInt
+  folio         Int?
+  fechaRegistro DateTime? @db.Date
+  tipoOperacion String?   @db.Text
+  intereses     String?   @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_inversiones {
+  id_inversiones            Int
+  fechaRegistro             DateTime? @db.Date
+  folio                     Int?
+  tipoOperacion             String?   @db.Text
+  tipoInversion             String?   @db.Text
+  subTipoInversion          String?   @db.Text
+  titular                   String?   @db.Text
+  tipoPersonaTer            String?   @db.Text
+  nombreRazonSocialTer      String?   @db.Text
+  rfcTer                    String?   @db.Text
+  numeroCuentaContrato      String?   @db.Text
+  paisInversion             String?   @db.Text
+  institucionRazonSocial    String?   @db.Text
+  rfcInstitucion            String?   @db.Text
+  saldoSituacionActual      Int?
+  tipoMoneda                String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  pais                      String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_leveluser {
+  id_level Int     @db.UnsignedInt
+  clave    Int?
+  valor    String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_loginusuer {
+  id             Int
+  idUsuario      String @default("") @db.VarChar(13)
+  password       String @db.VarChar(100)
+  complemento    Bytes  @default(dbgenerated()) @db.Binary(20)
+  nivel          String @default("") @db.VarChar(100)
+  cambioPassword Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_loginusuer_reg {
+  id             Int
+  idUsuario      String @default("") @db.VarChar(13)
+  password       String @db.VarChar(100)
+  complemento    Bytes  @default(dbgenerated()) @db.Binary(20)
+  nivel          String @default("") @db.VarChar(100)
+  cambioPassword Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_loginusuerad {
+  id             Int
+  idUsuario      String @default("") @db.VarChar(13)
+  password       String @db.VarChar(100)
+  complemento    Bytes  @default(dbgenerated()) @db.Binary(20)
+  nivel          String @default("") @db.VarChar(100)
+  direccion      String @db.VarChar(10)
+  cambioPassword Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_loginusuermcg {
+  id             Int
+  idUsuario      String @default("") @db.VarChar(13)
+  password       String @db.VarChar(100)
+  complemento    Bytes  @default(dbgenerated()) @db.Binary(20)
+  nivel          String @default("") @db.VarChar(100)
+  cambioPassword Int
+  estado         Int?
+  folio          Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_loginusuersancionados {
+  id             Int
+  idUsuario      String @default("") @db.VarChar(13)
+  password       String @db.VarChar(100)
+  complemento    Bytes  @default(dbgenerated()) @db.Binary(20)
+  nivel          String @default("") @db.VarChar(100)
+  direccion      String @db.VarChar(10)
+  cambioPassword Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_participacion {
+  id_participacion                Int
+  folio                           Int?
+  datosParticipacionEmp           String?   @db.Text
+  nombreEmpresaSociedadAsociacion String?   @db.VarChar(100)
+  rfcparticipacion                String?   @db.VarChar(13)
+  porcentajeParticipacion         Int?
+  tipoParticipacion               String?   @db.Text
+  otroParticipacion               String?   @db.Text
+  recibeRemuneracion              String?   @db.Text
+  montoMensual                    Int?
+  lugarRegistro                   String?   @db.Text
+  lugarUbicaEntidadFederativa     String?   @db.VarChar(20)
+  lugarUbicaPais                  String?   @db.Text
+  sector                          String?   @db.Text
+  otroSector                      String?   @db.Text
+  aclaracionesObservaciones       String?   @db.Text
+  tipoMovimiento                  String?   @db.Text
+  fecha                           DateTime? @db.Date
+  hora                            DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_prestamoocomodato {
+  id_prestamo                Int
+  folio                      Int?
+  fechaRegistro              DateTime? @db.Date
+  tipoOperacion              String?   @db.Text
+  tipoBien                   String?   @db.Text
+  tipoInmueble               String?   @db.Text
+  otroTipoInmueble           String?   @db.Text
+  ubicacionInmueble          String?   @db.Text
+  domicilioCalle             String?   @db.Text
+  domicilioNumeroExterior    String?   @db.Text
+  domicilioNumeroInterior    String?   @db.Text
+  domicilioColoniaLocalidad  String?   @db.Text
+  domicilioMunicipioAlcaldia String?   @db.Text
+  domicilioEntidadFederativa String?   @db.Text
+  domicilioCodigoPostal      String?   @db.Text
+  domicilioCiudadLocalidad   String?   @db.Text
+  domicilioEstadoProvincia   String?   @db.Text
+  domicilioPais              String?   @db.Text
+  vTipo                      String?   @db.Text
+  vMarca                     String?   @db.Text
+  vModelo                    String?   @db.Text
+  vAnio                      String?   @db.Text
+  vNumeroSerieRegistro       String?   @db.Text
+  vLugarRegistro             String?   @db.Text
+  vPais                      String?   @db.Text
+  vEntidadFederativa         String?   @db.Text
+  duenoTitular               String?   @db.Text
+  tipoDuenoTitular           String?   @db.Text
+  nombreTitular              String?   @db.Text
+  rfcTitular                 String?   @db.Text
+  relacionConTitular         String?   @db.Text
+  aclaracionesObservaciones  String?   @db.Text
+  tipoMovimiento             String?   @db.Text
+  fecha                      DateTime? @db.Date
+  hora                       DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_registrodeclarante {
+  id_registroDeclarante Int
+  rfc                   String? @db.VarChar(13)
+  curp                  String? @db.VarChar(18)
+  nombre                String? @db.Text
+  primerApellido        String? @db.Text
+  segundoApellido       String? @db.Text
+  correoElectronico     String? @db.VarChar(250)
+  contrasena            String? @db.VarChar(25)
+  c_contrasena          String? @db.VarChar(25)
+  pregunta              Int?
+  respuesta             String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_registrousuario {
+  id_registro     Int     @db.UnsignedInt
+  folio           Int?
+  curp            String? @db.VarChar(11)
+  rfc             String? @db.VarChar(11)
+  homoclave       String? @db.VarChar(11)
+  nombre          String? @db.Text
+  primerApellido  String? @db.Text
+  segundoApellido String? @db.Text
+  correo          String? @default("") @db.VarChar(80)
+  password        String? @db.Text
+  pregunta        String? @db.Text
+  respuesta       String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_representacion {
+  id_representacion         Int
+  folio                     Int?
+  tipoRelacion              String?   @db.Text
+  tipoRepresentacion        String?   @db.Text
+  fechaInicioRepresentacion DateTime? @db.Date
+  tipoPersona               String?   @db.Text
+  nombreRazonSocial         String?   @db.Text
+  rfc                       String?   @db.VarChar(13)
+  recibeRemuneracion        String?   @db.Text
+  montoMensual              Int?
+  lugarDondeUbica           String?   @db.Text
+  entidadFederativa         String?   @db.Text
+  pais                      String?   @db.Text
+  sector                    String?   @db.Text
+  otroSector                String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_solcambio {
+  id              Int     @db.UnsignedInt
+  nombre          String? @db.Text
+  primerApellido  String? @db.Text
+  segundoApellido String? @db.Text
+  profesion       String? @db.Text
+  cargo           String? @db.Text
+  dependencia     Int?
+  estado          Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_tomadecisiones {
+  id_tomaDecisiones         Int
+  folio                     Int?
+  tipoRelacion              String?   @db.Text
+  tipoInstitucion           String?   @db.Text
+  otroTipoInstitucion       String?   @db.Text
+  nombreInstitucion         String?   @db.Text
+  rfc                       String?   @db.VarChar(13)
+  puestoRol                 String?   @db.Text
+  fechaInicioParticipacion  DateTime? @db.Date
+  remuneracion              String?   @db.Text
+  montoMensualNeto          Int?
+  lugarDondeUbica           String?   @db.Text
+  entidadFederativa         String?   @db.Text
+  pais                      String?   @db.Text
+  aclaracionesObservaciones String?   @db.Text
+  tipoMovimiento            String?   @db.Text
+  fecha                     DateTime? @db.Date
+  hora                      DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_transancciones {
+  id_transacciones Int?
+  tabla            String?   @db.VarChar(100)
+  pk               String?   @db.VarChar(1000)
+  campo            String?   @db.VarChar(250)
+  valorOriginal    String?   @db.VarChar(1000)
+  valorNuevo       String?   @db.VarChar(1000)
+  fechaTrn         DateTime? @db.DateTime(0)
+  usuario          String?   @db.VarChar(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_usermcg {
+  id_user         Int       @db.UnsignedInt
+  folio           Int?
+  fechaRegistro   DateTime? @db.Date
+  adscripcion     Int?
+  nombre          String?   @db.Text
+  primerApellido  String?   @db.Text
+  segundoApellido String?   @db.Text
+  nombreUsuario   String?   @db.Text
+  estado          Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model decl_vehiculos {
+  id_vehiculos                   Int
+  folio                          Int?
+  tipoVehiculo                   String?   @db.Text
+  otroTipoVehiculo               String?   @db.Text
+  titular                        String?   @db.Text
+  tipoPersonaTercero             String?   @db.Text
+  nombreTercero                  String?   @db.Text
+  rfcTercero                     String?   @db.VarChar(13)
+  transmisor                     String?   @db.Text
+  nombreTransmisor               String?   @db.Text
+  rfcTransmisor                  String?   @db.VarChar(13)
+  relaciondelTransmisor          String?   @db.Text
+  marca                          String?   @db.Text
+  modelo                         String?   @db.Text
+  anio                           String?   @db.Text
+  numeroSerieRegistro            String?   @db.VarChar(20)
+  lugarRegistro                  String?   @db.Text
+  lugarRegistroEntidadFederativa String?   @db.VarChar(20)
+  lugarRegistroPais              String?   @db.Text
+  formaAdquisicion               String?   @db.Text
+  formaPago                      String?   @db.Text
+  valorAdquisicion               Int?
+  tipoMoneda                     String?   @db.Text
+  FechaAdquisicion               DateTime? @db.Date
+  aclaracionesObservaciones      String?   @db.Text
+  fechaRegistro                  DateTime? @db.Date
+  tipoMovimiento                 String?   @db.Text
+  fecha                          DateTime? @db.Date
+  hora                           DateTime? @db.Time(0)
+  motivoBaja                     String    @db.Text
+  bieni_especificaBaja           String    @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model di_participa {
+  id     Int     @db.UnsignedInt
+  codigo String? @db.VarChar(5)
+  valor  String? @db.VarChar(30)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model di_tipo_institucion {
+  id     Int     @db.UnsignedInt
+  codigo String? @db.VarChar(5)
+  valor  String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ds_generosp {
+  clave String @db.Text
+  valor String @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ds_tipo_falta {
+  clave String @db.Text
+  valor String @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ds_tipo_sancion {
+  clave String @db.Text
+  valor String @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ds_tipodocumento {
+  idDoc Int
+  clave String? @db.Text
+  valor String? @db.Text
+
+  @@ignore
+}
+
+model edificioslegis {
+  idEdificio Int     @id @default(autoincrement())
+  direccion  String? @db.Text
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model eservice_detalle_rm {
+  id_detalle Int
+  tipo       Int?
+  detalle    String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model gta_adminperson {
+  id          Int
+  user_s      String?   @db.VarChar(10)
+  rfc         String?   @db.VarChar(10)
+  user_tec    String?   @db.VarChar(10)
+  h_registro  DateTime? @db.Time(0)
+  f_registro  DateTime? @db.Date
+  descripcion String?   @db.LongText
+  h_inicio    DateTime? @db.Time(0)
+  id_servicio Int?
+  tiempo_s    DateTime? @db.Time(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model horascitas {
+  idHoraCita Int
+  hora       DateTime? @db.Time(0)
+  estatus    Int?      @default(1)
+  fechaCita  DateTime  @db.Date
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model i_entradas {
+  id          Int
+  fecha       DateTime @db.Date
+  cb          String   @db.VarChar(20)
+  hora        DateTime @db.Time(0)
+  crequerida  Int
+  precio      Float    @db.Float
+  id_contrato Int
+  id_pedido   String   @db.VarChar(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model i_salidas {
+  id          Int
+  fecha       DateTime @db.Date
+  cb          String   @db.VarChar(20)
+  hora        DateTime @db.Time(0)
+  crequerida  Int
+  precio      Float    @db.Float
+  id_contrato Int
+  id_pedido   String   @db.VarChar(6)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_clima_laboral_resp {
+  id         Int
+  id_usuario Int?
+  fecha      DateTime? @db.Date
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_clima_laboral_resp_detail {
+  id           Int     @db.UnsignedInt
+  id_preg      Int
+  id_respuesta Int?
+  respuesta    String? @db.VarChar(1)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_climalaboral_preguntas {
+  id               Int
+  texto            String?  @db.VarChar(1000)
+  valA             String?  @db.Text
+  valB             String?  @db.Text
+  valC             String?  @db.Text
+  valD             String?  @db.Text
+  tipo_ponderacion Boolean?
+  id_factor        Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_factores {
+  id       Int
+  factores String @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_genero_generales {
+  id                 Int
+  id_usuario         Int
+  sexo               Int?
+  edad               Int?
+  estado_civil       Int?
+  tiene_discapacidad Int?
+  antiguedad_poder   Int?
+  antiguedad_puesto  Int?
+  nivel_puesto       Int?
+  tipo_contratacion  Int?
+  fecha              DateTime @db.Date
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_genero_preguntas {
+  id               Int
+  texto            String?  @db.VarChar(1000)
+  valA             String?  @db.Text
+  valB             String?  @db.Text
+  valC             String?  @db.Text
+  valD             String?  @db.Text
+  tipo_ponderacion Boolean?
+  id_factor        Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_genero_resp {
+  id         Int
+  id_usuario Int?
+  fecha      DateTime? @db.Date
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lx_genero_resp_detail {
+  id           Int     @db.UnsignedInt
+  id_preg      Int
+  id_respuesta Int?
+  respuesta    String? @db.VarChar(1)
+
+  @@ignore
+}
+
+model lxi_clima_laboral_resp {
+  ID         Int       @id @default(autoincrement()) @db.UnsignedInt
+  id_usuario Int?
+  fecha      DateTime? @db.Date
+}
+
+model lxi_clima_laboral_resp_2023 {
+  ID         Int       @id @default(autoincrement()) @db.UnsignedInt
+  id_usuario Int?
+  fecha      DateTime? @db.Date
+}
+
+model lxi_clima_laboral_resp_detail {
+  ID           Int     @id @default(autoincrement()) @db.UnsignedInt
+  id_preg      Int
+  id_respuesta Int?
+  respuesta    String? @db.VarChar(1)
+}
+
+model lxi_clima_laboral_resp_detail_2023 {
+  ID           Int     @id @default(autoincrement()) @db.UnsignedInt
+  id_preg      Int
+  id_respuesta Int?
+  respuesta    String? @db.VarChar(1)
+}
+
+model lxi_climalaboral_preguntas {
+  id               Int      @id
+  texto            String?  @db.VarChar(1000)
+  valA             String?  @db.Text
+  valB             String?  @db.Text
+  valC             String?  @db.Text
+  valD             String?  @db.Text
+  tipo_ponderacion Boolean?
+  id_factor        Int?
+}
+
+model lxi_climalaboral_preguntas_2023 {
+  id               Int      @id
+  texto            String?  @db.VarChar(1000)
+  valA             String?  @db.Text
+  valB             String?  @db.Text
+  valC             String?  @db.Text
+  valD             String?  @db.Text
+  tipo_ponderacion Boolean?
+  id_factor        Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lxleg_temasvotacion {
+  idVotacion    Int
+  votacion      String?  @db.Text
+  temaVotacion  String?  @db.Text
+  status        Int?
+  fechaVotacion DateTime @db.Date
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_areaconocimiento {
+  id_areaCon       Int
+  areaConocimiento String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_documentos {
+  id_documentos          Int
+  id_servidor            Int?
+  R_INE1                 String? @db.VarChar(50)
+  R_INE2                 String? @db.VarChar(50)
+  R_cMedico              String? @db.VarChar(50)
+  R_curp                 String? @db.VarChar(50)
+  R_aNacimiento          String? @db.VarChar(50)
+  R_antecedentes         String? @db.VarChar(50)
+  R_cerEstudias          String? @db.VarChar(50)
+  R_comprobanteDomicilio String? @db.VarChar(50)
+  R_contratoB            String? @db.VarChar(50)
+  rfc_s                  String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_estadocivil {
+  id_estadoCivil Int
+  estadoCivil    String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_experienciaen {
+  idExperienciaEn Int
+  rfcS            String? @db.VarChar(50)
+  curpS           String? @db.VarChar(50)
+  administracion  Int?
+  economia        Int?
+  rPublicas       Int?
+  contabilidad    Int?
+  publicidad      Int?
+  otro            Int?
+  especifique     String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_experiencialaboral {
+  idExperiencia    Int?
+  rfcS             String?   @db.VarChar(50)
+  curpS            String?   @db.VarChar(50)
+  lugarEmpleo      String?   @db.VarChar(50)
+  fechaInicio      DateTime? @db.Date
+  fechaFin         DateTime? @db.Date
+  cargo            String?   @db.VarChar(50)
+  motivoSeparacion String?   @db.VarChar(50)
+  telefonoContacto Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_tipocontratacion {
+  id_tipoContrato Int
+  tipoContrato    String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model p_tipoplaza {
+  id_tipoPlaza Int
+  tipo         String? @db.VarChar(50)
+
+  @@ignore
+}
+
+model qrcode {
+  id          Int       @id @default(autoincrement())
+  RFC         String    @db.Text
+  Nombre      String    @db.Text
+  Direccion   String?   @db.Text
+  Adscripcion String?   @db.Text
+  Puesto      String    @db.Text
+  F_Alta      DateTime? @db.Date
+  C_Corta     String    @default("") @db.VarChar(45)
+  estatus     String    @db.Text
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model r_entrega {
+  id           Int
+  id_Usuario   Int
+  info         Int
+  rm           Int
+  personal     Int
+  uippe        Int
+  finanzas     Int
+  estado       Int
+  Random       String? @db.VarChar(9)
+  id_historial Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model r_entrega2 {
+  id          Int
+  id_diputado Int
+  nombre      String @db.Text
+  tipo        String @db.Text
+  info        Int
+  rm          Int
+  personal    Int
+  uippe       Int
+  finanzas    Int
+  estado      Int
+
+  @@ignore
+}
+
+model random {
+  Id        Int     @id @default(autoincrement())
+  Grupo     Int
+  Documento String? @db.VarChar(100)
+  Random    String  @db.VarChar(9)
+}
+
+model remitentesarchivod {
+  id     Int      @id @default(autoincrement())
+  nombre String?  @db.VarChar(50)
+  status Boolean? @default(true)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model s_cursos22_res {
+  id         Int
+  nombre     String    @db.Text
+  domicilio  String    @db.Text
+  tipo       Int
+  lugares    String    @db.Text
+  duracion   Int
+  hora       Int
+  f_inicio   DateTime  @db.Date
+  f_termino  DateTime  @db.Date
+  grupo      Int?
+  privado    Int?
+  instructor String?   @db.VarChar(100)
+  updated_at DateTime? @db.DateTime(0)
+
+  @@ignore
+}
+
+model s_datosgeneralesusr {
+  id          Int       @id @default(autoincrement())
+  rfc_usuario String?   @db.VarChar(10)
+  celular     String?   @db.VarChar(10)
+  telefono    String?   @db.VarChar(10)
+  email       String?   @db.VarChar(50)
+  updated_at  DateTime? @db.DateTime(0)
+  created_at  DateTime? @db.DateTime(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model s_evaluacion20 {
+  id_eva          Int
+  id_usuario      Int?
+  id_evaluador    Int?
+  id_cuestionario Int?
+  id_ponderacion  Int?
+  c1              Int?
+  c2              Int?
+  c3              Int?
+  c4              Int?
+  c5              Int?
+  c6              Int?
+  c7              Int?
+  c8              Int?
+  c9              Int?
+  c10             Int?
+  c11             Int?
+  c12             Int?
+  c13             Int?
+  c14             Int?
+  c15             Int?
+  c16             Int?
+  c17             Int?
+  c18             Int?
+  promedio        Float?
+  fecha           DateTime? @db.Date
+  comentarios     String?   @db.VarChar(300)
+  compromisos     String?   @db.VarChar(250)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model s_evaluacionr {
+  id_eva          Int
+  id_usuario      Int?
+  id_evaluador    Int?
+  id_cuestionario Int?
+  id_ponderacion  Int?
+  c1              Int?
+  c2              Int?
+  c3              Int?
+  c4              Int?
+  c5              Int?
+  c6              Int?
+  c7              Int?
+  c8              Int?
+  c9              Int?
+  c10             Int?
+  c11             Int?
+  c12             Int?
+  c13             Int?
+  c14             Int?
+  promedio        Float?
+  fecha           DateTime? @db.Date
+  comentarios     String?   @db.VarChar(300)
+  compromisos     String?   @db.VarChar(250)
+
+  @@ignore
+}
+
+model s_incripcion21_resp {
+  id          Int     @id @default(autoincrement())
+  id_usuario  String? @db.VarChar(13)
+  c_uno       Int?
+  c_uno_est   Int?
+  c_dos       Int?
+  c_dos_est   Int?
+  c_tres      Int?
+  c_tres_est  Int?
+  total_curso Int?
+  total_aprov Int?
+  Bandera     Int?
+
+  @@index([id], map: "id")
+}
+
+model s_incripcion_dos21_resp {
+  id          Int  @id @default(autoincrement())
+  id_usuario  Int
+  c_uno       Int?
+  c_uno_est   Int?
+  c_dos       Int?
+  c_dos_est   Int?
+  c_tres      Int?
+  c_tres_est  Int?
+  total_curso Int?
+  total_aprov Int?
+  Bandera_dos Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_entepublico {
+  poder  String? @db.VarChar(255)
+  clave  String? @db.VarChar(255)
+  siglas String? @db.VarChar(255)
+  valor  String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_genero {
+  id    Int     @db.UnsignedInt
+  clave String? @db.Text
+  valor String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_nivelrespo {
+  id    Int     @db.UnsignedInt
+  id_sp Int?
+  clave String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_puestos {
+  orden     String? @db.VarChar(255)
+  jerarquia String? @db.VarChar(255)
+  nivel     String? @db.VarChar(255)
+  funcional String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_ramo {
+  clave Int?
+  valor String? @db.VarChar(255)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_registrosp {
+  id_registrosp                    Int       @db.UnsignedInt
+  id                               String?   @db.Text
+  fechaCaptura                     DateTime? @db.DateTime(0)
+  ejercicioFiscal                  Int?
+  fechaInicial                     DateTime? @db.Date
+  fechaFinal                       DateTime? @db.Date
+  claveRamo                        Int?
+  valorRamo                        String?   @db.Text
+  rfc                              String?   @db.VarChar(13)
+  curp                             String?   @db.VarChar(18)
+  nombres                          String?   @db.Text
+  primerApellido                   String?   @db.Text
+  segundoApellido                  String?   @db.Text
+  claveGenero                      String?   @db.Text
+  valorGenero                      String?   @db.Text
+  nombreDependencia                String?   @db.Text
+  siglasDependencia                String?   @db.Text
+  claveDependencia                 String?   @db.Text
+  nombrePuesto                     String?   @db.Text
+  nivelPuesto                      String?   @db.Text
+  nombresSuperiorInmediato         String?   @db.Text
+  primerApellidoSuperiorInmediato  String?   @db.Text
+  segundoApellidoSuperiorInmediato String?   @db.Text
+  curpSuperiorInmediato            String?   @default("") @db.VarChar(18)
+  rfcSuperiorInmediato             String?   @default("") @db.VarChar(13)
+  nombrePuestoSupIn                String?   @db.Text
+  nivelPuestoSupIn                 Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_tipoarea {
+  id    Int     @db.UnsignedInt
+  id_sp Int?
+  clave String? @db.Text
+  valor String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model spic_tipoproc {
+  id    Int     @db.UnsignedInt
+  id_sp Int?
+  clave String? @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model st_asuntossaf {
+  fecha_r    DateTime @db.Date
+  fecha_d    DateTime @db.Date
+  fecha_a    DateTime @db.Date
+  folio      String   @db.VarChar(30)
+  referencia String   @db.VarChar(100)
+  turnado    String   @db.VarChar(100)
+  asunto     String   @db.VarChar(100)
+  comentario String   @db.VarChar(300)
+
+  @@ignore
+}
+
+model visita_doc {
+  id             Int      @id @default(autoincrement())
+  id_usuario     Int
+  Fecha_Consulta DateTime @db.Date
+  Hora_Consulta  DateTime @db.Time(0)
+  Bandera        Int
+  Path           String   @db.VarChar(300)
+  Fdocumento     String?  @db.Text
+  Numenvio       String   @db.VarChar(15)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model visita_docad {
+  id             Int
+  id_usuario     String   @db.VarChar(13)
+  Fecha_Consulta DateTime @db.Date
+  Hora_Consulta  DateTime @db.Time(0)
+  Bandera        Int
+  Path           String   @db.VarChar(300)
+  Fdocumento     String?  @db.Text
+  Numenvio       String   @db.VarChar(15)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model visitas_gral {
+  id             Int
+  id_usuario     Int
+  Fecha_Consulta DateTime @db.Date
+  Hora_Consulta  DateTime @db.Time(0)
+  bandera        Int
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model xl_climaresp {
+  id      Int
+  RFC     String @db.VarChar(1000)
+  id_resp Int
+  respA   Int
+  respB   Int
+  respC   Int
+  respD   Int
 
   @@ignore
 }

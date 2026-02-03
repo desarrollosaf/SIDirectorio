@@ -1,75 +1,139 @@
-import { Component } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
-type Dependencia = { id: string; nombre: string };
+
+
+interface DependenciaBackend {
+  id_Dependencia: number;
+  Nombre: string;
+}
+
+interface Dependencia {
+  id: number;
+  nombre: string;
+}
+
+interface DirectorioResponse {
+  dependencia: string;
+  direcciones: {
+    id_Direccion: number;
+    nombre: string;
+    departamentos: {
+      id_Departamento: number;
+      nombre: string;
+      usuarios: {
+        id_Usuario: number;
+        nombre: string;
+        rango?: number;
+        extension: string;
+      }[];
+    }[];
+  }[];
+}
 
 export type DirectoryRow = {
-  area: string;           
-  areaDetalle?: string;  
-  puesto?: string;        
-  nombre?: string;        
-  extension: string;      
+  esTitular: boolean;
+  direccionId?: number;        
+  direccion?: string;
+  departamentoId?: number;      
+  departamento?: string;
+  nombre: string;
+  rango?: number;
+  extension: string;
 };
 
-type Grouped = { area: string; items: DirectoryRow[] };
+type Grouped = { 
+  dependencia: string;
+  titular: DirectoryRow | null;
+  direcciones: {
+    id: number;                 
+    nombre: string;
+    departamentos: DirectoryRow[];
+  }[];
+};
+
+
 
 @Component({
   selector: 'app-directorio',
+  standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './directorio.component.html',
   styleUrl: './directorio.component.scss'
 })
-export class DirectorioComponent {
+export class DirectorioComponent implements OnInit {
 
-    loading = false;
+  loading = false;
+  loadingDependencias = false;
   error: string | null = null;
   searched = false;
 
   form!: FormGroup;
+  toast = { show: false, message: '' };
+  private toastTimer: any;
 
-  constructor(private fb: FormBuilder) {
+  sortBy: 'area' | 'nombre' | 'ext' = 'area';
+
+  dependencias: Dependencia[] = [];
+  dependenciaNombre: string = '';
+
+  private rows: DirectoryRow[] = [];
+  private filteredRows: DirectoryRow[] = [];
+  grouped: Grouped[] = [];
+  totalFiltered = 0;
+
+  // Para controlar el estado de los acordeones
+  collapsedStates: { [key: number]: boolean } = {};
+
+  private apiUrl = 'http://localhost:3000';
+
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient
+  ) {
     this.form = this.fb.group({
       dependencia: ['', Validators.required],
       q: [''],
     });
   }
 
-  
-  toast = { show: false, message: '' };
-  private toastTimer: any;
+  ngOnInit(): void {
+    this.loadDependencias();
+  }
 
- 
-  sortBy: 'area' | 'nombre' | 'ext' = 'area';
+  loadDependencias(): void {
+    this.loadingDependencias = true;
 
-  
-  dependencias: Dependencia[] = [
-    { id: 'LEGISLATURA', nombre: 'Legislatura' },
-    { id: 'ADMIN', nombre: 'Administración' },
-    { id: 'COM_SOCIAL', nombre: 'Comunicación Social' },
-  ];
-
-  
-  private rows: DirectoryRow[] = [];
-
-  
-  private filteredRows: DirectoryRow[] = [];
-
-  
-  grouped: Grouped[] = [];
-
-  
-  totalFiltered = 0;
-
-  
+    this.http.get<DependenciaBackend[]>(`${this.apiUrl}/dependencias`)
+      .pipe(
+        map(data =>
+          data.map(d => ({
+            id: d.id_Dependencia,
+            nombre: d.Nombre
+          }))
+        ),
+        catchError(err => {
+          console.error(err);
+          this.showToast('Error al cargar dependencias');
+          return of([]);
+        })
+      )
+      .subscribe(data => {
+        this.dependencias = data;
+        this.loadingDependencias = false;
+      });
+  }
 
   get depInvalid(): boolean {
-    const c = this.form.controls.dependencia;
+    const c = this.form.controls['dependencia'];
     return c.invalid && (c.touched || this.searched);
   }
 
-  async onSearch(): Promise<void> {
+  onSearch(): void {
     this.searched = true;
 
     if (this.form.invalid) {
@@ -77,26 +141,68 @@ export class DirectorioComponent {
       return;
     }
 
+    const depId = this.form.value.dependencia;
     this.loading = true;
     this.error = null;
 
-    try {
-      const dep = this.form.value.dependencia!;
-      
-      this.rows = await this.mockApi(dep);
-
-      this.applyFilterAndSort();
-    } catch (e) {
-      this.error = 'No se pudo cargar el directorio. Intenta de nuevo.';
-      this.rows = [];
-      this.filteredRows = [];
-      this.grouped = [];
-      this.totalFiltered = 0;
-    } finally {
-      this.loading = false;
-    }
+    this.http
+      .get<DirectorioResponse>(
+        `${this.apiUrl}/dependencias/${depId}/direcciones-extensiones`
+      )
+      .pipe(
+        map(res => {
+          const rows = this.mapBackendToRows(res);
+          this.dependenciaNombre = res.dependencia;
+          return rows;
+        }),
+        catchError(err => {
+          this.error = 'No se pudo cargar el directorio';
+          return of([]);
+        })
+      )
+      .subscribe(rows => {
+        this.rows = rows;
+        this.collapsedStates = {};
+        this.applyFilterAndSort();
+        this.loading = false;
+      });
   }
 
+private mapBackendToRows(data: DirectorioResponse): DirectoryRow[] {
+  const rows: DirectoryRow[] = [];
+
+  data.direcciones.forEach(dir => {
+    dir.departamentos.forEach(dep => {
+      if (dep.usuarios.length > 0) {
+        dep.usuarios.forEach(user => {
+          rows.push({
+            esTitular: user.rango === 1,
+            direccionId: dir.id_Direccion,      
+            direccion: dir.nombre,
+            departamentoId: dep.id_Departamento, 
+            departamento: dep.nombre,
+            nombre: user.nombre,
+            rango: user.rango,
+            extension: user.extension,
+          });
+        });
+      } else {
+        rows.push({
+          esTitular: false,
+          direccionId: dir.id_Direccion,      
+          direccion: dir.nombre,
+          departamentoId: dep.id_Departamento, 
+          departamento: dep.nombre,
+          nombre: '',
+          extension: 'Sin extensión',
+        });
+      }
+    });
+  });
+
+  return rows;
+}
+  
   onClear(): void {
     this.form.reset({ dependencia: '', q: '' });
     this.rows = [];
@@ -106,10 +212,11 @@ export class DirectorioComponent {
     this.error = null;
     this.searched = false;
     this.sortBy = 'area';
+    this.collapsedStates = {};
   }
 
   clearQuery(): void {
-    this.form.controls.q.setValue('');
+    this.form.controls['q'].setValue('');
     this.applyFilterAndSort();
   }
 
@@ -119,75 +226,100 @@ export class DirectorioComponent {
   }
 
   applyFilterAndSort(): void {
-   
-    if (!this.rows.length) {
-      this.filteredRows = [];
-      this.grouped = [];
-      this.totalFiltered = 0;
-      return;
-    }
-
-    const q = (this.form.value.q ?? '').toLowerCase().trim();
-    const norm = (s?: string) => (s ?? '').toLowerCase().trim();
-
-    
-    this.filteredRows = this.rows.filter(r => {
-      if (!q) return true;
-
-      return (
-        norm(r.area).includes(q) ||
-        norm(r.areaDetalle).includes(q) ||
-        norm(r.puesto).includes(q) ||
-        norm(r.nombre).includes(q) ||
-        (r.extension ?? '').includes(q)
-      );
-    });
-
-    
-    const sorted = [...this.filteredRows].sort((a, b) => {
-      if (this.sortBy === 'area') return norm(a.area).localeCompare(norm(b.area));
-
-      if (this.sortBy === 'nombre') {
-       
-        const an = norm(a.nombre);
-        const bn = norm(b.nombre);
-        if (!an && bn) return 1;
-        if (an && !bn) return -1;
-        return an.localeCompare(bn);
-      }
-
-     
-      const ax = parseInt(a.extension, 10);
-      const bx = parseInt(b.extension, 10);
-      if (!Number.isNaN(ax) && !Number.isNaN(bx)) return ax - bx;
-      return norm(a.extension).localeCompare(norm(b.extension));
-    });
-
-    
-    const map = new Map<string, DirectoryRow[]>();
-    for (const r of sorted) {
-      const key = r.area || 'Sin área';
-      const arr = map.get(key) ?? [];
-      arr.push(r);
-      map.set(key, arr);
-    }
-
-    this.grouped = Array.from(map.entries()).map(([area, items]) => ({ area, items }));
-    this.totalFiltered = sorted.length;
+  
+  if (!this.rows.length) {
+    this.filteredRows = [];
+    this.grouped = [];
+    this.totalFiltered = 0;
+    return;
   }
+
+  const q = (this.form.value.q ?? '').toLowerCase().trim();
+  const norm = (s?: string) => (s ?? '').toLowerCase().trim();
+
+  this.filteredRows = this.rows.filter(r =>
+    !q ||
+    norm(r.direccion).includes(q) ||
+    norm(r.departamento).includes(q) ||
+    norm(r.nombre).includes(q) ||
+    r.extension.includes(q)
+  );
+
+  // Ordenar: primero titular (rango 1), luego por direccionId, luego departamentoId
+  const sorted = [...this.filteredRows].sort((a, b) => {
+    // El titular (rango 1) siempre primero
+    if (a.rango === 1 && b.rango !== 1) return -1;
+    if (b.rango === 1 && a.rango !== 1) return 1;
+    
+    // Si el sortBy es 'area', ordenar por IDs
+    if (this.sortBy === 'area') {
+      // Primero por direccionId
+      const dirIdComp = (a.direccionId || 0) - (b.direccionId || 0);
+      if (dirIdComp !== 0) return dirIdComp;
+      
+      // Luego por departamentoId
+      return (a.departamentoId || 0) - (b.departamentoId || 0);
+    }
+    
+    // Ordenar por nombre
+    if (this.sortBy === 'nombre') return norm(a.nombre).localeCompare(norm(b.nombre));
+    
+    // Ordenar por extensión
+    if (a.extension === 'Sin extensión') return 1;
+    if (b.extension === 'Sin extensión') return -1;
+    return parseInt(a.extension) - parseInt(b.extension);
+  });
+
+  const titular = sorted.find(r => r.rango === 1) || null;
+  const restantes = sorted.filter(r => r.rango !== 1);
+
+  // Agrupar por dirección (manteniendo el ID)
+  const mapDirecciones = new Map<number, { nombre: string; rows: DirectoryRow[] }>();
+  
+  restantes.forEach(r => {
+    const key = r.direccionId || 0;
+    if (!mapDirecciones.has(key)) {
+      mapDirecciones.set(key, { nombre: r.direccion || 'Sin dirección', rows: [] });
+    }
+    mapDirecciones.get(key)!.rows.push(r);
+  });
+
+
+  // Convertir el map a array y ordenar por ID de dirección
+  const direccionesArray = Array.from(mapDirecciones.entries())
+    .sort((a, b) => a[0] - b[0]) // Ordenar por ID de dirección
+    .map(([id, data]) => ({
+      id,
+      nombre: data.nombre,
+      departamentos: data.rows
+    }));
+
+  this.grouped = [{
+    dependencia: this.dependenciaNombre,
+    titular: titular,
+    direcciones: direccionesArray
+  }];
+
+  this.totalFiltered = sorted.length;
+ 
+}
+
+  toggleCollapse(index: number): void {
+    this.collapsedStates[index] = !this.collapsedStates[index];
+  }
+
+  isCollapsed(index: number): boolean {
+    return this.collapsedStates[index] !== false;
+  }
+
 
   async copy(text: string): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
-      this.showToast('Extensión copiada ');
+      this.showToast('Extensión copiada ✓');
     } catch {
-      this.showToast('No se pudo copiar ');
+      this.showToast('No se pudo copiar ✗');
     }
-  }
-
-  onDownloadPdf(): void {
-   
-    window.open('/api/directorio/pdf', '_blank');
   }
 
   private showToast(message: string): void {
@@ -195,52 +327,5 @@ export class DirectorioComponent {
     this.toast.show = true;
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(() => (this.toast.show = false), 1600);
-  }
-
-  
-  private async mockApi(dependencia: string): Promise<DirectoryRow[]> {
-    
-    await new Promise(res => setTimeout(res, 450));
-
-    if (!dependencia) return [];
-
-    return [
-      {
-        area: 'Junta de Coordinación Política',
-        puesto: 'Presidente de la Junta de Coordinación Política',
-        nombre: 'Dip. Vázquez Rodríguez José Francisco',
-        extension: '6494',
-      },
-      {
-        area: 'Junta de Coordinación Política',
-        puesto: 'Secretaría Ejecutiva',
-        nombre: 'D. en D. Olvera Herreros Omar Salvador',
-        extension: '6609',
-      },
-      {
-        area: 'Junta de Coordinación Política',
-        puesto: 'Recepción de Presidencia',
-        nombre: '',
-        extension: '6606',
-      },
-      {
-        area: 'Grupo Parlamentario del PRI',
-        puesto: 'Recepción',
-        nombre: '',
-        extension: '6101',
-      },
-      {
-        area: 'Grupo Parlamentario del PAN',
-        puesto: 'Recepción',
-        nombre: '',
-        extension: '6201',
-      },
-      {
-        area: 'Grupo Parlamentario del PRD',
-        puesto: 'Recepción',
-        nombre: '',
-        extension: '6301',
-      },
-    ];
   }
 }
