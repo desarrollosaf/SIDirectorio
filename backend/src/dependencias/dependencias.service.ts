@@ -102,6 +102,7 @@ export class DependenciasService {
         id_Usuario: true,
         Nombre: true,
         id_Departamento: true,
+        Puesto: true,
         s_users: {
           select: { rango: true },
         },
@@ -116,14 +117,47 @@ export class DependenciasService {
       select: {
         extension: true,
         servidor_publico_id: true,
+        ubicaciones: {
+          select: {
+            calle: true,
+            num_ext: true,
+            num_int: true,
+            colonia: true,
+            codigo_postal: true,
+          },
+        },
       },
     });
 
-    const extensionesMap = new Map<number, string>();
+    const extensionesMap = new Map<number, {
+      extension: string;
+      ubicacion: {
+        calle: string | null;
+        num_ext: string | null;
+        num_int: string | null;
+        colonia: string | null;
+        codigo_postal: string | null;
+      } | null;
+    }>();
+
     extensiones.forEach(ext => {
-      if (ext.extension) {
-        extensionesMap.set(Number(ext.servidor_publico_id), ext.extension);
-      }
+      if (!ext.extension) return;
+
+      extensionesMap.set(
+        Number(ext.servidor_publico_id),
+        {
+          extension: ext.extension,
+          ubicacion: ext.ubicaciones
+            ? {
+              calle: ext.ubicaciones.calle ?? null,
+              num_ext: ext.ubicaciones.num_ext ?? null,
+              num_int: ext.ubicaciones.num_int ?? null,
+              colonia: ext.ubicaciones.colonia ?? null,
+              codigo_postal: ext.ubicaciones.codigo_postal ?? null,
+            }
+            : null,
+        }
+      );
     });
 
     // 5️⃣ Usuarios por departamento
@@ -132,8 +166,8 @@ export class DependenciasService {
     usuarios.forEach(u => {
       if (!u.id_Departamento) return;
 
-      const extension = extensionesMap.get(u.id_Usuario);
-      if (!extension) return;
+      const extData = extensionesMap.get(u.id_Usuario);
+      if (!extData) return;
 
       if (!usuariosPorDepartamento.has(u.id_Departamento)) {
         usuariosPorDepartamento.set(u.id_Departamento, []);
@@ -142,26 +176,43 @@ export class DependenciasService {
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
         id_Usuario: u.id_Usuario,
         nombre: u.Nombre,
+        cargo: u.Puesto,
         rango: u.s_users?.[0]?.rango ?? null,
-        extension,
+        extension: extData.extension,
+        ubicacion: extData.ubicacion,
       });
     });
 
     // 6️⃣ Respuesta final
-    return dependencias.map(dep => ({
-      id_Dependencia: dep.id_Dependencia,
-      dependencia: dep.nombre_completo,
-      direcciones: dep.t_direccion.map(dir => ({
-        id_Direccion: dir.id_Direccion,
-        nombre: dir.nombre_completo,
-        departamentos: dir.t_departamento.map(dpto => ({
-          id_Departamento: dpto.id_Departamento,
-          nombre: dpto.nombre_completo,
-          usuarios: (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-            .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0)),
+    return dependencias.map(dep => {
+
+      let ubicacionDependencia: any = null;
+
+      dep.t_direccion.forEach(dir => {
+        dir.t_departamento.forEach(dpto => {
+          const usuarios = usuariosPorDepartamento.get(dpto.id_Departamento);
+          if (usuarios && usuarios.length && !ubicacionDependencia) {
+            ubicacionDependencia = usuarios[0].ubicacion;
+          }
+        });
+      });
+
+      return {
+        id_Dependencia: dep.id_Dependencia,
+        dependencia: dep.nombre_completo,
+        ubicacion: ubicacionDependencia, // 👈 AQUÍ
+        direcciones: dep.t_direccion.map(dir => ({
+          id_Direccion: dir.id_Direccion,
+          nombre: dir.nombre_completo,
+          departamentos: dir.t_departamento.map(dpto => ({
+            id_Departamento: dpto.id_Departamento,
+            nombre: dpto.nombre_completo,
+            usuarios: (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+              .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0)),
+          })),
         })),
-      })),
-    }));
+      };
+    });
   }
 
 
