@@ -46,18 +46,18 @@ export class DependenciasService {
     const dependencia = await prisma.t_dependencia.findUnique({
       where: { id_Dependencia: idDependencia },
       select: {
-        Nombre: true,
+        nombre_completo: true,
         t_direccion: {
           select: {
             id_Direccion: true,
-            Nombre: true,
+            nombre_completo: true,
             t_departamento: {
               where: {
                 Estado: 1,
               },
               select: {
                 id_Departamento: true,
-                Nombre: true,
+                nombre_completo: true,
               },
             },
           },
@@ -136,13 +136,13 @@ export class DependenciasService {
 
     // 6️⃣ Armar respuesta final
     return {
-      dependencia: dependencia.Nombre,
+      dependencia: dependencia.nombre_completo,
       direcciones: dependencia.t_direccion.map(dir => ({
         id_Direccion: dir.id_Direccion,
-        nombre: dir.Nombre,
+        nombre: dir.nombre_completo,
         departamentos: dir.t_departamento.map(dep => ({
           id_Departamento: dep.id_Departamento,
-          nombre: dep.Nombre,
+          nombre: dep.nombre_completo,
           usuarios: (usuariosPorDepartamento.get(dep.id_Departamento) ?? [])
             .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0))
         })),
