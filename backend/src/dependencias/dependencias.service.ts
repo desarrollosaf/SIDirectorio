@@ -42,57 +42,73 @@ export class DependenciasService {
 
   async findDireccionesByDependenciaConExtensiones(idDependencia: number) {
 
-    // 1️⃣ Dependencia → Direcciones → Departamentos (SIN usuarios)
-    const dependencia = await prisma.t_dependencia.findUnique({
-      where: { id_Dependencia: idDependencia },
-      select: {
-        nombre_completo: true,
-        t_direccion: {
-          select: {
-            id_Direccion: true,
-            nombre_completo: true,
-            t_departamento: {
-              where: {
-                Estado: 1,
-              },
-              select: {
-                id_Departamento: true,
-                nombre_completo: true,
+    // 1️⃣ Dependencias → Direcciones → Departamentos
+    const dependencias = idDependencia === 0
+      ? await prisma.t_dependencia.findMany({
+        select: {
+          id_Dependencia: true,
+          nombre_completo: true,
+          t_direccion: {
+            select: {
+              id_Direccion: true,
+              nombre_completo: true,
+              t_departamento: {
+                where: { Estado: 1 },
+                select: {
+                  id_Departamento: true,
+                  nombre_completo: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      })
+      : await prisma.t_dependencia.findMany({
+        where: { id_Dependencia: idDependencia },
+        select: {
+          id_Dependencia: true,
+          nombre_completo: true,
+          t_direccion: {
+            select: {
+              id_Direccion: true,
+              nombre_completo: true,
+              t_departamento: {
+                where: { Estado: 1 },
+                select: {
+                  id_Departamento: true,
+                  nombre_completo: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
-    if (!dependencia) return null;
+    if (!dependencias.length) return null;
 
-    // 2️⃣ Obtener IDs de departamentos
-    const departamentosIds = dependencia.t_direccion
+    // 2️⃣ IDs de departamentos
+    const departamentosIds = dependencias
+      .flatMap(dep => dep.t_direccion)
       .flatMap(dir => dir.t_departamento)
       .map(dep => dep.id_Departamento);
 
-    // 3️⃣ Obtener usuarios activos por departamento
+    // 3️⃣ Usuarios activos
     const usuarios = await prisma.s_usuario.findMany({
       where: {
         Estado: 1,
-        id_Departamento: {
-          in: departamentosIds,
-        },
+        id_Departamento: { in: departamentosIds },
       },
       select: {
         id_Usuario: true,
         Nombre: true,
         id_Departamento: true,
         s_users: {
-          select: {
-            rango: true,
-          },
+          select: { rango: true },
         },
       },
     });
 
-    // 4️⃣ Obtener extensiones
+    // 4️⃣ Extensiones
     const extensiones = await prismaDirectorio.extensiones.findMany({
       where: {
         servidor_publico_id: { not: null },
@@ -104,16 +120,13 @@ export class DependenciasService {
     });
 
     const extensionesMap = new Map<number, string>();
-
     extensiones.forEach(ext => {
-      if (!ext.extension) return; // 👈 evita null
-
-      extensionesMap.set(
-        Number(ext.servidor_publico_id),
-        ext.extension
-      );
+      if (ext.extension) {
+        extensionesMap.set(Number(ext.servidor_publico_id), ext.extension);
+      }
     });
 
+    // 5️⃣ Usuarios por departamento
     const usuariosPorDepartamento = new Map<number, any[]>();
 
     usuarios.forEach(u => {
@@ -134,21 +147,23 @@ export class DependenciasService {
       });
     });
 
-    // 6️⃣ Armar respuesta final
-    return {
-      dependencia: dependencia.nombre_completo,
-      direcciones: dependencia.t_direccion.map(dir => ({
+    // 6️⃣ Respuesta final
+    return dependencias.map(dep => ({
+      id_Dependencia: dep.id_Dependencia,
+      dependencia: dep.nombre_completo,
+      direcciones: dep.t_direccion.map(dir => ({
         id_Direccion: dir.id_Direccion,
         nombre: dir.nombre_completo,
-        departamentos: dir.t_departamento.map(dep => ({
-          id_Departamento: dep.id_Departamento,
-          nombre: dep.nombre_completo,
-          usuarios: (usuariosPorDepartamento.get(dep.id_Departamento) ?? [])
-            .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0))
+        departamentos: dir.t_departamento.map(dpto => ({
+          id_Departamento: dpto.id_Departamento,
+          nombre: dpto.nombre_completo,
+          usuarios: (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+            .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0)),
         })),
       })),
-    };
+    }));
   }
+
 
 
   findOne(id: number) {
