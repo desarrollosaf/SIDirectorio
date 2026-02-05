@@ -17,8 +17,17 @@ interface Dependencia {
   nombre: string;
 }
 
+// Cambia la interfaz para que acepte un array
 interface DirectorioResponse {
+  id_Dependencia?: number;
   dependencia: string;
+  ubicacion?: {
+    calle: string;
+    num_ext: string;
+    num_int: string;
+    colonia: string;
+    codigo_postal: string;
+  };
   direcciones: {
     id_Direccion: number;
     nombre: string;
@@ -29,6 +38,7 @@ interface DirectorioResponse {
         id_Usuario: number;
         nombre: string;
         rango?: number;
+        cargo?: string;  // Agregado
         extension: string;
       }[];
     }[];
@@ -37,17 +47,23 @@ interface DirectorioResponse {
 
 export type DirectoryRow = {
   esTitular: boolean;
+  esDireccion?: boolean;  // Agregado
+  dependenciaId?: number;
+  dependenciaNombre?: string;
   direccionId?: number;        
   direccion?: string;
   departamentoId?: number;      
   departamento?: string;
   nombre: string;
   rango?: number;
+  cargo?: string;
   extension: string;
 };
 
 type Grouped = { 
+  dependenciaId: number;
   dependencia: string;
+  ubicacion?: string;  // Agregado
   titular: DirectoryRow | null;
   direcciones: {
     id: number;                 
@@ -79,15 +95,14 @@ export class DirectorioComponent implements OnInit {
   sortBy: 'area' | 'nombre' | 'ext' = 'area';
 
   dependencias: Dependencia[] = [];
-  dependenciaNombre: string = '';
-
+  
   private rows: DirectoryRow[] = [];
   private filteredRows: DirectoryRow[] = [];
   grouped: Grouped[] = [];
   totalFiltered = 0;
 
   // Para controlar el estado de los acordeones
-  collapsedStates: { [key: number]: boolean } = {};
+  collapsedStates: { [key: string]: boolean } = {};
 
   private apiUrl = 'http://localhost:3000';
 
@@ -96,7 +111,7 @@ export class DirectorioComponent implements OnInit {
     private http: HttpClient
   ) {
     this.form = this.fb.group({
-      dependencia: ['', Validators.required],
+      dependencia: [''],
       q: [''],
     });
   }
@@ -129,66 +144,96 @@ export class DirectorioComponent implements OnInit {
   }
 
   get depInvalid(): boolean {
-    const c = this.form.controls['dependencia'];
-    return c.invalid && (c.touched || this.searched);
+    return false;
   }
+  // Agrega esta propiedad a la clase
+private ubicacionesPorDependencia = new Map<number, any>();
 
-  onSearch(): void {
-    this.searched = true;
+// Modifica onSearch para guardar las ubicaciones
+onSearch(): void {
+  this.searched = true;
+  const depId = this.form.value.dependencia || 0;
+  
+  this.loading = true;
+  this.error = null;
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+  this.http
+    .get<DirectorioResponse | DirectorioResponse[]>(
+      `${this.apiUrl}/dependencias/${depId}/direcciones-extensiones`
+    )
+    .pipe(
+      map(res => {
+        const dataArray = Array.isArray(res) ? res : [res];
+        
+        // Guardar ubicaciones
+        dataArray.forEach(data => {
+          if (data.ubicacion && data.id_Dependencia) {
+            this.ubicacionesPorDependencia.set(data.id_Dependencia, data.ubicacion);
+          }
+        });
+        
+        const rows = dataArray.flatMap(data => this.mapBackendToRows(data));
+        return rows;
+      }),
+      catchError(err => {
+        this.error = 'No se pudo cargar el directorio';
+        return of([]);
+      })
+    )
+    .subscribe(rows => {
+      this.rows = rows;
+      this.collapsedStates = {};
+      this.applyFilterAndSort();
+      this.loading = false;
+    });
+}
 
-    const depId = this.form.value.dependencia;
-    this.loading = true;
-    this.error = null;
-
-    this.http
-      .get<DirectorioResponse>(
-        `${this.apiUrl}/dependencias/${depId}/direcciones-extensiones`
-      )
-      .pipe(
-        map(res => {
-          const rows = this.mapBackendToRows(res);
-          this.dependenciaNombre = res.dependencia;
-          return rows;
-        }),
-        catchError(err => {
-          this.error = 'No se pudo cargar el directorio';
-          return of([]);
-        })
-      )
-      .subscribe(rows => {
-        this.rows = rows;
-        this.collapsedStates = {};
-        this.applyFilterAndSort();
-        this.loading = false;
-      });
-  }
+// Método para formatear la ubicación
+getUbicacionString(depId: number): string {
+  const ub = this.ubicacionesPorDependencia.get(depId);
+  if (!ub) return '';
+  
+  const partes = [];
+  if (ub.calle) partes.push(ub.calle);
+  if (ub.num_ext && ub.num_ext !== 'S/N') partes.push(`No. ${ub.num_ext}`);
+  if (ub.colonia) partes.push(`Col. ${ub.colonia}`);
+  if (ub.codigo_postal) partes.push(`C.P. ${ub.codigo_postal}`);
+  
+  return partes.join(', ');
+}
 
 private mapBackendToRows(data: DirectorioResponse): DirectoryRow[] {
   const rows: DirectoryRow[] = [];
+  const esOSFEM = data.dependencia === 'ÓRGANO SUPERIOR DE FISCALIZACIÓN DEL ESTADO DE MÉXICO';
 
   data.direcciones.forEach(dir => {
     dir.departamentos.forEach(dep => {
+      const nombreNormalizado = this.normalizarTexto(dep.nombre);
+      const esDireccion = esOSFEM && nombreNormalizado.startsWith('DIRECCION');
+      
       if (dep.usuarios.length > 0) {
         dep.usuarios.forEach(user => {
           rows.push({
             esTitular: user.rango === 1,
+            esDireccion: esDireccion,
+            dependenciaId: data.id_Dependencia,
+            dependenciaNombre: data.dependencia,
             direccionId: dir.id_Direccion,      
             direccion: dir.nombre,
             departamentoId: dep.id_Departamento, 
             departamento: dep.nombre,
             nombre: user.nombre,
             rango: user.rango,
+            cargo: user.cargo,
             extension: user.extension,
           });
         });
       } else {
         rows.push({
           esTitular: false,
+          esDireccion: esDireccion, 
+          dependenciaId: data.id_Dependencia,
+          dependenciaNombre: data.dependencia,
           direccionId: dir.id_Direccion,      
           direccion: dir.nombre,
           departamentoId: dep.id_Departamento, 
@@ -201,6 +246,14 @@ private mapBackendToRows(data: DirectorioResponse): DirectoryRow[] {
   });
 
   return rows;
+}
+
+private normalizarTexto(texto: string): string {
+  return texto
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
 }
   
   onClear(): void {
@@ -225,8 +278,7 @@ private mapBackendToRows(data: DirectorioResponse): DirectoryRow[] {
     this.applyFilterAndSort();
   }
 
-  applyFilterAndSort(): void {
-  
+ applyFilterAndSort(): void {
   if (!this.rows.length) {
     this.filteredRows = [];
     this.grouped = [];
@@ -239,79 +291,89 @@ private mapBackendToRows(data: DirectorioResponse): DirectoryRow[] {
 
   this.filteredRows = this.rows.filter(r =>
     !q ||
+    norm(r.dependenciaNombre).includes(q) ||
     norm(r.direccion).includes(q) ||
     norm(r.departamento).includes(q) ||
     norm(r.nombre).includes(q) ||
     r.extension.includes(q)
   );
 
-  // Ordenar: primero titular (rango 1), luego por direccionId, luego departamentoId
   const sorted = [...this.filteredRows].sort((a, b) => {
-    // El titular (rango 1) siempre primero
+    const depComp = (a.dependenciaId || 0) - (b.dependenciaId || 0);
+    if (depComp !== 0) return depComp;
+
     if (a.rango === 1 && b.rango !== 1) return -1;
     if (b.rango === 1 && a.rango !== 1) return 1;
     
-    // Si el sortBy es 'area', ordenar por IDs
     if (this.sortBy === 'area') {
-      // Primero por direccionId
       const dirIdComp = (a.direccionId || 0) - (b.direccionId || 0);
       if (dirIdComp !== 0) return dirIdComp;
-      
-      // Luego por departamentoId
       return (a.departamentoId || 0) - (b.departamentoId || 0);
     }
     
-    // Ordenar por nombre
     if (this.sortBy === 'nombre') return norm(a.nombre).localeCompare(norm(b.nombre));
     
-    // Ordenar por extensión
     if (a.extension === 'Sin extensión') return 1;
     if (b.extension === 'Sin extensión') return -1;
     return parseInt(a.extension) - parseInt(b.extension);
   });
 
-  const titular = sorted.find(r => r.rango === 1) || null;
-  const restantes = sorted.filter(r => r.rango !== 1);
-
-  // Agrupar por dirección (manteniendo el ID)
-  const mapDirecciones = new Map<number, { nombre: string; rows: DirectoryRow[] }>();
+  // Guardar las ubicaciones por dependencia
+  const ubicacionesPorDep = new Map<number, any>();
   
-  restantes.forEach(r => {
-    const key = r.direccionId || 0;
-    if (!mapDirecciones.has(key)) {
-      mapDirecciones.set(key, { nombre: r.direccion || 'Sin dirección', rows: [] });
+  const mapDependencias = new Map<number, DirectoryRow[]>();
+  
+  sorted.forEach(r => {
+    const key = r.dependenciaId || 0;
+    if (!mapDependencias.has(key)) {
+      mapDependencias.set(key, []);
     }
-    mapDirecciones.get(key)!.rows.push(r);
+    mapDependencias.get(key)!.push(r);
   });
 
+  this.grouped = Array.from(mapDependencias.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([depId, rowsDep]) => {
+      const titular = rowsDep.find(r => r.rango === 1) || null;
+      const restantes = rowsDep.filter(r => r.rango !== 1);
 
-  // Convertir el map a array y ordenar por ID de dirección
-  const direccionesArray = Array.from(mapDirecciones.entries())
-    .sort((a, b) => a[0] - b[0]) // Ordenar por ID de dirección
-    .map(([id, data]) => ({
-      id,
-      nombre: data.nombre,
-      departamentos: data.rows
-    }));
+      const mapDirecciones = new Map<number, { nombre: string; rows: DirectoryRow[] }>();
+      
+      restantes.forEach(r => {
+        const key = r.direccionId || 0;
+        if (!mapDirecciones.has(key)) {
+          mapDirecciones.set(key, { nombre: r.direccion || 'Sin dirección', rows: [] });
+        }
+        mapDirecciones.get(key)!.rows.push(r);
+      });
 
-  this.grouped = [{
-    dependencia: this.dependenciaNombre,
-    titular: titular,
-    direcciones: direccionesArray
-  }];
+      const direccionesArray = Array.from(mapDirecciones.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([id, data]) => ({
+          id,
+          nombre: data.nombre,
+          departamentos: data.rows
+        }));
+
+      return {
+        dependenciaId: depId,
+        dependencia: rowsDep[0]?.dependenciaNombre || 'Sin dependencia',
+        ubicacion: this.getUbicacionString(depId),  // Agregado
+        titular: titular,
+        direcciones: direccionesArray
+      };
+    });
 
   this.totalFiltered = sorted.length;
- 
 }
 
-  toggleCollapse(index: number): void {
-    this.collapsedStates[index] = !this.collapsedStates[index];
+  toggleCollapse(key: string): void {
+    this.collapsedStates[key] = !this.collapsedStates[key];
   }
 
-  isCollapsed(index: number): boolean {
-    return this.collapsedStates[index] !== false;
+  isCollapsed(key: string): boolean {
+    return this.collapsedStates[key] !== false;
   }
-
 
   async copy(text: string): Promise<void> {
     try {
