@@ -43,46 +43,26 @@ export class DependenciasService {
   async findDireccionesByDependenciaConExtensiones(idDependencia: number) {
 
     // 1️⃣ Dependencias → Direcciones → Departamentos
-    const dependencias = idDependencia === 0
-      ? await prisma.t_dependencia.findMany({
-        select: {
-          id_Dependencia: true,
-          nombre_completo: true,
-          t_direccion: {
-            select: {
-              id_Direccion: true,
-              nombre_completo: true,
-              t_departamento: {
-                where: { Estado: 1 },
-                select: {
-                  id_Departamento: true,
-                  nombre_completo: true,
-                },
+    const dependencias = await prisma.t_dependencia.findMany({
+      where: idDependencia === 0 ? undefined : { id_Dependencia: idDependencia },
+      select: {
+        id_Dependencia: true,
+        nombre_completo: true,
+        t_direccion: {
+          select: {
+            id_Direccion: true,
+            nombre_completo: true,
+            t_departamento: {
+              where: { Estado: 1 },
+              select: {
+                id_Departamento: true,
+                nombre_completo: true,
               },
             },
           },
         },
-      })
-      : await prisma.t_dependencia.findMany({
-        where: { id_Dependencia: idDependencia },
-        select: {
-          id_Dependencia: true,
-          nombre_completo: true,
-          t_direccion: {
-            select: {
-              id_Direccion: true,
-              nombre_completo: true,
-              t_departamento: {
-                where: { Estado: 1 },
-                select: {
-                  id_Departamento: true,
-                  nombre_completo: true,
-                },
-              },
-            },
-          },
-        },
-      });
+      },
+    });
 
     if (!dependencias.length) return null;
 
@@ -111,9 +91,7 @@ export class DependenciasService {
 
     // 4️⃣ Extensiones
     const extensiones = await prismaDirectorio.extensiones.findMany({
-      where: {
-        servidor_publico_id: { not: null },
-      },
+      where: { servidor_publico_id: { not: null } },
       select: {
         extension: true,
         servidor_publico_id: true,
@@ -129,59 +107,68 @@ export class DependenciasService {
       },
     });
 
-    const extensionesMap = new Map<number, {
-      extension: string;
-      ubicacion: {
-        calle: string | null;
-        num_ext: string | null;
-        num_int: string | null;
-        colonia: string | null;
-        codigo_postal: string | null;
-      } | null;
-    }>();
+    const extensionesMap = new Map<number, any>();
 
     extensiones.forEach(ext => {
       if (!ext.extension) return;
 
-      extensionesMap.set(
-        Number(ext.servidor_publico_id),
-        {
-          extension: ext.extension,
-          ubicacion: ext.ubicaciones
-            ? {
-              calle: ext.ubicaciones.calle ?? null,
-              num_ext: ext.ubicaciones.num_ext ?? null,
-              num_int: ext.ubicaciones.num_int ?? null,
-              colonia: ext.ubicaciones.colonia ?? null,
-              codigo_postal: ext.ubicaciones.codigo_postal ?? null,
-            }
-            : null,
-        }
-      );
+      extensionesMap.set(Number(ext.servidor_publico_id), {
+        extension: ext.extension,
+        ubicacion: ext.ubicaciones ?? null,
+      });
     });
 
     // 5️⃣ Usuarios por departamento
     const usuariosPorDepartamento = new Map<number, any[]>();
 
     usuarios.forEach(u => {
-      if (!u.id_Departamento) return;
-
-      const extData = extensionesMap.get(u.id_Usuario);
-      if (!extData) return;
+      const ext = extensionesMap.get(u.id_Usuario);
+      if (!u.id_Departamento || !ext) return;
 
       if (!usuariosPorDepartamento.has(u.id_Departamento)) {
         usuariosPorDepartamento.set(u.id_Departamento, []);
       }
 
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
-        id_Usuario: u.id_Usuario,
         nombre: u.Nombre,
         cargo: u.Puesto,
         rango: u.s_users?.[0]?.rango ?? null,
-        extension: extData.extension,
-        ubicacion: extData.ubicacion,
+        extension: ext.extension,
+        ubicacion: ext.ubicacion,
       });
     });
+
+    // ✅ Dirección especial (UNA SOLA VEZ)
+    const direccionJunta = {
+      id_Direccion: 1,
+      nombre: 'JUNTA DE COORDINACIÓN POLÍTICA',
+      departamentos: [
+        {
+          nombre: 'Presidencia',
+          usuarios: [{
+            nombre: 'DIP. VAZQUEZ RODRIGUEZ JOSE FRANCISCO',
+            cargo: 'PRESIDENTE DE LA JUNTA DE COORDINACIÓN POLÍTICA',
+            extension: '6494',
+          }],
+        },
+        {
+          nombre: 'Secretaría Ejecutiva',
+          usuarios: [{
+            nombre: 'D. EN D. OLVERA HERREROS OMAR SALVADOR',
+            cargo: 'SECRETARÍA EJECUTIVA',
+            extension: '6609',
+          }],
+        },
+        {
+          nombre: 'Recepción',
+          usuarios: [{
+            nombre: 'RECEPCIÓN DE PRESIDENCIA',
+            cargo: 'RECEPCIÓN',
+            extension: '6606',
+          }],
+        },
+      ],
+    };
 
     // 6️⃣ Respuesta final
     return dependencias.map(dep => {
@@ -200,20 +187,33 @@ export class DependenciasService {
       return {
         id_Dependencia: dep.id_Dependencia,
         dependencia: dep.nombre_completo,
-        ubicacion: ubicacionDependencia, // 👈 AQUÍ
-        direcciones: dep.t_direccion.map(dir => ({
-          id_Direccion: dir.id_Direccion,
-          nombre: dir.nombre_completo,
-          departamentos: dir.t_departamento.map(dpto => ({
-            id_Departamento: dpto.id_Departamento,
-            nombre: dpto.nombre_completo,
-            usuarios: (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-              .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0)),
-          })),
-        })),
+        ubicacion: ubicacionDependencia,
+        direcciones: dep.t_direccion.map(dir => {
+
+          // ⭐ AQUÍ va la lógica especial
+          if (
+            dir.id_Direccion === 1 &&
+            dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
+          ) {
+            return direccionJunta;
+          }
+
+          // Dirección normal
+          return {
+            id_Direccion: dir.id_Direccion,
+            nombre: dir.nombre_completo,
+            departamentos: dir.t_departamento.map(dpto => ({
+              id_Departamento: dpto.id_Departamento,
+              nombre: dpto.nombre_completo,
+              usuarios: (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0)),
+            })),
+          };
+        }),
       };
     });
   }
+
 
 
 
