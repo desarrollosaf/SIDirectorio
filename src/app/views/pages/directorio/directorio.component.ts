@@ -104,7 +104,7 @@ export class DirectorioComponent implements OnInit {
   // Para controlar el estado de los acordeones
   collapsedStates: { [key: string]: boolean } = {};
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://administracionyfinanzasplem.gob.mx/directoriov2/backend/api';
 
   constructor(
     private fb: FormBuilder,
