@@ -19,7 +19,7 @@ export class ThemeModeService {
 
     // Set initial localStorage 'theme' value based on the 'prefers-color-scheme' media query if 'null'
     if (this.getStoredTheme() === null) {
-      this.setStoredTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      this.setStoredTheme(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'light');
     }
     
     // Set the initial theme.
