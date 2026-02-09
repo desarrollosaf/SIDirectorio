@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DirectorioService, Dependencia, DirectorioResponse } from './directorio.service';
+import { DirectorioService, Dependencia, DirectorioResponse } from '../../../services/directorio.service';
 
 export type DirectoryRow = {
   esTitular: boolean;
