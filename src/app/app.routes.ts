@@ -3,6 +3,7 @@ import { BaseComponent } from './views/layout/base/base.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'landing', pathMatch: 'full' },
   {
     path: 'landing',
     loadComponent: () => import('./views/pages/landing/landing.component').then(c => c.LandingComponent),
