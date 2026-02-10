@@ -1,54 +1,81 @@
-
-
 <header class="header">
-  <img src="assets/img/logo/logo_congreso.svg" alt="Congreso" class="logo">
+  <img src="https://administracionyfinanzasplem.gob.mx/directorio/assets/img/logo/logo_congreso.svg" alt="Congreso" class="logo">
 
   <nav class="nav">
     <a href="#definiciones">Definiciones</a>
-    <a href="#faq">Guía IP</a>
+    <a href="#faq">¿Cómo funciona mi teléfono IP?</a>
     <a routerLink="/buscador">Buscador</a>
   </nav>
 </header>
 
 <div class="landing-wrapper">
+  <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
-      <!-- <h1>Directorio Telefónico Interno</h1>
-      <p>Guía rápida de uso del teléfono IP institucional</p> -->
-
       <div class="hero-actions">
-        <button>Guía del usuario</button>
-        <button>Buscador</button>
+        <button class="btn-primary">
+          Guía del usuario 📖
+        </button>
+        <button class="btn-secondary" routerLink="/buscador">
+          Buscador 🔍
+        </button>
       </div>
     </div>
   </section>
+
+  <!-- Definiciones Section -->
   <section id="definiciones" class="section">
-    <h2>Definiciones de vista frontal</h2>
+    <div class="section-header">
+      <h2>Definiciones de vista frontal</h2>
+    </div>
+
+    <!-- Imagen responsiva del teléfono -->
+    <div class="phone-container">
+      <img 
+        src="https://administracionyfinanzasplem.gob.mx/directorio/assets/img/banner/telefono.jpg" 
+        alt="Teléfono IP" 
+        class="phone-image"
+      />
+    </div>
 
     <div class="grid">
       <div class="card">
         <h3>Indicador de estado</h3>
-        <p>Luz verde sólida: llamada activa</p>
-        <p>Luz verde intermitente: llamada en espera</p>
-        <p>Luz roja intermitente: llamada entrante</p>
+        <ul class="card-list">
+          <li><span class="status green"></span> Luz verde sólida: llamada activa</li>
+          <li><span class="status green-blink"></span> Luz verde intermitente: llamada en espera</li>
+          <li><span class="status red-blink"></span> Luz roja intermitente: llamada entrante</li>
+        </ul>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/mensajes.svg" alt="Mensajes" class="card-icon-img">
+        </div>
         <h3>Mensajes</h3>
         <p>Acceso a los mensajes del sistema.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/directory.svg" alt="Directorio" class="card-icon-img">
+        </div>
         <h3>Directorio</h3>
         <p>Consulta de contactos guardados.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/home.svg" alt="Inicio" class="card-icon-img">
+        </div>
         <h3>Inicio</h3>
         <p>Regresa a la pantalla principal.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/hold.svg" alt="Espera" class="card-icon-img">
+        </div>
         <h3>Espera</h3>
         <p>Pone la llamada activa en espera.</p>
       </div>
@@ -59,11 +86,14 @@
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/navigation.svg" alt="Navegación" class="card-icon-img">
+        </div>
         <h3>Teclas de navegación</h3>
-        <ul>
-          <li>Arriba / Abajo: navegar</li>
-          <li>Izquierda: regresar</li>
-          <li>Derecha: sin función</li>
+        <ul class="card-list">
+          <li>⬆️ ⬇️ Arriba / Abajo: navegar</li>
+          <li>⬅️ Izquierda: regresar</li>
+          <li>➡️ Derecha: sin función</li>
         </ul>
       </div>
 
@@ -73,92 +103,187 @@
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/mute.svg" alt="Silencio" class="card-icon-img">
+        </div>
         <h3>Silencio</h3>
         <p>Activa o desactiva el micrófono.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/headset.svg" alt="Auriculares" class="card-icon-img">
+        </div>
         <h3>Auriculares</h3>
         <p>Cambia entre auriculares y teléfono.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/transfer.svg" alt="Transferencia" class="card-icon-img">
+        </div>
         <h3>Transferencia</h3>
         <p>Transfiere la llamada a otro número.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/conference.svg" alt="Conferencia" class="card-icon-img">
+        </div>
         <h3>Conferencia</h3>
         <p>Inicia una conferencia de 3 vías.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/send.svg" alt="Enviar" class="card-icon-img">
+        </div>
         <h3>Enviar</h3>
         <p>Marca el número ingresado.</p>
       </div>
 
       <div class="card">
+        <div class="card-icon-wrapper">
+          <img src="icons/speaker.svg" alt="Altavoz" class="card-icon-img">
+        </div>
         <h3>Altavoz</h3>
         <p>Alterna entre altavoz y auricular.</p>
       </div>
     </div>
   </section>
 
+  <!-- FAQ Section -->
   <section id="faq" class="section faq">
-    <h2>¿Cómo funciona mi teléfono IP?</h2>
+    <div class="section-header">
+      <h2>¿Cómo funciona mi teléfono IP?</h2>
+    </div>
 
-    <details>
-      <summary>Uso de audífonos o altavoz</summary>
-      <p>Utilice los botones correspondientes para activar altavoz o audífonos.</p>
-    </details>
+    <div class="faq-container">
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Uso de audífonos o altavoz</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Use el botón <img src="icons/altavoz.svg" alt="altavoz" class="card-icon-img"> para encender/apagar el altavoz.<br>
+          Use el botón <img src="icons/auriculares.svg" alt="auriculares" class="card-icon-img"> para usar los audífonos, una vez que estén conectados.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Hacer una llamada</summary>
-      <p>Levante el auricular, marque el número y presione enviar.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Hacer una llamada</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Levante el auricular o el audífono, o presione el botón Altavoz o una línea disponible.<br>
+          La línea tendrá tono de llamada y el LED de la línea se pondrá en verde.<br>
+          Marque el número de teléfono<br>
+          Presione el botón <img src="icons/enviar.svg" alt="enviar" class="card-icon-img"> o la tecla #.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Remarcado</summary>
-      <p>Levante el auricular y presione el botón de enviar.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Remarcado</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Levante el teléfono.<br>
+          Presione el botón <img src="icons/enviar.svg" alt="enviar" class="card-icon-img">.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Contestar llamadas</summary>
-      <p>Levante el auricular o presione altavoz.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Contestar llamadas</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Conteste la llamada levantando el auricular o el audífono, o presionando <img src="icons/altavoz.svg" alt="altavoz" class="card-icon-img"> o el botón de la línea por la que entra la llamada.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Retener / recuperar llamada</summary>
-      <p>Use el botón de espera para retener o recuperar una llamada.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Retener / recuperar llamada</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Retener: Retenga una llamada presionando el botón <img src="icons/pausa.svg" alt="pausa" class="card-icon-img">.<br>
+          Recuperar la llamada: Recupere la llamada presionando la línea parpadeante (Indicador de estado).</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Transferencia de llamada</summary>
-      <p>Presione transferir, marque el número y confirme.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Transferencia de llamada</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Presione el botón <img src="icons/transferir.svg" alt="transferir" class="card-icon-img">.<br>
+          Marque el número y presione el botón <img src="icons/enviar.svg" alt="enviar" class="card-icon-img"> para completar la transferencia de la llamada en curso.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Jalar llamada</summary>
-      <p>Marque *20* + extensión.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Jalar llamada</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Marque <code>*20*</code> y el número de la extensión que desea contestar.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Conferencia de 3 vías</summary>
-      <p>Use el botón de conferencia para agregar participantes.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Conferencia de 3 vías</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Iniciar una llamada en conferencia: Supongamos que usted ya está en una llamada y desea agregar un tercer participante a una conferencia de 3 vías.</p>
+          <p style="padding-left: 2rem; margin-top: 1rem;">
+            Presione el botón de <img src="icons/conferencia.svg" alt="conferencia" class="card-icon-img"> para abrir la pantalla de marcado en conferencia.<br>
+            Marque el número del tercer participante y presione la tecla <img src="icons/enviar.svg" alt="enviar" class="card-icon-img">.<br>
+            Cuando se establezca la comunicación con el tercer participante, presione la tecla de función "ConfCall" para iniciar la conferencia de 3 vías.<br>
+            Repita el paso 1-3 para agregar la cuarta parte a la conferencia.
+          </p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Silencio</summary>
-      <p>Activa o desactiva el micrófono durante la llamada.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Silencio</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Presione el botón <img src="icons/silencio.svg" alt="silencio" class="card-icon-img"> para activar y desactivar el modo silencio.<br>
+          El ícono <img src="icons/silencio.svg" alt="silencio" class="card-icon-img"> indica cuando el micrófono está en silencio.<br>
+          Presione el botón <img src="icons/silencio.svg" alt="silencio" class="card-icon-img"> para activar y desactivar el modo no molestar con el auricular colgado.</p>
+        </div>
+      </details>
 
-    <details>
-      <summary>Ajuste de volumen</summary>
-      <p>Use el control de volumen según sea necesario.</p>
-    </details>
+      <details class="faq-item">
+        <summary>
+          <span class="faq-title">Ajuste de volumen</span>
+          <span class="faq-arrow">▼</span>
+        </summary>
+        <div class="faq-content">
+          <p>Use el botón de volumen para ajustar el volumen del timbre cuando el teléfono no esté en uso. Presione el botón de volumen <img src="icons/volumen.svg" alt="volumen" class="card-icon-img"> durante una llamada para ajustar el volumen de la llamada.</p>
+        </div>
+      </details>
+    </div>
   </section>
 </div>
 
 <footer class="footer">
-  <p>Poder Legislativo del Estado de México</p>
+  <div class="footer-content">
+    <p>© 2026 Poder Legislativo del Estado de México</p>
+    <div class="footer-links">
+      <a href="#">Aviso de Privacidad</a>
+      <a href="#">Términos de Uso</a>
+      <a href="#">Contacto</a>
+    </div>
+  </div>
 </footer>
