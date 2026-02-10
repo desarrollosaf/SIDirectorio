@@ -9,6 +9,6 @@ import { RouterModule } from '@angular/router';
 })
 export class LandingComponent {
   openPdf() {
-    window.open('/pdf/Manual_Telefonia.pdf', '_blank');
+    window.open('assets/pdf/Manual_Telefonia.pdf', '_blank');
   }
 }
