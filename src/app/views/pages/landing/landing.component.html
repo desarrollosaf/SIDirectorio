@@ -2,8 +2,13 @@
   <img src="https://administracionyfinanzasplem.gob.mx/directorio/assets/img/logo/logo_congreso.svg" alt="Congreso" class="logo">
 
   <nav class="nav">
-    <a href="#definiciones">Definiciones</a>
-    <a href="#faq">¿Cómo funciona mi teléfono IP?</a>
+    <a
+  routerLink="/landing"
+  fragment="definiciones">
+  Definiciones
+</a>
+    <a routerLink="/landing"
+  fragment="faq">¿Cómo funciona mi teléfono IP?</a>
     <a [routerLink]="['/directorio']">Buscador</a>
   </nav>
 </header>
