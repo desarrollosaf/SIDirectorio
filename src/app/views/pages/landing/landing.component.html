@@ -4,7 +4,7 @@
   <nav class="nav">
     <a href="#definiciones">Definiciones</a>
     <a href="#faq">¿Cómo funciona mi teléfono IP?</a>
-    <a routerLink="/buscador">Buscador</a>
+    <a [routerLink]="['/directorio']">Buscador</a>
   </nav>
 </header>
 
@@ -13,11 +13,13 @@
   <section class="hero">
     <div class="hero-content">
       <div class="hero-actions">
-        <button class="btn-primary">
-          Guía del usuario 📖
+        <button
+          class="btn-primary"
+          (click)="openPdf()">
+          Guía del usuario
         </button>
-        <button class="btn-secondary" routerLink="/buscador">
-          Buscador 🔍
+        <button class="btn-secondary" [routerLink]="['/directorio']">
+          Buscador
         </button>
       </div>
     </div>
@@ -279,11 +281,10 @@
 
 <footer class="footer">
   <div class="footer-content">
-    <p>© 2026 Poder Legislativo del Estado de México</p>
+    
     <div class="footer-links">
-      <a href="#">Aviso de Privacidad</a>
-      <a href="#">Términos de Uso</a>
-      <a href="#">Contacto</a>
+      <a>Poder Legislativo del Estado de México</a>
+      <a href="#">Términos y condiciones</a>
     </div>
   </div>
 </footer>

@@ -93,18 +93,17 @@ body {
    ============================================ */
 .hero {
   position: relative;
-  min-height: 65vh;
   width: 100%;
+  aspect-ratio: 1300 / 650; /* 🔥 proporción real del banner */
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+   justify-content: center;
   align-items: flex-start;
   padding: 2rem 4rem 4rem;
-  background-image: url('https://administracionyfinanzasplem.gob.mx/directorio/assets/img/banner/background_lxii_2026.svg'),
-                    url('https://administracionyfinanzasplem.gob.mx/directorio/assets/img/banner/telefono.jpg');
-  background-repeat: no-repeat, no-repeat;
-  background-position: top center, right center;
-  background-size: cover, auto 80%;
+  background-image: url('https://administracionyfinanzasplem.gob.mx/directorio/assets/img/banner/background_lxii_2026.svg');
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100% auto;
   background-color: #e8e8e8;
 }
 
@@ -112,6 +111,8 @@ body {
   position: relative;
   z-index: 2;
   max-width: 100%;
+  margin-left: 21rem;
+  transform: translateY(110px);
 }
 
 .hero-title {
@@ -150,7 +151,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.75rem;
+  padding: 0.50rem 1rem;
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -158,13 +159,13 @@ body {
   font-weight: 600;
   transition: var(--transition);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-  background: var(--button-gray);
-  color: #fff;
+  background: #7e7979;
+  color: #000000;
 }
 
 .hero-actions button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 16px #a7a4a4;;
   background: var(--button-gray-hover);
 }
 
@@ -256,7 +257,7 @@ body {
 .card:hover {
   box-shadow: 0 6px 20px rgba(150, 19, 75, 0.12);
   transform: translateY(-4px);
-  border-color: var(--primary-color);
+  border-color: #96134b;
 }
 
 /* ============================================
@@ -284,7 +285,7 @@ body {
 }
 
 .card:hover .card-icon-wrapper {
-  border-color: var(--primary-color);
+  border-color: #96134b;
   background: rgba(150, 19, 75, 0.05);
 }
 
@@ -488,7 +489,7 @@ body {
    FOOTER
    ============================================ */
 .footer {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  background: white;
   color: white;
   padding: 2.5rem 2rem;
   margin-top: 5rem;
@@ -515,14 +516,14 @@ body {
 }
 
 .footer-links a {
-  color: rgba(255, 255, 255, 0.85);
+  color: #000000;
   text-decoration: none;
   transition: color 0.3s ease;
   font-weight: 500;
 }
 
 .footer-links a:hover {
-  color: #fff;
+  color: #000000;
   text-decoration: underline;
 }
 
@@ -559,9 +560,10 @@ body {
   }
   
   .hero {
-    min-height: 50vh;
+    height: 320px;
     padding: 2rem;
-    background-size: cover, auto 60%;
+    background-size: 100% auto;
+    background-position: top center;
   }
   
   .hero-title {
@@ -604,11 +606,10 @@ body {
     padding: 0.4rem 0;
   }
   
-  .hero {
-    min-height: auto;
+   .hero {
+    height: 260px;
     padding: 2rem 1rem;
-    background-image: url('https://administracionyfinanzasplem.gob.mx/directorio/assets/img/banner/background_lxii_2026.svg');
-    background-size: cover;
+    background-size: cover;       /* aquí SÍ */
     background-position: top center;
     justify-content: flex-start;
   }
@@ -710,6 +711,16 @@ body {
   
   .card p {
     font-size: 0.85rem;
+  }
+
+  .hero-content {
+    margin-left: 0;
+    transform: translateY(10px);
+    text-align: center;
+  }
+
+  .hero-actions {
+    justify-content: center;
   }
 }
 
