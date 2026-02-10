@@ -2,13 +2,10 @@
 <header class="dir-topbar">
   <div class="dir-topbar__inner">
     <div class="dir-logos">
-      <img class="dir-logo" src="assets/logos/edomex.png" alt="Logo Gobierno" />
-      <img class="dir-logo" src="assets/logos/congreso.png" alt="Logo Congreso" />
+      <img class="dir-logo" src="https://administracionyfinanzasplem.gob.mx/directorio/assets/img/logo/logo_congreso.svg" alt="Logo Gobierno" />
     </div>
 
-    <div class="dir-top-actions">
-      <a class="dir-login" href="#" (click)="$event.preventDefault()">Login</a>
-    </div>
+    
   </div>
 </header>
 
@@ -27,7 +24,7 @@
         </div>
 
         <button type="button" class="btn btn-primary btn-sm dir-primary" (click)="onSearch()">
-          PDF
+          Directorio PDF
         </button>
       </div>
 
@@ -40,16 +37,19 @@
 
             <form [formGroup]="form" class="dir-form" (ngSubmit)="onSearch()">
               <label class="form-label mb-1">Dependencia</label>
-              <select 
-                class="form-select dir-control" 
-                formControlName="dependencia" 
-                [class.is-invalid]="depInvalid"
-                [disabled]="loadingDependencias">
-                <option value="">Todas las dependencias</option>
-                <option *ngFor="let d of dependencias" [value]="d.id">
-                  {{ d.nombre }}
-                </option>
-              </select>
+               <select 
+                  id="selectDependencia"
+                  class="material-select" 
+                  formControlName="dependencia" 
+                  [class.is-invalid]="depInvalid"
+                  [class.has-value]="form.get('dependencia')?.value"
+                  [disabled]="loadingDependencias"
+                  required>
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let d of dependencias" [value]="d.id">
+                    {{ d.nombre }}
+                  </option>
+                </select>
               
               <div class="invalid-feedback" *ngIf="depInvalid">
                 Selecciona una dependencia.
