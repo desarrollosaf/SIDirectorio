@@ -1,7 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { DependenciasService } from './dependencias.service';
 import { CreateDependenciaDto } from './dto/create-dependencia.dto';
 import { UpdateDependenciaDto } from './dto/update-dependencia.dto';
+import { generarReporteDependenciasPDF } from './pdf/reporte-pdf';
+import { Response } from 'express';
+
 
 @Controller('dependencias')
 export class DependenciasController {
@@ -10,6 +13,22 @@ export class DependenciasController {
   @Post()
   create(@Body() createDependenciaDto: CreateDependenciaDto) {
     return this.dependenciasService.create(createDependenciaDto);
+  }
+
+  @Get('reporte/pdf/:id')
+  async generarPDF(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const data = await this.dependenciasService.findExtensionespdf(+id);
+
+    if (!data) {
+      return res.status(404).json({
+        message: 'No se encontraron dependencias',
+      });
+    }
+
+    generarReporteDependenciasPDF(data, res);
   }
 
   @Get()
