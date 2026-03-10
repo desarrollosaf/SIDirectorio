@@ -72,6 +72,8 @@ export class DependenciasService {
       .flatMap(dir => dir.t_departamento)
       .map(dep => dep.id_Departamento);
 
+    const dependenciasExcluirRango4 = [0, 1, 2, 4, 5, 6, 7, 8];
+    const dependenciasExcluirRango5 = [3];
     // 3️⃣ Usuarios activos
     const usuarios = await prisma.s_usuario.findMany({
       where: {
@@ -89,11 +91,13 @@ export class DependenciasService {
       },
     });
 
+
     // 4️⃣ Extensiones
     const extensiones = await prismaDirectorio.extensiones.findMany({
       where: { servidor_publico_id: { not: null } },
       select: {
         extension: true,
+        extension_privada: true, // 👈 NUEVO
         servidor_publico_id: true,
         ubicaciones: {
           select: {
@@ -107,36 +111,61 @@ export class DependenciasService {
       },
     });
 
+
     const extensionesMap = new Map<number, any>();
 
     extensiones.forEach(ext => {
-      if (!ext.extension) return;
+      if (!ext.extension && !ext.extension_privada) return;
 
       extensionesMap.set(Number(ext.servidor_publico_id), {
-        extension: ext.extension,
+        extension_publica: ext.extension ?? null,
+        extension_privada: ext.extension_privada ?? null,
         ubicacion: ext.ubicaciones ?? null,
       });
     });
 
     // 5️⃣ Usuarios por departamento
     const usuariosPorDepartamento = new Map<number, any[]>();
-
     usuarios.forEach(u => {
+      if (!u.id_Departamento) return;
+
+      const rango = u.s_users?.[0]?.rango ?? null;
+
+      // 🔒 Reglas por dependencia
+      if (
+        dependenciasExcluirRango4.includes(idDependencia) &&
+        rango === 4
+      ) {
+        console.log(`⛔ Excluido por rango 4: ${u.Nombre}`);
+        return;
+      }
+
+      if (
+        dependenciasExcluirRango5.includes(idDependencia) &&
+        rango === 5
+      ) {
+        console.log(`⛔ Excluido por rango 5: ${u.Nombre}`);
+        return;
+      }
+
       const ext = extensionesMap.get(u.id_Usuario);
-      if (!u.id_Departamento || !ext) return;
 
       if (!usuariosPorDepartamento.has(u.id_Departamento)) {
         usuariosPorDepartamento.set(u.id_Departamento, []);
       }
 
+      const extension = ext?.extension_publica ?? ext?.extension_privada ?? '';
+
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
-        nombre: u.Nombre,
+        nombre: extension ? `${extension} - ${u.Nombre}` : u.Nombre,
         cargo: u.Puesto,
-        rango: u.s_users?.[0]?.rango ?? null,
-        extension: ext.extension,
-        ubicacion: ext.ubicacion,
+        rango,
+        extension_publica: ext?.extension_publica ?? null,
+        extension_privada: ext?.extension_privada ?? null,
+        ubicacion: ext?.ubicacion ?? null,
       });
     });
+
 
     // ✅ Dirección especial (UNA SOLA VEZ)
     const direccionJunta = {
@@ -202,16 +231,250 @@ export class DependenciasService {
           return {
             id_Direccion: dir.id_Direccion,
             nombre: dir.nombre_completo,
-            departamentos: dir.t_departamento.map(dpto => ({
-              id_Departamento: dpto.id_Departamento,
-              nombre: dpto.nombre_completo,
-              usuarios: (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-                .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0)),
-            })),
+            departamentos: dir.t_departamento.map(dpto => {
+              const usuarios =
+                (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                  .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
+
+              return {
+                id_Departamento: dpto.id_Departamento,
+                nombre: dpto.nombre_completo,
+                usuarios, // ← puede ser []
+              };
+            }),
           };
         }),
       };
     });
+  }
+
+  async findExtensionespdf(idDependencia: number) {
+
+    // 1️⃣ Dependencias → Direcciones → Departamentos
+    const dependencias = await prisma.t_dependencia.findMany({
+      where: idDependencia === 0 ? undefined : { id_Dependencia: idDependencia },
+      select: {
+        id_Dependencia: true,
+        nombre_completo: true,
+        t_direccion: {
+          select: {
+            id_Direccion: true,
+            nombre_completo: true,
+            t_departamento: {
+              where: { Estado: 1 },
+              select: {
+                id_Departamento: true,
+                nombre_completo: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!dependencias.length) return null;
+
+    // 🔹 Crear relación Departamento → Dependencia
+    const departamentosInfo = dependencias
+      .flatMap(dep =>
+        dep.t_direccion.flatMap(dir =>
+          dir.t_departamento.map(dpto => ({
+            id_Departamento: dpto.id_Departamento,
+            id_Dependencia: dep.id_Dependencia,
+          }))
+        )
+      );
+
+    const departamentoDependenciaMap = new Map<number, number>();
+
+    departamentosInfo.forEach(d => {
+      departamentoDependenciaMap.set(d.id_Departamento, d.id_Dependencia);
+    });
+
+    // 2️⃣ IDs de departamentos
+    const departamentosIds = dependencias
+      .flatMap(dep => dep.t_direccion)
+      .flatMap(dir => dir.t_departamento)
+      .map(dep => dep.id_Departamento);
+
+    const dependenciasExcluirRango4 = [0, 1, 2, 4, 5, 6, 7, 8];
+    const dependenciasExcluirRango5 = [3];
+    // 3️⃣ Usuarios activos
+    const usuarios = await prisma.s_usuario.findMany({
+      where: {
+        Estado: 1,
+        id_Departamento: { in: departamentosIds },
+      },
+      select: {
+        id_Usuario: true,
+        Nombre: true,
+        id_Departamento: true,
+        Puesto: true,
+        s_users: {
+          select: { rango: true },
+        },
+      },
+    });
+
+
+    // 4️⃣ Extensiones
+    const extensiones = await prismaDirectorio.extensiones.findMany({
+      where: { servidor_publico_id: { not: null } },
+      select: {
+        extension: true,
+        extension_privada: true, // 👈 NUEVO
+        servidor_publico_id: true,
+        ubicaciones: {
+          select: {
+            calle: true,
+            num_ext: true,
+            num_int: true,
+            colonia: true,
+            codigo_postal: true,
+          },
+        },
+      },
+    });
+
+
+    const extensionesMap = new Map<number, any>();
+
+    extensiones.forEach(ext => {
+      if (!ext.extension && !ext.extension_privada) return;
+
+      extensionesMap.set(Number(ext.servidor_publico_id), {
+        extension_publica: ext.extension ?? null,
+        extension_privada: ext.extension_privada ?? null,
+        ubicacion: ext.ubicaciones ?? null,
+      });
+    });
+
+    // 5️⃣ Usuarios por departamento
+    const usuariosPorDepartamento = new Map<number, any[]>();
+    usuarios.forEach(u => {
+
+
+      if (!u.id_Departamento) return;
+
+      const rango = u.s_users?.[0]?.rango ?? null;
+      const dependenciaUsuario = departamentoDependenciaMap.get(u.id_Departamento);
+
+      if (!dependenciaUsuario) return;
+
+      // 🔒 Reglas por dependencia
+      if (
+        dependenciasExcluirRango4.includes(dependenciaUsuario) &&
+        rango === 4
+      ) {
+        
+        return;
+      }
+
+      if (
+        dependenciasExcluirRango5.includes(dependenciaUsuario) &&
+        rango === 5
+      ) {
+       
+        return;
+      }
+
+      const ext = extensionesMap.get(u.id_Usuario);
+
+      if (!usuariosPorDepartamento.has(u.id_Departamento)) {
+        usuariosPorDepartamento.set(u.id_Departamento, []);
+      }
+
+      usuariosPorDepartamento.get(u.id_Departamento)!.push({
+        nombre: u.Nombre,
+        cargo: u.Puesto,
+        rango,
+        extension_publica: ext?.extension_publica ?? null,
+        extension_privada: ext?.extension_privada ?? null,
+        ubicacion: ext?.ubicacion ?? null,
+      });
+    });
+
+
+    // ✅ Dirección especial (UNA SOLA VEZ)
+    const direccionJunta = {
+      id_Direccion: 1,
+      nombre: 'JUNTA DE COORDINACIÓN POLÍTICA',
+      departamentos: [
+        {
+          nombre: 'Presidencia',
+          usuarios: [{
+            nombre: 'DIP. VAZQUEZ RODRIGUEZ JOSE FRANCISCO',
+            cargo: 'PRESIDENTE DE LA JUNTA DE COORDINACIÓN POLÍTICA',
+            extension: '6494',
+          }],
+        },
+        {
+          nombre: 'Secretaría Ejecutiva',
+          usuarios: [{
+            nombre: 'D. EN D. OLVERA HERREROS OMAR SALVADOR',
+            cargo: 'SECRETARÍA EJECUTIVA',
+            extension: '6609',
+          }],
+        },
+        {
+          nombre: 'Recepción',
+          usuarios: [{
+            nombre: 'RECEPCIÓN DE PRESIDENCIA',
+            cargo: 'RECEPCIÓN',
+            extension: '6606',
+          }],
+        },
+      ],
+    };
+
+    // 6️⃣ Respuesta final
+    return dependencias.map(dep => {
+
+      let ubicacionDependencia: any = null;
+
+      dep.t_direccion.forEach(dir => {
+        dir.t_departamento.forEach(dpto => {
+          const usuarios = usuariosPorDepartamento.get(dpto.id_Departamento);
+          if (usuarios && usuarios.length && !ubicacionDependencia) {
+            ubicacionDependencia = usuarios[0].ubicacion;
+          }
+        });
+      });
+
+      return {
+        id_Dependencia: dep.id_Dependencia,
+        dependencia: dep.nombre_completo,
+        ubicacion: ubicacionDependencia,
+        direcciones: dep.t_direccion.map(dir => {
+
+          // ⭐ AQUÍ va la lógica especial
+          if (
+            dir.id_Direccion === 1 &&
+            dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
+          ) {
+            return direccionJunta;
+          }
+
+          // Dirección normal
+          return {
+            id_Direccion: dir.id_Direccion,
+            nombre: dir.nombre_completo,
+            departamentos: dir.t_departamento.map(dpto => {
+              const usuarios =
+                (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                  .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
+
+              return {
+                id_Departamento: dpto.id_Departamento,
+                nombre: dpto.nombre_completo,
+                usuarios, // ← puede ser []
+              };
+            }),
+          };
+        }),
+      };
+    });
+
   }
 
 
