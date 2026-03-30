@@ -1,5 +1,10 @@
-import PDFDocument from 'pdfkit';
 import { Response } from 'express';
+import PDFDocument from 'pdfkit';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const PDFDoc = require('pdfkit');
+
+type PDFDocType = InstanceType<typeof PDFDocument>;
 
 const TABLE = {
   startX: 50,
@@ -12,11 +17,12 @@ const TABLE = {
 const nameX = 150;
 const deptX = 70;
 const extX = 370;
-
 const nameWidth = 300;
-const lineHeight = 18;
 
-function drawRowLine(doc: PDFDocument, y: number) {
+const CONTENT_TOP = 120;
+const CONTENT_BOTTOM_MARGIN = 90;
+
+function drawRowLine(doc: PDFDocType, y: number) {
   doc
     .moveTo(TABLE.startX, y)
     .lineTo(TABLE.startX + TABLE.tableWidth, y)
@@ -25,31 +31,36 @@ function drawRowLine(doc: PDFDocument, y: number) {
     .stroke();
 }
 
-
-function drawHeaderFooter(doc: PDFDocument) {
-
-  // encabezado
+function drawHeaderFooter(doc: PDFDocType) {
   doc.image('assets/header_directorio.png', 0, 0, {
     width: doc.page.width,
   });
 
-  // pie
   doc.image('assets/footer_directorio.png', 0, doc.page.height - 70, {
     width: doc.page.width,
   });
+}
 
+function ensureSpace(doc: PDFDocType, neededHeight: number) {
+  const bottomLimit = doc.page.height - CONTENT_BOTTOM_MARGIN;
+  if (doc.y + neededHeight > bottomLimit) {
+    doc.addPage();
+  }
 }
 
 export function generarReporteDependenciasPDF(
   data: any[],
   res: Response,
 ) {
-  const doc = new PDFDocument({
+  const doc: PDFDocType = new PDFDoc({
     size: 'LETTER',
-    margins: { top: 120, bottom: 90, left: 50, right: 50 },
+    margins: {
+      top: CONTENT_TOP,
+      bottom: CONTENT_BOTTOM_MARGIN,
+      left: 50,
+      right: 50,
+    },
   });
-
-
 
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader(
@@ -59,28 +70,33 @@ export function generarReporteDependenciasPDF(
 
   doc.pipe(res);
 
-  // 📄 PAGINA 1
+  let pageNumber = 0;
+
+  doc.on('pageAdded', () => {
+    pageNumber++;
+
+    if (pageNumber >= 2) {
+      drawHeaderFooter(doc);
+      doc.y = CONTENT_TOP;
+    }
+  });
+
+  // ─── PÁGINA 1: Portada ───────────────────────────────────────────────────────
   doc.image('assets/portada_directorio.png', 0, 0, {
     width: doc.page.width,
     height: doc.page.height,
   });
 
-  // 📄 PAGINA 2
+  // ─── PÁGINA 2: LXII ─────────────────────────────────────────────────────────
   doc.addPage();
-
   doc.image('assets/directorio_lxii.png', 0, 0, {
     width: doc.page.width,
     height: doc.page.height,
   });
 
-  // 📄 PAGINA 3
+  // ─── PÁGINA 3+: Contenido ───────────────────────────────────────────────────
   doc.addPage();
 
-  drawHeaderFooter(doc);
-
-  doc.y = 120;
-
-  // Encabezado
   doc
     .fontSize(12)
     .text('H. CONGRESO DEL ESTADO', { align: 'center' })
@@ -94,13 +110,14 @@ export function generarReporteDependenciasPDF(
     return;
   }
 
-  data.forEach(dep => {
+  const usableWidth =
+    doc.page.width - doc.page.margins.left - doc.page.margins.right;
 
-    const usableWidth =
-      doc.page.width - doc.page.margins.left - doc.page.margins.right;
-    // 🔷 DEPENDENCIA
+  data.forEach((dep: any) => {
+    ensureSpace(doc, 30);
+
     doc
-      .moveDown()
+      .moveDown(0.5)
       .fontSize(12)
       .text(dep.dependencia, doc.page.margins.left, doc.y, {
         width: usableWidth,
@@ -110,116 +127,81 @@ export function generarReporteDependenciasPDF(
 
     if (!Array.isArray(dep.direcciones)) return;
 
-    dep.direcciones.forEach(dir => {
-
+    dep.direcciones.forEach((dir: any) => {
       const tieneUsuarios = dir.departamentos?.some(
-        d => Array.isArray(d.usuarios) && d.usuarios.length > 0
+        (d: any) => Array.isArray(d.usuarios) && d.usuarios.length > 0,
       );
 
-      if (!tieneUsuarios) return; // 🔴 omitir dirección completa
-
+      if (!tieneUsuarios) return;
       if (!Array.isArray(dir.departamentos)) return;
 
-      // 🔹 DIRECCIÓN (solo si existe)
       if (dir.nombre) {
-
-        const usableWidth =
-          doc.page.width - doc.page.margins.left - doc.page.margins.right;
+        ensureSpace(doc, 30);
 
         doc
-          .moveDown()
+          .moveDown(0.5)
           .fontSize(12)
           .text(dir.nombre, doc.page.margins.left, doc.y, {
             width: usableWidth,
             align: 'left',
-            underline: true,
           });
       }
-      const headerY = doc.y + 5;
 
+      ensureSpace(doc, TABLE.rowHeight + 10);
+      const headerY = doc.y + 5;
 
       doc
         .fontSize(10)
-        .text('NOMBRE', TABLE.colNombre, headerY + 6)
+        .text('NOMBRE / DEPARTAMENTO', TABLE.colNombre, headerY + 6)
         .text('EXT.', TABLE.colExt, headerY + 6);
 
+      doc.y = headerY + TABLE.rowHeight;
 
-      doc.moveDown();
+      dir.departamentos.forEach((dpto: any) => {
+        if (!Array.isArray(dpto.usuarios) || dpto.usuarios.length === 0) return;
 
-      dir.departamentos.forEach(dpto => {
-
-        if (!Array.isArray(dpto.usuarios) || dpto.usuarios.length === 0) {
-          return; // 🔴 omitir departamento vacío
-        }
-        if (!Array.isArray(dpto.usuarios) || !dpto.usuarios.length) return;
-
-        // 🏢 Departamento (una sola vez)
         if (dpto.nombre && dep.dependencia !== 'LEGISLATURA') {
+          ensureSpace(doc, 24);
+
           doc
-            .moveDown(0.8)
             .fontSize(9)
             .text(dpto.nombre, deptX, doc.y, {
               width: nameWidth,
-              underline: true,
             });
         }
 
-        // 👥 Usuarios
-        dpto.usuarios.forEach(u => {
-
-          const rowY = doc.y + 6;
-
-          const nameText = u.nombre ?? '';
+        dpto.usuarios.forEach((u: any) => {
+          const nameText: string = u.nombre ?? '';
+          const extText: string =
+            u.extension_privada || u.extension
+              ? `Ext. ${u.extension_privada || u.extension}`
+              : '';
 
           const nameHeight = doc.heightOfString(nameText, {
             width: nameWidth,
-            fontSize: 9,
           });
-
-
-          // 🔹 altura final de la fila
           const rowHeight = Math.max(TABLE.rowHeight, nameHeight + 12);
 
-          // 🔴 AQUÍ VA LA VALIDACIÓN DE SALTO DE PÁGINA
-          if (doc.y + rowHeight > doc.page.height - doc.page.margins.bottom) {
-            doc.addPage();
+          ensureSpace(doc, rowHeight + 2);
 
-            drawHeaderFooter(doc);
+          const rowY = doc.y;
 
-            doc.y = 120;
-          }
+          drawRowLine(doc, rowY);
 
-          // reajustar Y después del addPage
-          const adjustedRowY = doc.y + 6;
-
-          // Línea superior
-          drawRowLine(doc, adjustedRowY);
-
-          // 🧑 Nombre
-          doc.fontSize(9).text(nameText, nameX, adjustedRowY + 6, {
+          doc.fontSize(9).text(nameText, nameX, rowY + 6, {
             width: nameWidth,
+            lineBreak: true,
+          });
+
+          doc.fontSize(9).text(extText, extX, rowY + 6, {
+            width: 80,
+            align: 'right',
             lineBreak: false,
           });
 
-          // ☎️ Extensión
-          doc.fontSize(9).text(
-            (u.extension_privada || u.extension) ? `Ext. ${u.extension_privada || u.extension}` : '',
-            extX,
-            adjustedRowY + 6,
-            {
-              width: 80,
-              align: 'right',
-              lineBreak: false,
-            }
-          );
-
-          // ⬇️ mover cursor SOLO UNA VEZ
-          doc.y = adjustedRowY + rowHeight;
+          doc.y = rowY + rowHeight;
         });
       });
-
-
-
     });
   });
 
