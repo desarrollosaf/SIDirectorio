@@ -160,9 +160,10 @@ export class DependenciasService {
       const extension = ext?.extension_publica ?? ext?.extension_privada ?? '';
 
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
-        nombre: extension ? `${extension} - ${u.Nombre}` : u.Nombre,
+        nombre: u.Nombre,
         cargo: u.Puesto,
         rango,
+        extension: ext?.extension_publica ?? ext?.extension_privada ?? null,
         extension_publica: ext?.extension_publica ?? null,
         extension_privada: ext?.extension_privada ?? null,
         ubicacion: ext?.ubicacion ?? null,
@@ -394,6 +395,7 @@ export class DependenciasService {
         nombre: u.Nombre,
         cargo: u.Puesto,
         rango,
+        extension: ext?.extension_publica ?? ext?.extension_privada ?? null,
         extension_publica: ext?.extension_publica ?? null,
         extension_privada: ext?.extension_privada ?? null,
         ubicacion: ext?.ubicacion ?? null,
