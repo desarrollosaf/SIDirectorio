@@ -44,12 +44,12 @@ const LOGO_SIZE = 50;
 
 // ─── LOGOS DE GRUPOS PARLAMENTARIOS (por nombre de dirección) ────────────────
 const GRUPO_LOGOS: Record<string, string> = {
-  'GRUPO PARLAMENTARIO DEL PMC':  'assets/unidades/mc.png',
-  'GRUPO PARLAMENTARIO MORENA':   'assets/unidades/morena.png',
-  'GRUPO PARLAMENTARIO DEL PAN':  'assets/unidades/pan.png',
-  'GRUPO PARLAMENTARIO DEL PRD':  'assets/unidades/prd.png',
-  'GRUPO PARLAMENTARIO DEL PRI':  'assets/unidades/pri.png',
-  'GRUPO PARLAMENTARIO DEL PT':   'assets/unidades/pt.png',
+  'GRUPO PARLAMENTARIO DEL PMC': 'assets/unidades/mc.png',
+  'GRUPO PARLAMENTARIO MORENA': 'assets/unidades/morena.png',
+  'GRUPO PARLAMENTARIO DEL PAN': 'assets/unidades/pan.png',
+  'GRUPO PARLAMENTARIO DEL PRD': 'assets/unidades/prd.png',
+  'GRUPO PARLAMENTARIO DEL PRI': 'assets/unidades/pri.png',
+  'GRUPO PARLAMENTARIO DEL PT': 'assets/unidades/pt.png',
   'GRUPO PARLAMENTARIO DEL PVEM': 'assets/unidades/verde.png',
 };
 
@@ -306,6 +306,7 @@ function renderDireccion(
 // ─── EXPORT PRINCIPAL ────────────────────────────────────────────────────────
 export function generarReporteDependenciasPDF(
   data: any[],
+  servicios: any[],
   res: Response,
 ) {
   const doc: PDFDocType = new PDFDoc({
@@ -444,6 +445,86 @@ export function generarReporteDependenciasPDF(
       });
     }
   });
+
+  // ─── PÁGINA FINAL: Servicios ──────────────────────────────────────────────
+  if (Array.isArray(servicios) && servicios.length > 0) {
+    doc.addPage();
+
+    const usableW = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+    // Título de sección
+    ensureSpace(doc, 40);
+    doc
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .fillColor('#000000')
+      .text('SERVICIOS', TABLE.startX, doc.y, {
+        width: TABLE.tableWidth,
+        align: 'center',
+      })
+      .font('Helvetica');
+
+    doc.moveDown(0.5);
+
+    // Encabezado de tabla (fondo gris)
+    const headerY = doc.y;
+    doc.rect(TABLE.startX, headerY, TABLE.tableWidth, TABLE.rowHeight).fill('#CCCCCC');
+
+    const extColWidth = 80;
+    const extColX = TABLE.startX + TABLE.tableWidth - extColWidth;
+
+    doc
+      .fillColor('#000000')
+      .fontSize(10)
+      .font('Helvetica-Bold')
+      .text('EXT.', extColX, headerY + 6, {
+        width: extColWidth,
+        align: 'right',
+      })
+      .font('Helvetica');
+
+    doc.y = headerY + TABLE.rowHeight;
+
+    // Filas de servicios
+    servicios.forEach((srv: any) => {
+      const nameText: string = srv.nombre ?? '';
+      const extText: string = srv.extension ? `Ext. ${srv.extension}` : '';
+
+      const nameColX = TABLE.startX + 5;
+      const nameColWidth = extColX - nameColX - 10;
+      const nameHeight = doc.heightOfString(nameText, { width: nameColWidth });
+      const rowHeight = Math.max(TABLE.rowHeight, nameHeight + 12);
+
+      ensureSpace(doc, rowHeight + 2);
+
+      const rowY = doc.y;
+      drawRowLine(doc, rowY);
+
+      doc
+        .fontSize(9)
+        .font('Helvetica')
+        .fillColor('#000000')
+        .text(nameText, nameColX, rowY + 6, {
+          width: nameColWidth,
+          lineBreak: true,
+        });
+
+      doc
+        .fontSize(9)
+        .fillColor('#000000')
+        .text(extText, extColX, rowY + 6, {
+          width: extColWidth,
+          align: 'right',
+          lineBreak: false,
+        });
+
+      doc.y = rowY + rowHeight;
+    });
+
+    // Línea de cierre de tabla
+    drawRowLine(doc, doc.y);
+  }
+
 
   doc.end();
 }
