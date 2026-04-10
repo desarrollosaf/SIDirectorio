@@ -497,10 +497,18 @@ export class DependenciasService {
       return Array.from(grupos.values());
     }
 
+    const servicios = await prismaDirectorio.servicios.findMany({
+            where: { deleted_at: null },
+            select: {
+              id: true,
+              nombre: true,
+              extension: true,
+            },
+            orderBy: { nombre: 'asc' },
+          });
 
     // 6️⃣ Respuesta final
-    // 6️⃣ Respuesta final
-    return dependencias.map(dep => {
+    const dependenciasData = dependencias.map(dep => {
 
       let ubicacionDependencia: any = null;
 
@@ -543,6 +551,7 @@ export class DependenciasService {
         };
       });
 
+      
       return {
         id_Dependencia: dep.id_Dependencia,
         dependencia: dep.nombre_completo,
@@ -559,6 +568,12 @@ export class DependenciasService {
         direcciones,
       };
     });
+
+    return {
+      dependencias: dependenciasData,
+      servicios,
+    };
+  
 
   }
 
