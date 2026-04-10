@@ -101,10 +101,13 @@ export class DependenciasService {
         servidor_publico_id: true,
         ubicaciones: {
           select: {
+            id: true,
+            nombre: true,
             calle: true,
             num_ext: true,
             num_int: true,
             colonia: true,
+            municipio: true,
             codigo_postal: true,
           },
         },
@@ -326,10 +329,13 @@ export class DependenciasService {
         servidor_publico_id: true,
         ubicaciones: {
           select: {
+            id: true,
+            nombre: true,
             calle: true,
             num_ext: true,
             num_int: true,
             colonia: true,
+            municipio: true,
             codigo_postal: true,
           },
         },
@@ -366,7 +372,7 @@ export class DependenciasService {
         dependenciasExcluirRango4.includes(dependenciaUsuario) &&
         rango === 4
       ) {
-        
+
         return;
       }
 
@@ -374,7 +380,7 @@ export class DependenciasService {
         dependenciasExcluirRango5.includes(dependenciaUsuario) &&
         rango === 5
       ) {
-       
+
         return;
       }
 
@@ -427,6 +433,72 @@ export class DependenciasService {
       ],
     };
 
+
+    // ─── Ubicaciones por dependencia (para OSFEM) ──────────────────────────────
+    const ubicacionesPorDependencia = await prismaDirectorio.ubicaciones_dependencias.findMany({
+      where: { deleted_at: null },
+      select: {
+        dependencia_id: true,
+        ubicaciones: {
+          select: {
+            id: true,
+            nombre: true,
+            calle: true,
+            num_ext: true,
+            num_int: true,
+            colonia: true,
+            municipio: true,
+            codigo_postal: true,
+          },
+        },
+      },
+    });
+
+    // Mapa: dependencia_id → ubicaciones[]
+    const ubicacionesMap = new Map<number, any[]>();
+    ubicacionesPorDependencia.forEach(ud => {
+      const depId = Number(ud.dependencia_id);
+      if (!ubicacionesMap.has(depId)) ubicacionesMap.set(depId, []);
+      ubicacionesMap.get(depId)!.push(ud.ubicaciones);
+    });
+
+    // Helper: dado un array de direcciones, agrupa por ubicacion_id del primer usuario
+    function agruparDireccionesPorUbicacion(
+      direcciones: any[],
+      usuariosPorDepartamento: Map<number, any[]>,
+      ubicacionesMap: any[],
+    ): any[] {
+      // Mapa ubicacion_id → { ubicacion, direcciones[] }
+      const grupos = new Map<string, { ubicacion: any; direcciones: any[] }>();
+
+      direcciones.forEach(dir => {
+        // Buscar la ubicacion_id del primer usuario de esta dirección
+        let ubicacionId: string | null = null;
+        let ubicacionObj: any = null;
+
+        for (const dpto of dir.departamentos ?? []) {
+          const usuarios = usuariosPorDepartamento.get(dpto.id_Departamento) ?? [];
+          if (usuarios.length && usuarios[0].ubicacion) {
+            // Construir clave por calle+num para agrupar
+            const ub = usuarios[0].ubicacion;
+            ubicacionId = `${ub.calle}-${ub.num_ext}`;
+            ubicacionObj = ub;
+            break;
+          }
+        }
+
+        const key = ubicacionId ?? 'sin-ubicacion';
+        if (!grupos.has(key)) {
+          grupos.set(key, { ubicacion: ubicacionObj, direcciones: [] });
+        }
+        grupos.get(key)!.direcciones.push(dir);
+      });
+
+      return Array.from(grupos.values());
+    }
+
+
+    // 6️⃣ Respuesta final
     // 6️⃣ Respuesta final
     return dependencias.map(dep => {
 
@@ -441,37 +513,50 @@ export class DependenciasService {
         });
       });
 
+      const esOsfem = (dep.nombre_completo ?? '')
+        .toUpperCase()
+        .includes('ÓRGANO SUPERIOR DE FISCALIZACIÓN');
+
+      // Construir direcciones normales (igual que antes)
+      const direcciones = dep.t_direccion.map(dir => {
+        if (
+          dir.id_Direccion === 1 &&
+          dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
+        ) {
+          return direccionJunta;
+        }
+
+        return {
+          id_Direccion: dir.id_Direccion,
+          nombre: dir.nombre_completo,
+          departamentos: dir.t_departamento.map(dpto => {
+            const usuarios =
+              (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
+
+            return {
+              id_Departamento: dpto.id_Departamento,
+              nombre: dpto.nombre_completo,
+              usuarios,
+            };
+          }),
+        };
+      });
+
       return {
         id_Dependencia: dep.id_Dependencia,
         dependencia: dep.nombre_completo,
         ubicacion: ubicacionDependencia,
-        direcciones: dep.t_direccion.map(dir => {
-
-          // ⭐ AQUÍ va la lógica especial
-          if (
-            dir.id_Direccion === 1 &&
-            dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
-          ) {
-            return direccionJunta;
-          }
-
-          // Dirección normal
-          return {
-            id_Direccion: dir.id_Direccion,
-            nombre: dir.nombre_completo,
-            departamentos: dir.t_departamento.map(dpto => {
-              const usuarios =
-                (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-                  .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
-
-              return {
-                id_Departamento: dpto.id_Departamento,
-                nombre: dpto.nombre_completo,
-                usuarios, // ← puede ser []
-              };
-            }),
-          };
-        }),
+        ubicaciones_dep: ubicacionesMap.get(dep.id_Dependencia) ?? [],
+        // Solo OSFEM tendrá grupos_ubicacion poblado
+        grupos_ubicacion: esOsfem
+          ? agruparDireccionesPorUbicacion(
+            direcciones,
+            usuariosPorDepartamento,
+            ubicacionesMap.get(dep.id_Dependencia) ?? [],
+          )
+          : [],
+        direcciones,
       };
     });
 
