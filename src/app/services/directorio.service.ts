@@ -36,7 +36,9 @@ export interface DirectorioResponse {
         nombre: string;
         rango?: number;
         cargo?: string;
-        extension: string;
+        extension: string | null;
+        extension_publica: string | null;
+        extension_privada: string | null;
       }[];
     }[];
   }[];
