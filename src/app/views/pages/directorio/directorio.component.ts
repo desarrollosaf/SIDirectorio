@@ -161,6 +161,7 @@ export class DirectorioComponent implements OnInit {
         const esDireccion = esOSFEM && nombreNormalizado.startsWith('DIRECCION');
 
         if (dep.usuarios.length > 0) {
+          // directorio.component.ts — dentro de mapBackendToRows
           dep.usuarios.forEach(user => {
             rows.push({
               esTitular: user.rango === 1,
@@ -174,7 +175,7 @@ export class DirectorioComponent implements OnInit {
               nombre: user.nombre,
               rango: user.rango,
               cargo: user.cargo,
-              extension: user.extension,
+              extension: user.extension ?? user.extension_publica ?? user.extension_privada ?? '', // 👈
             });
           });
         } else {

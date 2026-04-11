@@ -2,10 +2,12 @@
 <header class="dir-topbar">
   <div class="dir-topbar__inner">
     <div class="dir-logos">
-      <img class="dir-logo" src="https://administracionyfinanzasplem.gob.mx/directorio/assets/img/logo/logo_congreso.svg" alt="Logo Gobierno" />
+      <img
+        class="dir-logo"
+        src="https://administracionyfinanzasplem.gob.mx/directorio/assets/img/logo/logo_congreso.svg"
+        alt="Logo Gobierno"
+      />
     </div>
-
-    
   </div>
 </header>
 
@@ -18,12 +20,19 @@
         <div>
           <h1 class="dir-title">Directorio telefónico interno</h1>
           <p class="dir-desc">
-            Consulta aquí las direcciones, números telefónicos y extensiones de las dependencias que integran el Poder Legislativo. 
-            Para iniciar la búsqueda da clic sobre el nombre de la dependencia seguido del botón buscar. Para una búsqueda más puntual, selecciona la dirección y departamento.
+            Consulta aquí las direcciones, números telefónicos y extensiones de
+            las dependencias que integran el Poder Legislativo. Para iniciar la
+            búsqueda da clic sobre el nombre de la dependencia seguido del botón
+            buscar. Para una búsqueda más puntual, selecciona la dirección y
+            departamento.
           </p>
         </div>
 
-        <button type="button" class="btn btn-primary btn-sm dir-primary" (click)="onSearch()">
+        <button
+          type="button"
+          class="btn btn-primary btn-sm dir-primary"
+          (click)="onSearch()"
+        >
           Directorio PDF
         </button>
       </div>
@@ -37,35 +46,45 @@
 
             <form [formGroup]="form" class="dir-form" (ngSubmit)="onSearch()">
               <label class="form-label mb-1">Dependencia</label>
-               <select 
-                  id="selectDependencia"
-                  class="material-select" 
-                  formControlName="dependencia" 
-                  [class.is-invalid]="depInvalid"
-                  [class.has-value]="form.get('dependencia')?.value"
-                  [disabled]="loadingDependencias"
-                  required>
-                  <option value="" disabled selected hidden></option>
-                  <option *ngFor="let d of dependencias" [value]="d.id">
-                    {{ d.nombre }}
-                  </option>
-                </select>
-              
+              <select
+                id="selectDependencia"
+                class="material-select"
+                formControlName="dependencia"
+                [class.is-invalid]="depInvalid"
+                [class.has-value]="form.get('dependencia')?.value"
+                [disabled]="loadingDependencias"
+                required
+              >
+                <option value="" disabled selected hidden></option>
+                <option *ngFor="let d of dependencias" [value]="d.id">
+                  {{ d.nombre }}
+                </option>
+              </select>
+
               <div class="invalid-feedback" *ngIf="depInvalid">
                 Selecciona una dependencia.
               </div>
 
               <div class="mt-3 d-grid gap-2">
-                <button 
-                  class="btn btn-primary" 
+                <button
+                  class="btn btn-primary"
                   type="button"
-                  (click)="onSearch()" 
-                  [disabled]="loading || loadingDependencias">
-                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                  {{ loading ? 'Buscando...' : 'Buscar' }}
+                  (click)="onSearch()"
+                  [disabled]="loading || loadingDependencias"
+                >
+                  <span
+                    *ngIf="loading"
+                    class="spinner-border spinner-border-sm me-2"
+                  ></span>
+                  {{ loading ? "Buscando..." : "Buscar" }}
                 </button>
 
-                <button class="btn btn-outline-secondary" type="button" (click)="onClear()" [disabled]="loading">
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  (click)="onClear()"
+                  [disabled]="loading"
+                >
                   Limpiar
                 </button>
               </div>
@@ -81,29 +100,47 @@
               <span class="placeholder col-4"></span>
             </div>
             <div class="progress dir-progress">
-              <div class="progress-bar progress-bar-striped progress-bar-animated w-100"></div>
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated w-100"
+              ></div>
             </div>
             <div class="dir-muted mt-2">Cargando resultados…</div>
           </div>
 
           <div *ngIf="!loading && error" class="alert alert-danger dir-alert">
             <div><strong>Error:</strong> {{ error }}</div>
-            <button class="btn btn-sm btn-light mt-2" type="button" (click)="onSearch()">Reintentar</button>
+            <button
+              class="btn btn-sm btn-light mt-2"
+              type="button"
+              (click)="onSearch()"
+            >
+              Reintentar
+            </button>
           </div>
 
-          <div *ngIf="!loading && searched && !error && grouped.length === 0" class="alert alert-warning dir-alert">
-            <strong>Sin resultados.</strong> Prueba otra dependencia o ajusta el filtro.
+          <div
+            *ngIf="!loading && searched && !error && grouped.length === 0"
+            class="alert alert-warning dir-alert"
+          >
+            <strong>Sin resultados.</strong> Prueba otra dependencia o ajusta el
+            filtro.
           </div>
 
-        
-          <div *ngIf="!loading && !error && grouped.length > 0" class="dir-resultsbar">
+          <div
+            *ngIf="!loading && !error && grouped.length > 0"
+            class="dir-resultsbar"
+          >
             <div class="dir-count">
               <span>{{ totalFiltered }}</span> resultado(s)
             </div>
 
             <div class="d-flex align-items-center gap-2">
               <span class="dir-muted small">Ordenar</span>
-              <select class="form-select form-select-sm dir-control dir-sort" [value]="sortBy" (change)="setSort($any($event.target).value)">
+              <select
+                class="form-select form-select-sm dir-control dir-sort"
+                [value]="sortBy"
+                (change)="setSort($any($event.target).value)"
+              >
                 <option value="area">Área</option>
                 <option value="nombre">Nombre</option>
                 <option value="ext">Extensión</option>
@@ -111,120 +148,154 @@
             </div>
           </div>
 
-      
           <!-- Resultados por dependencia -->
-<div *ngIf="!loading && !error && grouped.length > 0">
-  <div *ngFor="let g of grouped; let i = index">
-    
-    <!-- Cabecera: Nombre de la Dependencia -->
-    <div class="card mb-3 border-0 shadow-sm">
-      <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">{{ g.dependencia }}</h5>
-        <small class="d-block mt-1 opacity-90" *ngIf="g.ubicacion">
-          <i class="bi bi-geo-alt"></i> {{ g.ubicacion }}
-        </small>
-      </div>
-      
-      <!-- Titular de la Dependencia (Rango 1) -->
-      <div class="card-body" *ngIf="g.titular">
-        <div class="border-bottom pb-3 mb-3">
-          <p class="mb-1">
-            <strong>Titular:</strong> {{ g.titular.nombre }}
-          </p>
-          <p class="mb-1">
-            <strong>Cargo:</strong> {{ g.titular.cargo || 'SECRETARIO' }}
-          </p>
-          <p class="mb-0">
-            <strong>Extensión:</strong> 
-            <span 
-              class="text-primary cursor-pointer"
-              style="text-decoration: underline; cursor: pointer;"
-              (click)="copy(g.titular.extension)"
-              title="Click para copiar"
-            >
-              {{ g.titular.extension }}
-            </span>
-          </p>
-        </div>
-      </div>
+          <div *ngIf="!loading && !error && grouped.length > 0">
+            <div *ngFor="let g of grouped; let i = index">
+              <!-- Cabecera: Nombre de la Dependencia -->
+              <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                  <h5 class="mb-0">{{ g.dependencia }}</h5>
+                  <small class="d-block mt-1 opacity-90" *ngIf="g.ubicacion">
+                    <i class="bi bi-geo-alt"></i> {{ g.ubicacion }}
+                  </small>
+                </div>
 
-      <!-- Direcciones y Departamentos -->
-      <div class="accordion accordion-flush" *ngIf="g.direcciones.length > 0">
-        <div class="accordion-item" *ngFor="let dir of g.direcciones; let j = index">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              [class.collapsed]="isCollapsed(g.dependenciaId + '-' + j)"
-              type="button"
-              (click)="toggleCollapse(g.dependenciaId + '-' + j)"
-            >
-              <div class="w-100">
-                <div class="fw-semibold">{{ dir.nombre }}</div>
-              </div>
-            </button>
-          </h2>
+                <!-- Titular de la Dependencia (Rango 1) -->
+                <div class="card-body" *ngIf="g.titular">
+                  <div class="border-bottom pb-3 mb-3">
+                    <p class="mb-1">
+                      <strong>Titular:</strong> {{ g.titular.nombre }}
+                    </p>
+                    <p class="mb-1">
+                      <strong>Cargo:</strong>
+                      {{ g.titular.cargo || "SECRETARIO" }}
+                    </p>
+                    <p class="mb-0">
+                      <strong>Extensión:</strong>
+                      <span
+                        class="text-primary cursor-pointer"
+                        style="text-decoration: underline; cursor: pointer"
+                        (click)="copy(g.titular.extension)"
+                        title="Click para copiar"
+                      >
+                        {{ g.titular.extension }}
+                      </span>
+                    </p>
+                  </div>
+                </div>
 
-          <div
-            class="accordion-collapse collapse"
-            [class.show]="!isCollapsed(g.dependenciaId + '-' + j)"
-          >
-            <div class="accordion-body p-0">
-              <!-- Lista de departamentos/usuarios -->
-              <div class="list-group list-group-flush">
-                <div 
-                  class="list-group-item d-flex justify-content-between align-items-center py-3"
-                  [class.bg-warning]="dep.esDireccion"
-                  [class.bg-opacity-25]="dep.esDireccion"
-                  *ngFor="let dep of dir.departamentos"
+                <!-- Direcciones y Departamentos -->
+                <div
+                  class="accordion accordion-flush"
+                  *ngIf="g.direcciones.length > 0"
                 >
-                  <div>
-                    <div class="fw-semibold text-uppercase small text-muted">
-                      {{ dep.departamento }}
-                    </div>
-                    <div class="mt-1" *ngIf="dep.nombre">
-                      <span [class.fw-bold]="dep.esDireccion">{{ dep.nombre }}</span>
-                    </div>
-                    <div class="mt-1 text-muted fst-italic" *ngIf="!dep.nombre">
-                      <small>No asignado</small>
-                    </div>
-                  </div>
-                  <div class="text-end">
-                    <span 
-                      class="badge px-3 py-2 cursor-pointer"
-                      [class.bg-dark]="dep.extension !== 'Sin extensión'"
-                      [class.bg-secondary]="dep.extension === 'Sin extensión'"
-                      (click)="dep.extension !== 'Sin extensión' && copy(dep.extension)"
-                      [title]="dep.extension !== 'Sin extensión' ? 'Click para copiar' : ''"
+                  <div
+                    class="accordion-item"
+                    *ngFor="let dir of g.direcciones; let j = index"
+                  >
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button"
+                        [class.collapsed]="
+                          isCollapsed(g.dependenciaId + '-' + j)
+                        "
+                        type="button"
+                        (click)="toggleCollapse(g.dependenciaId + '-' + j)"
+                      >
+                        <div class="w-100">
+                          <div class="fw-semibold">{{ dir.nombre }}</div>
+                        </div>
+                      </button>
+                    </h2>
+
+                    <div
+                      class="accordion-collapse collapse"
+                      [class.show]="!isCollapsed(g.dependenciaId + '-' + j)"
                     >
-                      {{ dep.extension }}
-                    </span>
+                      <div class="accordion-body p-0">
+                        <!-- Lista de departamentos/usuarios -->
+                        <div class="list-group list-group-flush">
+                          <div
+                            class="list-group-item d-flex justify-content-between align-items-center py-3"
+                            [class.bg-warning]="dep.esDireccion"
+                            [class.bg-opacity-25]="dep.esDireccion"
+                            *ngFor="let dep of dir.departamentos"
+                          >
+                            <div>
+                              <div
+                                class="fw-semibold text-uppercase small text-muted"
+                              >
+                                {{ dep.departamento }}
+                              </div>
+                              <div class="mt-1" *ngIf="dep.nombre">
+                                <span [class.fw-bold]="dep.esDireccion">{{
+                                  dep.nombre
+                                }}</span>
+                              </div>
+                              <div
+                                class="mt-1 text-muted fst-italic"
+                                *ngIf="!dep.nombre"
+                              >
+                                <small>No asignado</small>
+                              </div>
+                            </div>
+                            <div class="text-end">
+                              <span
+                                class="badge px-3 py-2"
+                                [class.bg-dark]="dep.extension"
+                                [class.bg-secondary]="!dep.extension"
+                                [style.cursor]="
+                                  dep.extension ? 'pointer' : 'default'
+                                "
+                                (click)="dep.extension && copy(dep.extension)"
+                                [title]="
+                                  dep.extension ? 'Click para copiar' : ''
+                                "
+                              >
+                                {{ dep.extension || "Sin extensión" }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                </div>
+
+                <!-- Mensaje si no hay direcciones -->
+                <div
+                  class="card-body text-center text-muted"
+                  *ngIf="g.direcciones.length === 0 && !g.titular"
+                >
+                  <small
+                    >No hay información disponible para esta dependencia</small
+                  >
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Mensaje si no hay direcciones -->
-      <div class="card-body text-center text-muted" *ngIf="g.direcciones.length === 0 && !g.titular">
-        <small>No hay información disponible para esta dependencia</small>
-      </div>
-    </div>
-
-  </div>
-</div>
 
           <!-- Toast -->
-          <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
-            <div class="toast text-bg-dark border-0 dir-toast" [class.show]="toast.show" role="alert">
+          <div
+            class="toast-container position-fixed bottom-0 end-0 p-3"
+            style="z-index: 1080"
+          >
+            <div
+              class="toast text-bg-dark border-0 dir-toast"
+              [class.show]="toast.show"
+              role="alert"
+            >
               <div class="d-flex">
                 <div class="toast-body">{{ toast.message }}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" aria-label="Close" (click)="toast.show=false"></button>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white me-2 m-auto"
+                  aria-label="Close"
+                  (click)="toast.show = false"
+                ></button>
               </div>
             </div>
           </div>
-
         </section>
       </div>
     </section>
