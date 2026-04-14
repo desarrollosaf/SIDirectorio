@@ -417,12 +417,17 @@ model edificios {
 }
 
 model encargados {
-  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  usuario_id      BigInt?   @db.UnsignedBigInt
-  departamento_id BigInt?   @db.UnsignedBigInt
-  created_at      DateTime? @db.Timestamp(0)
-  updated_at      DateTime? @db.Timestamp(0)
-  deleted_at      DateTime? @db.Timestamp(0)
+  id              Int             @id @default(autoincrement())
+  usuario_id      Int?
+  departamento_id Int?
+  created_at      DateTime?       @db.Timestamp(0)
+  updated_at      DateTime?       @db.Timestamp(0)
+  deleted_at      DateTime?       @db.Timestamp(0)
+  t_departamento  t_departamento? @relation(fields: [departamento_id], references: [id_Departamento], onDelete: NoAction, onUpdate: NoAction, map: "fk_encargados_departamento")
+  s_usuario       s_usuario?      @relation(fields: [usuario_id], references: [id_Usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_encargados_usuario")
+
+  @@index([departamento_id], map: "fk_encargados_departamento")
+  @@index([usuario_id], map: "fk_encargados_usuario")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -2258,27 +2263,28 @@ model s_users21 {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model s_usuario {
-  id_Usuario              Int       @id @default(autoincrement())
-  N_Usuario               String?   @db.VarChar(100)
+  id_Usuario              Int          @id @default(autoincrement())
+  N_Usuario               String?      @db.VarChar(100)
   id_Dependencia          Int?
   id_Direccion            Int?
   id_Departamento         Int?
-  Nombre                  String    @db.LongText
-  A_Paterno               String?   @db.VarChar(25)
-  A_Materno               String?   @db.VarChar(25)
-  C_Electronico           String?   @db.VarChar(70)
-  Contrasena              String?   @db.VarChar(10)
+  Nombre                  String       @db.LongText
+  A_Paterno               String?      @db.VarChar(25)
+  A_Materno               String?      @db.VarChar(25)
+  C_Electronico           String?      @db.VarChar(70)
+  Contrasena              String?      @db.VarChar(10)
   Estado                  Int?
-  Puesto                  String    @db.Text
-  f_ingreso               DateTime  @db.Date
-  grado_estudios          String?   @db.VarChar(250)
-  grado_abreviado         String?   @db.VarChar(100)
-  curp                    String?   @db.VarChar(18)
+  Puesto                  String       @db.Text
+  f_ingreso               DateTime     @db.Date
+  grado_estudios          String?      @db.VarChar(250)
+  grado_abreviado         String?      @db.VarChar(100)
+  curp                    String?      @db.VarChar(18)
   telefono                BigInt?
   personal_secretarial_id Int?
-  created_at              DateTime? @db.Timestamp(0)
-  updated_at              DateTime? @db.Timestamp(0)
-  deleted_at              DateTime? @db.Timestamp(0)
+  created_at              DateTime?    @db.Timestamp(0)
+  updated_at              DateTime?    @db.Timestamp(0)
+  deleted_at              DateTime?    @db.Timestamp(0)
+  encargados              encargados[]
   s_users                 s_users[]
 
   @@index([id_Usuario], map: "id_Usuario")
@@ -2831,6 +2837,7 @@ model t_departamento {
   c_presup        Int
   nombre_completo String?      @db.VarChar(500)
   nom_cap         String?      @db.LongText
+  encargados      encargados[]
   t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], onDelete: NoAction, map: "fk_departamento_direccion")
 
   @@index([id_Departamento], map: "id_Departamento")

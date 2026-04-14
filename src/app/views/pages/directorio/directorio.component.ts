@@ -329,11 +329,10 @@ export class DirectorioComponent implements OnInit {
     this.totalFiltered = sorted.length;
   }
 
-  private apiUrl = 'http://localhost:3000/api';
 
   onDownloadPdf(): void {
     const depId = this.form.get('dependencia')?.value || 0;
-    window.open(`${this.apiUrl}/dependencias/reporte/pdf/${depId}`, '_blank');
+    this.directorioService.descargarPdf(depId);
   }
 
   /**
