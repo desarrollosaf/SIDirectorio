@@ -85,4 +85,10 @@ export class DirectorioService {
       })
     );
   }
+
+  descargarPdf(depId: number): void {
+    window.open(`${this.apiUrl}/dependencias/reporte/pdf/${depId}`, '_blank');
+  }
+
+
 }

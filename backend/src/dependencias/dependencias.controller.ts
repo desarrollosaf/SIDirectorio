@@ -15,25 +15,30 @@ export class DependenciasController {
     return this.dependenciasService.create(createDependenciaDto);
   }
 
-@Get('reporte/pdf/:id')
-async generarPDF(
-  @Param('id') id: string,
-  @Res() res: Response,
-) {
-  const resultado = await this.dependenciasService.findExtensionespdf(+id);
-
-  if (!resultado) {
-    return res.status(404).json({
-      message: 'No se encontraron dependencias',
-    });
+  @Get('encargados/departamento/:id')
+  encargadosPorDepartamento(@Param('id') id: string) {
+    return this.dependenciasService.encargadosPorDepartamento(+id);
   }
 
-  generarReporteDependenciasPDF(
-    resultado.dependencias,  // ✅ ahora existe
-    resultado.servicios,     // ✅ ahora existe
-    res,
-  );
-}
+  @Get('reporte/pdf/:id')
+  async generarPDF(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const resultado = await this.dependenciasService.findExtensionespdf(+id);
+
+    if (!resultado) {
+      return res.status(404).json({
+        message: 'No se encontraron dependencias',
+      });
+    }
+
+    generarReporteDependenciasPDF(
+      resultado.dependencias,  // ✅ ahora existe
+      resultado.servicios,     // ✅ ahora existe
+      res,
+    );
+  }
 
   @Get()
   findAll() {

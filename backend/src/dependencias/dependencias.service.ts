@@ -25,6 +25,7 @@ export class DependenciasService {
       select: {
         Nombre: true,
         t_direccion: {
+          where: { Estado: 1 }, // ✅ aquí va
           select: {
             id_Direccion: true,
             Nombre: true,
@@ -49,6 +50,7 @@ export class DependenciasService {
         id_Dependencia: true,
         nombre_completo: true,
         t_direccion: {
+          where: { Estado: 1 },
           select: {
             id_Direccion: true,
             nombre_completo: true,
@@ -139,7 +141,6 @@ export class DependenciasService {
         dependenciasExcluirRango4.includes(idDependencia) &&
         rango === 4
       ) {
-        console.log(`⛔ Excluido por rango 4: ${u.Nombre}`);
         return;
       }
 
@@ -147,7 +148,6 @@ export class DependenciasService {
         dependenciasExcluirRango5.includes(idDependencia) &&
         rango === 5
       ) {
-        console.log(`⛔ Excluido por rango 5: ${u.Nombre}`);
         return;
       }
 
@@ -160,6 +160,7 @@ export class DependenciasService {
       const extension = ext?.extension_publica ?? ext?.extension_privada ?? '';
 
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
+        id_Usuario: u.id_Usuario,
         nombre: u.Nombre,
         cargo: u.Puesto,
         rango,
@@ -202,6 +203,8 @@ export class DependenciasService {
         },
       ],
     };
+
+
 
     // 6️⃣ Respuesta final
     return dependencias.map(dep => {
@@ -347,8 +350,6 @@ export class DependenciasService {
     const extensionesMap = new Map<number, any>();
 
     extensiones.forEach(ext => {
-      if (!ext.extension && !ext.extension_privada) return;
-
       extensionesMap.set(Number(ext.servidor_publico_id), {
         extension_publica: ext.extension ?? null,
         extension_privada: ext.extension_privada ?? null,
@@ -356,52 +357,61 @@ export class DependenciasService {
       });
     });
 
+    const encargados = await prisma.encargados.findMany({
+      where: { deleted_at: null },
+      include: {
+        t_departamento: {
+          select: { nombre_completo: true },
+        },
+      },
+    });
+
     // 5️⃣ Usuarios por departamento
     const usuariosPorDepartamento = new Map<number, any[]>();
     usuarios.forEach(u => {
-
-
       if (!u.id_Departamento) return;
 
       const rango = u.s_users?.[0]?.rango ?? null;
       const dependenciaUsuario = departamentoDependenciaMap.get(u.id_Departamento);
-
       if (!dependenciaUsuario) return;
 
-      // 🔒 Reglas por dependencia
-      if (
-        dependenciasExcluirRango4.includes(dependenciaUsuario) &&
-        rango === 4
-      ) {
-
-        return;
-      }
-
-      if (
-        dependenciasExcluirRango5.includes(dependenciaUsuario) &&
-        rango === 5
-      ) {
-
-        return;
-      }
-
+      // ─── Lógica de encargados ───────────────────────────────────────────
+      const encargadoEntry = encargados.find(
+        enc => Number(enc.usuario_id) === u.id_Usuario,
+      );
       const ext = extensionesMap.get(u.id_Usuario);
+      if (encargadoEntry) {
+        const tieneExtension = ext?.extension_publica || ext?.extension_privada;
+        if (!tieneExtension) return;
+      }
+
+      if (!usuariosPorDepartamento.has(u.id_Departamento)) {
+        usuariosPorDepartamento.set(u.id_Departamento, []);
+      }
+
+
+      // 🔒 Reglas por dependencia
+      if (dependenciasExcluirRango4.includes(dependenciaUsuario) && rango === 4) return;
+      if (dependenciasExcluirRango5.includes(dependenciaUsuario) && rango === 5) return;
 
       if (!usuariosPorDepartamento.has(u.id_Departamento)) {
         usuariosPorDepartamento.set(u.id_Departamento, []);
       }
 
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
-        nombre: u.Nombre,
+        id_Usuario: u.id_Usuario,
+        nombre: encargadoEntry && Number(encargadoEntry.departamento_id) === Number(u.id_Departamento)
+          ? `${u.Nombre} (Encargado)`
+          : u.Nombre,
         cargo: u.Puesto,
         rango,
         extension: ext?.extension_publica ?? ext?.extension_privada ?? null,
         extension_publica: ext?.extension_publica ?? null,
         extension_privada: ext?.extension_privada ?? null,
         ubicacion: ext?.ubicacion ?? null,
+        ubicacion_id: ext?.ubicacion ? Number(ext.ubicacion.id) : null,
       });
     });
-
 
     // ✅ Dirección especial (UNA SOLA VEZ)
     const direccionJunta = {
@@ -464,50 +474,78 @@ export class DependenciasService {
       ubicacionesMap.get(depId)!.push(ud.ubicaciones);
     });
 
-    // Helper: dado un array de direcciones, agrupa por ubicacion_id del primer usuario
+    // ─── Mapa inverso: ubicacion_id → Set de id_Departamento ──────────────────
+    const ubicacionDepartamentosMap = new Map<number, Set<number>>();
+
+    usuarios.forEach(u => {
+      if (!u.id_Departamento) return;
+      const ext = extensionesMap.get(u.id_Usuario);
+      if (!ext?.ubicacion) return;
+      const ubId = Number(ext.ubicacion.id);
+      if (!ubicacionDepartamentosMap.has(ubId)) {
+        ubicacionDepartamentosMap.set(ubId, new Set());
+      }
+      ubicacionDepartamentosMap.get(ubId)!.add(u.id_Departamento);
+    });
+
+
     function agruparDireccionesPorUbicacion(
       direcciones: any[],
       usuariosPorDepartamento: Map<number, any[]>,
-      ubicacionesMap: any[],
+      ubicacionesDep: any[],
+      ubicacionDepartamentosMap: Map<number, Set<number>>,
     ): any[] {
-      // Mapa ubicacion_id → { ubicacion, direcciones[] }
-      const grupos = new Map<string, { ubicacion: any; direcciones: any[] }>();
 
-      direcciones.forEach(dir => {
-        // Buscar la ubicacion_id del primer usuario de esta dirección
-        let ubicacionId: string | null = null;
-        let ubicacionObj: any = null;
+      return ubicacionesDep
+        .filter((ub: any) => ub != null)
+        .map((ub: any) => {
+          const ubId = Number(ub.id);
+          const dptosEnUbicacion = ubicacionDepartamentosMap.get(ubId) ?? new Set();
 
-        for (const dpto of dir.departamentos ?? []) {
-          const usuarios = usuariosPorDepartamento.get(dpto.id_Departamento) ?? [];
-          if (usuarios.length && usuarios[0].ubicacion) {
-            // Construir clave por calle+num para agrupar
-            const ub = usuarios[0].ubicacion;
-            ubicacionId = `${ub.calle}-${ub.num_ext}`;
-            ubicacionObj = ub;
-            break;
-          }
-        }
+          // Filtrar solo las direcciones que tienen al menos un departamento en esta ubicación
+          const direccionesDeUbicacion = direcciones
+            .map(dir => {
+              // Filtrar departamentos de esta dirección que pertenecen a esta ubicación
+              const departamentosFiltrados = (dir.departamentos ?? []).filter(
+                (dpto: any) => dptosEnUbicacion.has(dpto.id_Departamento),
+              );
 
-        const key = ubicacionId ?? 'sin-ubicacion';
-        if (!grupos.has(key)) {
-          grupos.set(key, { ubicacion: ubicacionObj, direcciones: [] });
-        }
-        grupos.get(key)!.direcciones.push(dir);
-      });
+              if (departamentosFiltrados.length === 0) return null;
 
-      return Array.from(grupos.values());
+              return {
+                ...dir,
+                departamentos: departamentosFiltrados,
+              };
+            })
+            .filter(Boolean);
+
+          return {
+            ubicacion: ub,
+            direcciones: direccionesDeUbicacion,
+          };
+        });
     }
 
     const servicios = await prismaDirectorio.servicios.findMany({
-            where: { deleted_at: null },
-            select: {
-              id: true,
-              nombre: true,
-              extension: true,
-            },
-            orderBy: { nombre: 'asc' },
-          });
+      where: { deleted_at: null },
+      select: {
+        id: true,
+        nombre: true,
+        extension: true,
+      },
+      orderBy: { nombre: 'asc' },
+    });
+
+
+    const encargadosPorUsuario = new Map<number, string>();
+    encargados.forEach(enc => {
+      if (enc.usuario_id && enc.t_departamento?.nombre_completo) {
+        encargadosPorUsuario.set(
+          Number(enc.usuario_id),
+          enc.t_departamento.nombre_completo,
+        );
+      }
+    });
 
     // 6️⃣ Respuesta final
     const dependenciasData = dependencias.map(dep => {
@@ -527,6 +565,12 @@ export class DependenciasService {
         .toUpperCase()
         .includes('ÓRGANO SUPERIOR DE FISCALIZACIÓN');
 
+      const encargadosParaPdf = encargados.map(enc => ({
+        usuario_id: Number(enc.usuario_id),
+        departamento_id: Number(enc.departamento_id),
+        t_departamento: enc.t_departamento,
+      }));
+
       // Construir direcciones normales (igual que antes)
       const direcciones = dep.t_direccion.map(dir => {
         if (
@@ -539,25 +583,33 @@ export class DependenciasService {
         return {
           id_Direccion: dir.id_Direccion,
           nombre: dir.nombre_completo,
-          departamentos: dir.t_departamento.map(dpto => {
-            const usuarios =
-              (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-                .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
+          departamentos: dir.t_departamento.filter(dpto => dpto.id_Departamento !== 109)
+            .map(dpto => {
+              const usuarios =
+                (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                  .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
 
-            return {
-              id_Departamento: dpto.id_Departamento,
-              nombre: dpto.nombre_completo,
-              usuarios,
-            };
-          }),
+              return {
+                id_Departamento: dpto.id_Departamento,
+                nombre: dpto.nombre_completo,
+                usuarios,
+                encargados: encargados
+                  .filter(enc => enc.departamento_id === dpto.id_Departamento)
+                  .map(enc => ({
+                    usuario_id: Number(enc.usuario_id),
+                    departamento_id: enc.departamento_id,
+                    t_departamento: enc.t_departamento,
+                  })),
+              };
+            }),
         };
       });
 
-      
       return {
         id_Dependencia: dep.id_Dependencia,
         dependencia: dep.nombre_completo,
         ubicacion: ubicacionDependencia,
+        encargados: encargadosParaPdf,
         ubicaciones_dep: ubicacionesMap.get(dep.id_Dependencia) ?? [],
         // Solo OSFEM tendrá grupos_ubicacion poblado
         grupos_ubicacion: esOsfem
@@ -565,22 +617,45 @@ export class DependenciasService {
             direcciones,
             usuariosPorDepartamento,
             ubicacionesMap.get(dep.id_Dependencia) ?? [],
+            ubicacionDepartamentosMap,  // 👈
           )
           : [],
         direcciones,
       };
     });
 
+
     return {
       dependencias: dependenciasData,
       servicios,
     };
-  
+
 
   }
 
 
 
+  async encargadosPorDepartamento(idDepartamento: number) {
+    const encargados = await prisma.encargados.findMany({
+      where: {
+        departamento_id: idDepartamento,
+        deleted_at: null,
+        s_usuario: {
+          isNot: null,
+        },
+      },
+      include: {
+        s_usuario: true,
+        t_departamento: true,
+      },
+    });
+
+    return JSON.parse(
+      JSON.stringify(encargados, (_, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      ),
+    );
+  }
 
   findOne(id: number) {
     return `This action returns a #${id} dependencia`;
