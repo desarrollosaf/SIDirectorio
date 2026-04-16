@@ -50,7 +50,7 @@ export interface DirectorioResponse {
 export class DirectorioService {
   private apiUrl = 'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Obtiene todas las dependencias
@@ -77,18 +77,20 @@ export class DirectorioService {
     return this.http.get<DirectorioResponse | DirectorioResponse[]>(
       `${this.apiUrl}/dependencias/${depId}/direcciones-extensiones`
     )
-    .pipe(
-      map(res => Array.isArray(res) ? res : [res]),
-      catchError(err => {
-        console.error('Error al cargar directorio:', err);
-        throw err; // Propagamos el error para manejarlo en el componente
-      })
-    );
+      .pipe(
+        map(res => Array.isArray(res) ? res : [res]),
+        catchError(err => {
+          console.error('Error al cargar directorio:', err);
+          throw err; // Propagamos el error para manejarlo en el componente
+        })
+      );
   }
 
-  descargarPdf(depId: number): void {
-    window.open(`${this.apiUrl}/dependencias/reporte/pdf/${depId}`, '_blank');
-  }
+descargarPdf(depId: number): Observable<Blob> {
+  return this.http.get(`${this.apiUrl}/dependencias/reporte/pdf/${depId}`, {
+    responseType: 'blob'
+  });
+}
 
 
 }

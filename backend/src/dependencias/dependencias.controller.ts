@@ -34,16 +34,19 @@ export class DependenciasController {
     }
 
     generarReporteDependenciasPDF(
-      resultado.dependencias,  // ✅ ahora existe
-      resultado.servicios,     // ✅ ahora existe
+      resultado.dependencias,
+      resultado.servicios,
       res,
     );
   }
+
 
   @Get()
   findAll() {
     return this.dependenciasService.findAll();
   }
+
+
 
   @Get(':id/direcciones')
   findDirecciones(
@@ -72,4 +75,8 @@ export class DependenciasController {
   remove(@Param('id') id: string) {
     return this.dependenciasService.remove(+id);
   }
+
+
+
+
 }

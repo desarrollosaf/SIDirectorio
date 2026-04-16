@@ -41,6 +41,7 @@ export class DirectorioComponent implements OnInit {
 
   loading = false;
   loadingDependencias = false;
+  descargandoReporte = false;
   error: string | null = null;
   searched = false;
 
@@ -332,7 +333,30 @@ export class DirectorioComponent implements OnInit {
 
   onDownloadPdf(): void {
     const depId = this.form.get('dependencia')?.value || 0;
-    this.directorioService.descargarPdf(depId);
+
+    this.descargandoReporte = true;
+
+    this.directorioService.descargarPdf(depId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Directorio Telefónico.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(url);
+        this.descargandoReporte = false;
+      },
+      error: (e) => {
+        this.descargandoReporte = false;
+        this.showToast('Error al descargar PDF');
+        console.error(e);
+      }
+    });
   }
 
   /**

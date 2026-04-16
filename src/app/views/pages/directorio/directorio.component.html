@@ -27,13 +27,13 @@
             departamento.
           </p>
         </div>
-
         <button
           type="button"
           class="btn btn-primary btn-sm dir-primary"
           (click)="onDownloadPdf()"
+          [disabled]="descargandoReporte"
         >
-          Directorio PDF
+          {{ descargandoReporte ? "Generando PDF..." : "Directorio PDF" }}
         </button>
       </div>
 

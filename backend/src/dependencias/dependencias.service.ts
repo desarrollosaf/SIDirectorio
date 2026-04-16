@@ -3,6 +3,7 @@ import { CreateDependenciaDto } from './dto/create-dependencia.dto';
 import { UpdateDependenciaDto } from './dto/update-dependencia.dto';
 import { prisma } from '../../prisma-users-database/prisma/prisma'
 import { prismaDirectorio } from '../../prisma-directorio-database/prisma/prisma'
+import PDFDocument from 'pdfkit';
 
 @Injectable()
 export class DependenciasService {
@@ -657,6 +658,9 @@ export class DependenciasService {
     );
   }
 
+
+
+
   findOne(id: number) {
     return `This action returns a #${id} dependencia`;
   }
@@ -668,4 +672,9 @@ export class DependenciasService {
   remove(id: number) {
     return `This action removes a #${id} dependencia`;
   }
+
+
+
+
+
 }
