@@ -179,6 +179,7 @@ export class DependenciasService {
       nombre: 'JUNTA DE COORDINACIÓN POLÍTICA',
       departamentos: [
         {
+          id_Departamento: 0,
           nombre: 'Presidencia',
           usuarios: [{
             nombre: 'DIP. VAZQUEZ RODRIGUEZ JOSE FRANCISCO',
@@ -187,6 +188,7 @@ export class DependenciasService {
           }],
         },
         {
+          id_Departamento: 0,
           nombre: 'Secretaría Ejecutiva',
           usuarios: [{
             nombre: 'D. EN D. OLVERA HERREROS OMAR SALVADOR',
@@ -195,6 +197,7 @@ export class DependenciasService {
           }],
         },
         {
+          id_Departamento: 0,
           nombre: 'Recepción',
           usuarios: [{
             nombre: 'RECEPCIÓN DE PRESIDENCIA',
@@ -225,33 +228,31 @@ export class DependenciasService {
         id_Dependencia: dep.id_Dependencia,
         dependencia: dep.nombre_completo,
         ubicacion: ubicacionDependencia,
-        direcciones: dep.t_direccion.map(dir => {
+        direcciones: (() => {
+          const dirs = dep.t_direccion.map(dir => {
+            // Dirección normal
+            return {
+              id_Direccion: dir.id_Direccion,
+              nombre: dir.nombre_completo,
+              departamentos: dir.t_departamento.map(dpto => {
+                const usuarios =
+                  (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                    .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
+                return {
+                  id_Departamento: dpto.id_Departamento,
+                  nombre: dpto.nombre_completo,
+                  usuarios,
+                };
+              }),
+            };
+          });
 
-          // ⭐ AQUÍ va la lógica especial
-          if (
-            dir.id_Direccion === 1 &&
-            dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
-          ) {
-            return direccionJunta;
+          if (dep.id_Dependencia === 1) {
+            dirs.unshift(direccionJunta);
           }
 
-          // Dirección normal
-          return {
-            id_Direccion: dir.id_Direccion,
-            nombre: dir.nombre_completo,
-            departamentos: dir.t_departamento.map(dpto => {
-              const usuarios =
-                (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-                  .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
-
-              return {
-                id_Departamento: dpto.id_Departamento,
-                nombre: dpto.nombre_completo,
-                usuarios, // ← puede ser []
-              };
-            }),
-          };
-        }),
+          return dirs;
+        })(),
       };
     });
   }
