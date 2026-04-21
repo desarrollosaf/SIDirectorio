@@ -491,41 +491,86 @@ export class DependenciasService {
     });
 
 
-    function agruparDireccionesPorUbicacion(
-      direcciones: any[],
-      usuariosPorDepartamento: Map<number, any[]>,
-      ubicacionesDep: any[],
-      ubicacionDepartamentosMap: Map<number, Set<number>>,
-    ): any[] {
+    function agruparPorUbicacionDesdeExtensiones(dep: any): any[] {
+      const porUbicacion = new Map<number, {
+        ubicacion: any;
+        direcciones: Map<number, {
+          id_Direccion: number;
+          nombre: string;
+          departamentos: Map<number, {
+            id_Departamento: number;
+            nombre: string;
+            usuarios: any[];
+            encargados: any[];
+          }>;
+        }>;
+      }>();
 
-      return ubicacionesDep
-        .filter((ub: any) => ub != null)
-        .map((ub: any) => {
-          const ubId = Number(ub.id);
-          const dptosEnUbicacion = ubicacionDepartamentosMap.get(ubId) ?? new Set();
+      for (const dir of dep.t_direccion) {
+        for (const dpto of dir.t_departamento) {
+          if (dpto.id_Departamento === 109) continue;
 
-          // Filtrar solo las direcciones que tienen al menos un departamento en esta ubicación
-          const direccionesDeUbicacion = direcciones
-            .map(dir => {
-              // Filtrar departamentos de esta dirección que pertenecen a esta ubicación
-              const departamentosFiltrados = (dir.departamentos ?? []).filter(
-                (dpto: any) => dptosEnUbicacion.has(dpto.id_Departamento),
-              );
+          const usuariosDelDpto = (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+            .sort((a: any, b: any) => (a.rango ?? 0) - (b.rango ?? 0));
 
-              if (departamentosFiltrados.length === 0) return null;
+          for (const u of usuariosDelDpto) {
+            // 👇 Ubicación proviene SIEMPRE de la extensión del usuario
+            if (!u.ubicacion?.id) continue;
 
-              return {
-                ...dir,
-                departamentos: departamentosFiltrados,
-              };
-            })
-            .filter(Boolean);
+            const ubId = Number(u.ubicacion.id);
 
-          return {
-            ubicacion: ub,
-            direcciones: direccionesDeUbicacion,
-          };
-        });
+            if (!porUbicacion.has(ubId)) {
+              porUbicacion.set(ubId, {
+                ubicacion: u.ubicacion,
+                direcciones: new Map(),
+              });
+            }
+
+            const ubEntry = porUbicacion.get(ubId)!;
+
+            if (!ubEntry.direcciones.has(dir.id_Direccion)) {
+              ubEntry.direcciones.set(dir.id_Direccion, {
+                id_Direccion: dir.id_Direccion,
+                nombre: dir.nombre_completo,
+                departamentos: new Map(),
+              });
+            }
+
+            const dirEntry = ubEntry.direcciones.get(dir.id_Direccion)!;
+
+            if (!dirEntry.departamentos.has(dpto.id_Departamento)) {
+              dirEntry.departamentos.set(dpto.id_Departamento, {
+                id_Departamento: dpto.id_Departamento,
+                nombre: dpto.nombre_completo,
+                usuarios: [],
+                encargados: encargados
+                  .filter(enc => enc.departamento_id === dpto.id_Departamento)
+                  .map(enc => ({
+                    usuario_id: Number(enc.usuario_id),
+                    departamento_id: enc.departamento_id,
+                    t_departamento: enc.t_departamento,
+                  })),
+              });
+            }
+
+            const dptoEntry = dirEntry.departamentos.get(dpto.id_Departamento)!;
+
+            const yaExiste = dptoEntry.usuarios.some(x => x.id_Usuario === u.id_Usuario);
+            if (!yaExiste) dptoEntry.usuarios.push(u);
+          }
+        }
+      }
+
+      return [...porUbicacion.values()]
+        .map(({ ubicacion, direcciones }) => ({
+          ubicacion,
+          direcciones: [...direcciones.values()].map(dir => ({
+            id_Direccion: dir.id_Direccion,
+            nombre: dir.nombre,
+            departamentos: [...dir.departamentos.values()],
+          })),
+        }))
+        .sort((a, b) => Number(a.ubicacion.id) - Number(b.ubicacion.id));
     }
 
     const servicios = await prismaDirectorio.servicios.findMany({
@@ -563,15 +608,15 @@ export class DependenciasService {
         });
       });
 
-      const esOsfem = (dep.nombre_completo ?? '')
-        .toUpperCase()
-        .includes('ÓRGANO SUPERIOR DE FISCALIZACIÓN');
+      const esOsfem = dep.id_Dependencia === 3;
 
       const encargadosParaPdf = encargados.map(enc => ({
         usuario_id: Number(enc.usuario_id),
         departamento_id: Number(enc.departamento_id),
         t_departamento: enc.t_departamento,
       }));
+
+
 
       // Construir direcciones normales (igual que antes)
       const direcciones = dep.t_direccion.map(dir => {
@@ -581,6 +626,7 @@ export class DependenciasService {
         ) {
           return direccionJunta;
         }
+
 
         return {
           id_Direccion: dir.id_Direccion,
@@ -607,6 +653,8 @@ export class DependenciasService {
         };
       });
 
+
+
       return {
         id_Dependencia: dep.id_Dependencia,
         dependencia: dep.nombre_completo,
@@ -615,17 +663,11 @@ export class DependenciasService {
         ubicaciones_dep: ubicacionesMap.get(dep.id_Dependencia) ?? [],
         // Solo OSFEM tendrá grupos_ubicacion poblado
         grupos_ubicacion: esOsfem
-          ? agruparDireccionesPorUbicacion(
-            direcciones,
-            usuariosPorDepartamento,
-            ubicacionesMap.get(dep.id_Dependencia) ?? [],
-            ubicacionDepartamentosMap,  // 👈
-          )
+          ? agruparPorUbicacionDesdeExtensiones(dep)
           : [],
         direcciones,
       };
     });
-
 
     return {
       dependencias: dependenciasData,
