@@ -20,11 +20,11 @@ const CONTENT_TOP = 120;
 const CONTENT_BOTTOM_MARGIN = 90;
 
 const DEPENDENCIA_LOGOS: Record<string, string> = {
-  'DIRECCION GENERAL DE COMUNICACIÓN SOCIAL': 'assets/unidades/com_social.png',
-  'DIRECCIÓN GENERAL DE COMUNICACIÓN SOCIAL': 'assets/unidades/com_social.png',
-  'CONTRALORIA': 'assets/unidades/contraloria.png',
-  'CONTRALORÍA': 'assets/unidades/contraloria.png',
-  'INSTITUTO DE ESTUDIOS LEGISLATIVOS': 'assets/unidades/inesle.png',
+  'DIRECCION GENERAL DE COMUNICACIÓN SOCIAL': 'assets/unidades/com_social.jpg',
+  'DIRECCIÓN GENERAL DE COMUNICACIÓN SOCIAL': 'assets/unidades/com_social.jpg',
+  'CONTRALORIA': 'assets/unidades/contraloria.jpg',
+  'CONTRALORÍA': 'assets/unidades/contraloria.jpg',
+  'INSTITUTO DE ESTUDIOS LEGISLATIVOS': 'assets/unidades/inesle.jpg',
   'LEGISLATURA': 'assets/unidades/lxii.png',
   'GRUPO PARLAMENTARIO DEL PMC': 'assets/unidades/mc.png',
   'GRUPO PARLAMENTARIO MORENA': 'assets/unidades/morena.png',
@@ -32,13 +32,13 @@ const DEPENDENCIA_LOGOS: Record<string, string> = {
   'GRUPO PARLAMENTARIO DEL PRD': 'assets/unidades/prd.png',
   'GRUPO PARLAMENTARIO DEL PRI': 'assets/unidades/pri.png',
   'GRUPO PARLAMENTARIO DEL PT': 'assets/unidades/pt.png',
-  'SECRETARÍA DE ADMINISTRACIÓN Y FINANZAS': 'assets/unidades/saf.png',
+  'SECRETARÍA DE ADMINISTRACIÓN Y FINANZAS': 'assets/unidades/saf.jpg',
   'SECRETARÍA DE ASUNTOS PARLAMENTARIOS': 'assets/unidades/sap.png',
   'UNIDAD DE INFORMACIÓN': 'assets/unidades/ui.png',
   'GRUPO PARLAMENTARIO DEL PVEM': 'assets/unidades/verde.png',
 };
 
-const OSFEM_LOGO = 'assets/unidades/osfem.png';
+const OSFEM_LOGO = 'assets/unidades/osfem.jpg';
 const LOGO_SIZE = 50;
 
 const GRUPO_LOGOS: Record<string, string> = {
@@ -60,7 +60,7 @@ function getNormalizedKey(nombre: string): string {
 }
 
 function isOsfem(depNombre: string): boolean {
-  return (depNombre ?? '').toUpperCase().includes('ÓRGANO SUPERIOR DE FISCALIZACIÓN');
+  return (depNombre ?? '').toUpperCase().includes('RGANO SUPERIOR DE FISCALIZACI');
 }
 
 function getLogoPath(depNombre: string): string | null {
@@ -273,6 +273,9 @@ function renderDireccion(
 
       doc.y = rowY + rowHeight;
     });
+    if (dir.nombre === 'JUNTA DE COORDINACIÓN POLÍTICA') {
+      drawRowLine(doc, doc.y);
+    }
   });
 }
 
@@ -330,22 +333,22 @@ export function generarReporteDependenciasPDF(
 
   data.forEach((dep: any) => {
     const depNombre: string = dep.dependencia ?? '';
-    const depIsOsfem = isOsfem(depNombre);
+    const depIsOsfem = dep.id_Dependencia === 3;
     const logoPath = depIsOsfem ? null : getLogoPath(depNombre);
+
 
     if (!depIsOsfem) {
       drawDependenciaHeader(doc, depNombre, logoPath, usableWidth, dep.ubicacion);
     }
 
-    if (!Array.isArray(dep.direcciones)) return;
-
+    // ✅ MOVER el return aquí adentro, solo para dependencias normales
     if (depIsOsfem && Array.isArray(dep.grupos_ubicacion) && dep.grupos_ubicacion.length > 0) {
       // ── OSFEM: una sección por cada ubicación física ─────────────────────
       dep.grupos_ubicacion.forEach((grupo: any) => {
         const tieneUsuarios = grupo.direcciones?.some((dir: any) =>
           dir.departamentos?.some((d: any) => Array.isArray(d.usuarios) && d.usuarios.length > 0)
         );
-        if (!tieneUsuarios) return;  // 👈 skip ubicaciones sin usuarios
+        if (!tieneUsuarios) return;
 
         const ub = grupo.ubicacion;
         ensureSpace(doc, LOGO_SIZE + 30);
@@ -372,24 +375,25 @@ export function generarReporteDependenciasPDF(
         doc.y = blockY + LOGO_SIZE + 8;
         doc.fillColor('#000000');
 
-        // ── UNA sola línea gris EXT. por ubicación OSFEM ──────────────────
         drawExtHeader(doc);
 
         grupo.direcciones.forEach((dir: any) => {
-          renderDireccion(doc, dir, depNombre, usableWidth, encargadosMap, true);  // 👈 skipHeader
+          renderDireccion(doc, dir, depNombre, usableWidth, encargadosMap, true);
         });
       });
 
     } else {
-      // ── Dependencias normales: UNA sola línea gris al inicio ──────────
+      // ── Dependencias normales ─────────────────────────────────────────────
+      if (!Array.isArray(dep.direcciones)) return; // 👈 return solo aplica aquí
+
       const tieneUsuarios = dep.direcciones.some((dir: any) =>
         dir.departamentos?.some((d: any) => Array.isArray(d.usuarios) && d.usuarios.length > 0)
       );
 
-      if (tieneUsuarios) drawExtHeader(doc);  // 👈 una sola vez
+      if (tieneUsuarios) drawExtHeader(doc);
 
       dep.direcciones.forEach((dir: any) => {
-        renderDireccion(doc, dir, depNombre, usableWidth, encargadosMap, true);  // 👈 skipHeader
+        renderDireccion(doc, dir, depNombre, usableWidth, encargadosMap, true);
       });
     }
   });
