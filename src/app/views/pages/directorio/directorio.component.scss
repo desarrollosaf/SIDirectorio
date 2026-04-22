@@ -1,12 +1,24 @@
 :host { display:block; }
 
 /* ===== Topbar ===== */
-.dir-topbar { background: #fff; border-bottom: 1px solid rgba(0,0,0,.06); }
-.dir-topbar__inner {
-  max-width: 1180px; margin: 0 auto; padding: 10px 16px;
-  display:flex; align-items:center; justify-content:space-between; gap: 12px;
+.dir-topbar {
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  min-height: 64px;        /* 👈 altura mínima garantizada */
 }
-.dir-logos { display:flex; align-items:center; gap: 14px; }
+.dir-topbar__inner {
+  max-width: 1180px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 64px;        /* 👈 mismo que el topbar */
+}
+.dir-logos { display: flex; align-items: center; gap: 14px; }
+.dir-logo {
+  display: block;
+  width: 220px;            /* ancho fijo */
+  height: 48px;            /* alto fijo */
+  object-fit: contain;     /* respeta proporciones */
+  object-position: left center;
+}
 .dir-logo { max-width: 300px; height: auto; }
 .dir-top-actions { display:flex; align-items:center; gap: 12px; }
 .dir-login { color: rgba(0,0,0,.55); font-size: .9rem; text-decoration:none; }
