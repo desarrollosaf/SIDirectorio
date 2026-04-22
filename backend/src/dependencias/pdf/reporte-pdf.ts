@@ -244,7 +244,8 @@ function renderDireccion(
 
       const encargadoLine = deptEncargado ? `Encargado: ${deptEncargado}` : '';
       const nameHeight = doc.heightOfString(nameText, { width: nameColWidth });
-      const extHeight = doc.heightOfString(extText, { width: extColWidth, fontSize: 8 });
+      doc.fontSize(8);
+      const extHeight = doc.heightOfString(extText, { width: extColWidth });
       const encHeight = deptEncargado ? doc.heightOfString(encargadoLine, { width: nameColWidth }) : 0;
       const totalTextHeight = Math.max(nameHeight, extHeight) + (deptEncargado ? encHeight + 2 : 0);
       const rowHeight = Math.max(TABLE.rowHeight, totalTextHeight + 8);
