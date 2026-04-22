@@ -363,15 +363,22 @@ export class DirectorioComponent implements OnInit {
    * Alterna el estado colapsado de un acordeón
    */
   toggleCollapse(key: string): void {
+  // Si no existe, lo inicializamos como ABIERTO (false = no colapsado)
+  // antes de togglear
+  if (this.collapsedStates[key] === undefined) {
+    this.collapsedStates[key] = false; // 👈 primer clic = abrir directo
+  } else {
     this.collapsedStates[key] = !this.collapsedStates[key];
   }
+}
 
   /**
    * Verifica si un acordeón está colapsado
    */
-  isCollapsed(key: string): boolean {
-    return this.collapsedStates[key] !== false;
-  }
+ isCollapsed(key: string): boolean {
+  // undefined = todavía no se tocó = colapsado por default
+  return this.collapsedStates[key] !== false;
+}
 
   /**
    * Copia texto al portapapeles
