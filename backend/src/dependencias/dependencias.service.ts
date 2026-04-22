@@ -130,35 +130,32 @@ export class DependenciasService {
       });
     });
 
+    const departamentoDependenciaMap = new Map<number, number>();
+    dependencias.forEach(dep =>
+      dep.t_direccion.forEach(dir =>
+        dir.t_departamento.forEach(dpto =>
+          departamentoDependenciaMap.set(dpto.id_Departamento, dep.id_Dependencia)
+        )
+      )
+    );
+
     // 5️⃣ Usuarios por departamento
     const usuariosPorDepartamento = new Map<number, any[]>();
     usuarios.forEach(u => {
       if (!u.id_Departamento) return;
 
       const rango = u.s_users?.[0]?.rango ?? null;
+      const dependenciaUsuario = departamentoDependenciaMap.get(u.id_Departamento);
+      if (!dependenciaUsuario) return;
 
-      // 🔒 Reglas por dependencia
-      if (
-        dependenciasExcluirRango4.includes(idDependencia) &&
-        rango === 4
-      ) {
-        return;
-      }
-
-      if (
-        dependenciasExcluirRango5.includes(idDependencia) &&
-        rango === 5
-      ) {
-        return;
-      }
+      if (dependenciasExcluirRango4.includes(dependenciaUsuario) && rango === 4) return;
+      if (dependenciasExcluirRango5.includes(dependenciaUsuario) && rango === 5) return;
 
       const ext = extensionesMap.get(u.id_Usuario);
 
       if (!usuariosPorDepartamento.has(u.id_Departamento)) {
         usuariosPorDepartamento.set(u.id_Departamento, []);
       }
-
-      const extension = ext?.extension_publica ?? ext?.extension_privada ?? '';
 
       usuariosPorDepartamento.get(u.id_Departamento)!.push({
         id_Usuario: u.id_Usuario,
