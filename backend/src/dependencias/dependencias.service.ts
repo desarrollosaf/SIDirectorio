@@ -617,43 +617,84 @@ export class DependenciasService {
       }));
 
 
-
       // Construir direcciones normales (igual que antes)
-      const direcciones = dep.t_direccion.map(dir => {
-        if (
-          dir.id_Direccion === 1 &&
-          dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
-        ) {
-          return direccionJunta;
+      const direcciones = (() => {
+        const dirs = dep.t_direccion.map(dir => {
+          if (
+            dir.id_Direccion === 1 &&
+            dir.nombre_completo === 'JUNTA DE COORDINACIÓN POLÍTICA'
+          ) {
+            return direccionJunta;
+          }
+
+
+          return {
+            id_Direccion: dir.id_Direccion,
+            nombre: dir.nombre_completo,
+            departamentos: dir.t_departamento.filter(dpto => dpto.id_Departamento !== 109)
+              .map(dpto => {
+                let usuarios =
+                  (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
+                    .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
+
+                if (dep.id_Dependencia === 1 && usuarios.length > 0) {
+                  const coordinador = {                           // 👈 nuevo objeto, no reasignar primero
+                    ...usuarios[0],
+                    nombre: `${usuarios[0].nombre} (Coordinador)`,
+                  };
+                  const resto = usuarios.slice(1).sort((a, b) =>
+                    (a.nombre ?? '').localeCompare(b.nombre ?? '', 'es')
+                  );
+                  usuarios = [coordinador, ...resto];             // 👈 reasignar let
+                }
+                return {
+                  id_Departamento: dpto.id_Departamento,
+                  nombre: dpto.nombre_completo,
+                  usuarios,
+                  encargados: encargados
+                    .filter(enc => enc.departamento_id === dpto.id_Departamento)
+                    .map(enc => ({
+                      usuario_id: Number(enc.usuario_id),
+                      departamento_id: enc.departamento_id,
+                      t_departamento: enc.t_departamento,
+                    })),
+                };
+              }),
+          };
+        });
+        if (dep.id_Dependencia === 1) {
+          const ORDEN_GRUPOS_DEP1 = [12, 13, 14, 16, 15, 17, 18];
+          const ubicacionesDep1 = ubicacionesMap.get(1) ?? [];
+
+          const ubicacionesOrdenadas = ORDEN_GRUPOS_DEP1
+            .map(id => ubicacionesDep1.find((u: any) => Number(u.id) === id))
+            .filter(Boolean);
+
+          const junta = dirs.filter((d: any) => d.id_Direccion === 1);
+          const grupos = dirs
+            .filter((d: any) => d.id_Direccion !== 1)
+            .sort((a: any, b: any) => {
+              const ubA = ubicacionesDep1.find(u =>
+                u.nombre?.toUpperCase().includes(
+                  (a.nombre ?? '').toUpperCase().replace('GRUPO PARLAMENTARIO ', '').substring(0, 10)
+                )
+              );
+              const ubB = ubicacionesDep1.find(u =>
+                u.nombre?.toUpperCase().includes(
+                  (b.nombre ?? '').toUpperCase().replace('GRUPO PARLAMENTARIO ', '').substring(0, 10)
+                )
+              );
+              const idxA = ubA ? ORDEN_GRUPOS_DEP1.indexOf(Number(ubA.id)) : 999;
+              const idxB = ubB ? ORDEN_GRUPOS_DEP1.indexOf(Number(ubB.id)) : 999;
+              return idxA - idxB;
+            });
+
+          return [...junta, ...grupos];
         }
 
+        return dirs;
 
-        return {
-          id_Direccion: dir.id_Direccion,
-          nombre: dir.nombre_completo,
-          departamentos: dir.t_departamento.filter(dpto => dpto.id_Departamento !== 109)
-            .map(dpto => {
-              const usuarios =
-                (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])
-                  .sort((a, b) => (a.rango ?? 0) - (b.rango ?? 0));
-
-              return {
-                id_Departamento: dpto.id_Departamento,
-                nombre: dpto.nombre_completo,
-                usuarios,
-                encargados: encargados
-                  .filter(enc => enc.departamento_id === dpto.id_Departamento)
-                  .map(enc => ({
-                    usuario_id: Number(enc.usuario_id),
-                    departamento_id: enc.departamento_id,
-                    t_departamento: enc.t_departamento,
-                  })),
-              };
-            }),
-        };
-      });
-
-
+      })();
 
       return {
         id_Dependencia: dep.id_Dependencia,

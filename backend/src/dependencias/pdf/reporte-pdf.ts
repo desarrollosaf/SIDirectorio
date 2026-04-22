@@ -293,12 +293,11 @@ export function generarReporteDependenciasPDF(
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', 'attachment; filename=directorio.pdf');
   doc.pipe(res);
-
-  let pageNumber = 0;
+  let pageNumber = 1; // 👈 empieza en 1 porque la portada ya existe
 
   doc.on('pageAdded', () => {
     pageNumber++;
-    if (pageNumber >= 2) {
+    if (pageNumber >= 2) { // 👈 a partir de página 3 (después de portada y lxii)
       drawHeaderFooter(doc);
       doc.y = CONTENT_TOP;
     }
@@ -307,8 +306,10 @@ export function generarReporteDependenciasPDF(
   doc.image('assets/portada_directorio.png', 0, 0, { width: doc.page.width, height: doc.page.height });
 
   doc.addPage();
-  doc.image('assets/directorio_lxii.png', 0, 0, { width: doc.page.width, height: doc.page.height });
-
+  doc.image('assets/directorio_lxii.png', TABLE.startX, CONTENT_TOP, {
+    width: doc.page.width - (TABLE.startX * 2),
+    height: doc.page.height - CONTENT_TOP - CONTENT_BOTTOM_MARGIN,
+  });
   doc.addPage();
 
   if (!Array.isArray(data)) {
