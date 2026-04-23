@@ -234,8 +234,8 @@ function renderDireccion(
       const deptEncargado = encargadoInfo?.nombre ?? null;
       const nameText: string = u.nombre ?? '';
       const extText: string =
-        u.extension_privada || u.extension
-          ? `Ext. ${u.extension_privada || u.extension}`
+        u.extension || u.extension_privada
+          ? `Ext. ${u.extension || u.extension_privada}`
           : '';
 
       const nameColX = TABLE.startX + 5;
@@ -425,7 +425,10 @@ export function generarReporteDependenciasPDF(
 
     servicios.forEach((srv: any) => {
       const nameText: string = srv.nombre ?? '';
-      const extText: string = srv.extension ? `Ext. ${srv.extension}` : '';
+      const extText: string =
+        srv.extension || srv.extension_privada
+          ? `Ext. ${srv.extension || srv.extension_privada}`
+          : '';
 
       const nameColX = TABLE.startX + 5;
       const nameColWidth = extColX - nameColX - 10;
