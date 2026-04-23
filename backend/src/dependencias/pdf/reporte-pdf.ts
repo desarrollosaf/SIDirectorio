@@ -80,8 +80,8 @@ function drawRowLine(doc: PDFDocType, y: number) {
 }
 
 function drawHeaderFooter(doc: PDFDocType) {
-  doc.image('assets/header_directorio.png', 0, 0, { width: doc.page.width });
-  doc.image('assets/footer_directorio.png', 0, doc.page.height - 70, { width: doc.page.width });
+  doc.image('assets/header_directorio.jpg', 0, 0, { width: doc.page.width });
+  doc.image('assets/footer_directorio.jpg', 0, doc.page.height - 70, { width: doc.page.width });
 }
 
 function ensureSpace(doc: PDFDocType, neededHeight: number) {
@@ -304,7 +304,7 @@ export function generarReporteDependenciasPDF(
     }
   });
 
-  doc.image('assets/portada_directorio.png', 0, 0, { width: doc.page.width, height: doc.page.height });
+  doc.image('assets/portada_directorio.jpg', 0, 0, { width: doc.page.width, height: doc.page.height });
 
   doc.addPage();
   doc.image('assets/directorio_lxii.png', TABLE.startX, CONTENT_TOP, {
