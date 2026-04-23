@@ -220,18 +220,20 @@
                         <div class="list-group list-group-flush">
                           <div
                             class="list-group-item d-flex justify-content-between align-items-center py-3"
-                            [class.bg-warning]="dep.esDireccion"
-                            [class.bg-opacity-25]="dep.esDireccion"
                             *ngFor="let dep of dir.departamentos"
                           >
                             <div>
                               <div
-                                class="fw-semibold text-uppercase small text-muted"
+                                class="text-uppercase"
+                                [class.fw-bold]="dep.esDireccion"
+                                [class.small]="!dep.esDireccion"
+                                [class.text-muted]="!dep.esDireccion"
+                                [class.fw-semibold]="!dep.esDireccion"
                               >
                                 {{ dep.departamento }}
                               </div>
                               <div class="mt-1" *ngIf="dep.nombre">
-                                <span [class.fw-bold]="dep.esDireccion">{{
+                                <span>{{
                                   dep.nombre
                                 }}</span>
                               </div>
