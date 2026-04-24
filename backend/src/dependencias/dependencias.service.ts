@@ -77,6 +77,7 @@ export class DependenciasService {
 
     const dependenciasExcluirRango4 = [0, 1, 2, 4, 5, 6, 7, 8];
     const dependenciasExcluirRango5 = [3];
+
     // 3️⃣ Usuarios activos
     const usuarios = await prisma.s_usuario.findMany({
       where: {
@@ -94,13 +95,12 @@ export class DependenciasService {
       },
     });
 
-
     // 4️⃣ Extensiones
     const extensiones = await prismaDirectorio.extensiones.findMany({
       where: { servidor_publico_id: { not: null } },
       select: {
         extension: true,
-        extension_privada: true, // 👈 NUEVO
+        extension_privada: true,
         servidor_publico_id: true,
         ubicaciones: {
           select: {
@@ -117,12 +117,9 @@ export class DependenciasService {
       },
     });
 
-
     const extensionesMap = new Map<number, any>();
-
     extensiones.forEach(ext => {
       if (!ext.extension && !ext.extension_privada) return;
-
       extensionesMap.set(Number(ext.servidor_publico_id), {
         extension_publica: ext.extension ?? null,
         extension_privada: ext.extension_privada ?? null,
@@ -169,11 +166,50 @@ export class DependenciasService {
       });
     });
 
+    // 6️⃣ Ubicaciones por departamento desde t_ubicacion_departamento
+    const ubicacionesDepartamento = await prisma.t_ubicacion_departamento.findMany({
+      where: {
+        departamento_id: { in: departamentosIds },
+      },
+      select: {
+        departamento_id: true,
+        t_ubicacion: {
+          select: { valor: true },
+        },
+      },
+    });
 
-    // ✅ Dirección especial (UNA SOLA VEZ)
+    const ubicacionDepartamentoMap = new Map<number, any>();
+    ubicacionesDepartamento.forEach(ud => {
+      if (ud.t_ubicacion?.valor) {
+        ubicacionDepartamentoMap.set(ud.departamento_id, ud.t_ubicacion.valor);
+      }
+    });
+
+    // 7️⃣ Ubicación por dirección para dependencia 3 (rango 1, 2, 3)
+    const ubicacionDireccionMap = new Map<number, any>();
+    const dep3 = dependencias.find(dep => dep.id_Dependencia === 3);
+
+    dep3?.t_direccion.forEach(dir => {
+      for (const dpto of dir.t_departamento) {
+        const usuariosDpto = usuariosPorDepartamento.get(dpto.id_Departamento) ?? [];
+        const tieneUsuariosValidos = usuariosDpto.some(u => [1, 2, 3].includes(u.rango));
+
+        if (tieneUsuariosValidos) {
+          const ubicacion = ubicacionDepartamentoMap.get(dpto.id_Departamento);
+          if (ubicacion) {
+            ubicacionDireccionMap.set(dir.id_Direccion, ubicacion);
+            break;
+          }
+        }
+      }
+    });
+
+    // ✅ Dirección especial
     const direccionJunta = {
       id_Direccion: 1,
       nombre: 'JUNTA DE COORDINACIÓN POLÍTICA',
+      ubicacion: null,
       departamentos: [
         {
           id_Departamento: 0,
@@ -205,18 +241,21 @@ export class DependenciasService {
       ],
     };
 
-
-
-    // 6️⃣ Respuesta final
+    // 8️⃣ Respuesta final
     return dependencias.map(dep => {
 
       let ubicacionDependencia: any = null;
 
       dep.t_direccion.forEach(dir => {
         dir.t_departamento.forEach(dpto => {
-          const usuarios = usuariosPorDepartamento.get(dpto.id_Departamento);
-          if (usuarios && usuarios.length && !ubicacionDependencia) {
-            ubicacionDependencia = usuarios[0].ubicacion;
+          if (!ubicacionDependencia) {
+            // Primero desde t_ubicacion_departamento
+            ubicacionDependencia = ubicacionDepartamentoMap.get(dpto.id_Departamento) ?? null;
+            // Fallback: ubicación del primer usuario
+            if (!ubicacionDependencia) {
+              const usuarios = usuariosPorDepartamento.get(dpto.id_Departamento);
+              if (usuarios?.length) ubicacionDependencia = usuarios[0].ubicacion;
+            }
           }
         });
       });
@@ -227,10 +266,16 @@ export class DependenciasService {
         ubicacion: ubicacionDependencia,
         direcciones: (() => {
           const dirs = dep.t_direccion.map(dir => {
-            // Dirección normal
+
+            // 👇 Ubicación a nivel dirección solo para dependencia 3
+            const ubicacionDir = dep.id_Dependencia === 3
+              ? ubicacionDireccionMap.get(dir.id_Direccion) ?? null
+              : null;
+
             return {
               id_Direccion: dir.id_Direccion,
               nombre: dir.nombre_completo,
+              ubicacion: ubicacionDir, // 👈 solo presente en dep 3
               departamentos: dir.t_departamento.map(dpto => {
                 const usuarios =
                   (usuariosPorDepartamento.get(dpto.id_Departamento) ?? [])

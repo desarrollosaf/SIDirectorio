@@ -2825,20 +2825,21 @@ model t_ctrfolio {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model t_departamento {
-  id_Departamento Int          @id @default(autoincrement())
-  C_presupDepto   Int
-  Nombre          String       @db.VarChar(100)
-  Creado          Int
-  F_Creacion      DateTime     @db.Date
-  U_Modificacion  DateTime     @db.Date
-  Estado          Int
-  id_Dependencia  Int?
-  id_Direccion    Int?
-  c_presup        Int
-  nombre_completo String?      @db.VarChar(500)
-  nom_cap         String?      @db.LongText
-  encargados      encargados[]
-  t_direccion     t_direccion? @relation(fields: [id_Direccion], references: [id_Direccion], onDelete: NoAction, map: "fk_departamento_direccion")
+  id_Departamento          Int                        @id @default(autoincrement())
+  C_presupDepto            Int
+  Nombre                   String                     @db.VarChar(100)
+  Creado                   Int
+  F_Creacion               DateTime                   @db.Date
+  U_Modificacion           DateTime                   @db.Date
+  Estado                   Int
+  id_Dependencia           Int?
+  id_Direccion             Int?
+  c_presup                 Int
+  nombre_completo          String?                    @db.VarChar(500)
+  nom_cap                  String?                    @db.LongText
+  encargados               encargados[]
+  t_direccion              t_direccion?               @relation(fields: [id_Direccion], references: [id_Direccion], onDelete: NoAction, map: "fk_departamento_direccion")
+  t_ubicacion_departamento t_ubicacion_departamento[]
 
   @@index([id_Departamento], map: "id_Departamento")
   @@index([id_Direccion], map: "fk_departamento_direccion")
@@ -4026,4 +4027,26 @@ model s_incripcion_dos21_Resp {
   total_curso Int?
   total_aprov Int?
   Bandera_dos Int?
+}
+
+model t_ubicacion {
+  id                       Int                        @id @default(autoincrement())
+  valor                    String                     @db.LongText
+  created_at               DateTime?                  @db.Timestamp(0)
+  updated_at               DateTime?                  @db.Timestamp(0)
+  deleted_at               DateTime?                  @db.Timestamp(0)
+  t_ubicacion_departamento t_ubicacion_departamento[]
+}
+
+model t_ubicacion_departamento {
+  id              Int            @id @default(autoincrement())
+  departamento_id Int
+  ubicacion_id    Int
+  created_at      DateTime?      @db.Timestamp(0)
+  updated_at      DateTime?      @db.Timestamp(0)
+  t_departamento  t_departamento @relation(fields: [departamento_id], references: [id_Departamento], onDelete: Cascade, map: "fk_ubicdep_departamento")
+  t_ubicacion     t_ubicacion    @relation(fields: [ubicacion_id], references: [id], onDelete: Cascade, map: "fk_ubicdep_ubicacion")
+
+  @@index([departamento_id], map: "fk_ubicdep_departamento")
+  @@index([ubicacion_id], map: "fk_ubicdep_ubicacion")
 }
