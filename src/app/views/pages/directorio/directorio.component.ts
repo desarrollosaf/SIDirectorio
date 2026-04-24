@@ -26,6 +26,7 @@ type Grouped = {
   direcciones: {
     id: number;
     nombre: string;
+     ubicacion?: string;
     departamentos: DirectoryRow[];
   }[];
 };
@@ -61,6 +62,7 @@ export class DirectorioComponent implements OnInit {
   collapsedStates: { [key: string]: boolean } = {};
 
   private ubicacionesPorDependencia = new Map<number, any>();
+  private ubicacionesDirecciones = new Map<number, any>();
 
   constructor(
     private fb: FormBuilder,
@@ -118,7 +120,26 @@ export class DirectorioComponent implements OnInit {
             if (data.ubicacion && data.id_Dependencia) {
               this.ubicacionesPorDependencia.set(data.id_Dependencia, data.ubicacion);
             }
-          });
+
+            if (data.id_Dependencia === 3) {
+              data.direcciones?.forEach((dir: any) => {
+                if (dir.ubicacion) {
+                  this.ubicacionesDirecciones.set(dir.id_Direccion, dir.ubicacion);
+                }
+              });
+            }
+
+            if (data.id_Dependencia === 3) {
+              data.direcciones?.forEach((dir: any) => {
+                console.log('dir.ubicacion:', dir.ubicacion); // 👈 agregar aquí
+                if (dir.ubicacion) {
+                  this.ubicacionesDirecciones.set(dir.id_Direccion, dir.ubicacion);
+                }
+              });
+            }
+
+          }); // 👈 cierre del forEach
+
 
           // Mapear datos a filas
           this.rows = dataArray.flatMap(data => this.mapBackendToRows(data));
@@ -139,6 +160,8 @@ export class DirectorioComponent implements OnInit {
   getUbicacionString(depId: number): string {
     const ub = this.ubicacionesPorDependencia.get(depId);
     if (!ub) return '';
+
+    if (typeof ub === 'string') return ub;
 
     const partes = [];
     if (ub.calle) partes.push(ub.calle);
@@ -223,6 +246,7 @@ export class DirectorioComponent implements OnInit {
     this.searched = false;
     this.sortBy = 'area';
     this.collapsedStates = {};
+    this.ubicacionesDirecciones.clear()
   }
 
   /**
@@ -310,13 +334,22 @@ export class DirectorioComponent implements OnInit {
           mapDirecciones.get(key)!.rows.push(r);
         });
 
+        // Map de ubicaciones por dirección (solo dep 3)
+        const ubicacionesDirecciones = new Map<number, any>();
+        if (depId === 3) {
+          // Las ubicaciones por dirección vienen del backend en data.direcciones
+          // Necesitamos guardarlas al momento del onSearch
+        }
+
         const direccionesArray = Array.from(mapDirecciones.entries())
           .sort((a, b) => a[0] - b[0])
           .map(([id, data]) => ({
             id,
             nombre: data.nombre,
+            ubicacion: this.ubicacionesDirecciones.get(id) ?? null, // 👈
             departamentos: data.rows
           }));
+
 
         return {
           dependenciaId: depId,
@@ -363,22 +396,22 @@ export class DirectorioComponent implements OnInit {
    * Alterna el estado colapsado de un acordeón
    */
   toggleCollapse(key: string): void {
-  // Si no existe, lo inicializamos como ABIERTO (false = no colapsado)
-  // antes de togglear
-  if (this.collapsedStates[key] === undefined) {
-    this.collapsedStates[key] = false; // 👈 primer clic = abrir directo
-  } else {
-    this.collapsedStates[key] = !this.collapsedStates[key];
+    // Si no existe, lo inicializamos como ABIERTO (false = no colapsado)
+    // antes de togglear
+    if (this.collapsedStates[key] === undefined) {
+      this.collapsedStates[key] = false; // 👈 primer clic = abrir directo
+    } else {
+      this.collapsedStates[key] = !this.collapsedStates[key];
+    }
   }
-}
 
   /**
    * Verifica si un acordeón está colapsado
    */
- isCollapsed(key: string): boolean {
-  // undefined = todavía no se tocó = colapsado por default
-  return this.collapsedStates[key] !== false;
-}
+  isCollapsed(key: string): boolean {
+    // undefined = todavía no se tocó = colapsado por default
+    return this.collapsedStates[key] !== false;
+  }
 
   /**
    * Copia texto al portapapeles
