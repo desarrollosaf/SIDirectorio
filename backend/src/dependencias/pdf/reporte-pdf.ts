@@ -233,9 +233,12 @@ function renderDireccion(
       const encargadoInfo = encargadosMap.get(u.id_Usuario);
       const deptEncargado = encargadoInfo?.nombre ?? null;
       const nameText: string = u.nombre ?? '';
-      const extText: string =
-        u.extension || u.extension_privada
-          ? `Ext. ${u.extension || u.extension_privada}`
+
+      // 👇 Separar en dos líneas si hay ambas
+      const extText: string = u.extension
+        ? u.extension
+        : u.extension_privada
+          ? `Ext. ${u.extension_privada}`
           : '';
 
       const nameColX = TABLE.startX + 5;
@@ -245,7 +248,7 @@ function renderDireccion(
       const encargadoLine = deptEncargado ? `Encargado: ${deptEncargado}` : '';
       const nameHeight = doc.heightOfString(nameText, { width: nameColWidth });
       doc.fontSize(8);
-      const extHeight = doc.heightOfString(extText, { width: extColWidth });
+      const extHeight = doc.heightOfString(extText, { width: extColWidth, lineBreak: true });
       const encHeight = deptEncargado ? doc.heightOfString(encargadoLine, { width: nameColWidth }) : 0;
       const totalTextHeight = Math.max(nameHeight, extHeight) + (deptEncargado ? encHeight + 2 : 0);
       const rowHeight = Math.max(TABLE.rowHeight, totalTextHeight + 8);
@@ -425,9 +428,10 @@ export function generarReporteDependenciasPDF(
 
     servicios.forEach((srv: any) => {
       const nameText: string = srv.nombre ?? '';
-      const extText: string =
-        srv.extension || srv.extension_privada
-          ? `Ext. ${srv.extension || srv.extension_privada}`
+      const extText: string = srv.extension
+        ? `Ext. ${srv.extension}`
+        : srv.extension_privada
+          ? `Ext. ${srv.extension_privada}`
           : '';
 
       const nameColX = TABLE.startX + 5;
