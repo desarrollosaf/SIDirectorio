@@ -217,7 +217,7 @@ export class DependenciasService {
           usuarios: [{
             nombre: 'DIP. VAZQUEZ RODRIGUEZ JOSE FRANCISCO',
             cargo: 'PRESIDENTE DE LA JUNTA DE COORDINACIÓN POLÍTICA',
-            extension: '6494',
+            extension: '6606',
           }],
         },
         {
