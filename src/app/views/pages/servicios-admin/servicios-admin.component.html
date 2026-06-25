@@ -1,0 +1,196 @@
+<div class="page-content">
+
+  <nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+      <li class="breadcrumb-item active">Servicios</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="card-title mb-0">Servicios telefónicos</h6>
+              <p class="text-muted fs-12px mb-0 mt-1">{{ totalItems }} registros</p>
+            </div>
+            <button class="btn btn-primary btn-sm" (click)="openAdd()">
+              <i class="feather icon-plus me-1"></i> Agregar
+            </button>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 mb-0">Cargando…</p>
+          </div>
+
+          <div *ngIf="!loading">
+            <!-- Controles -->
+            <div class="row mb-3 align-items-center">
+              <div class="col-sm-6 col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="mb-0 text-nowrap">Mostrar</label>
+                  <select class="form-select form-select-sm w-auto"
+                          [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                    <option [value]="10">10</option>
+                    <option [value]="25">25</option>
+                    <option [value]="50">50</option>
+                  </select>
+                  <span class="text-nowrap">registros</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4 ms-auto">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text"><i class="feather icon-search"></i></span>
+                  <input type="search" class="form-control"
+                         placeholder="Buscar por nombre o extensión…"
+                         [(ngModel)]="searchTerm" (input)="onSearch()" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Nombre del servicio</th>
+                    <th class="text-center" style="width:160px;">Extensión</th>
+                    <th class="text-center" style="width:100px;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="paged.length === 0">
+                    <td colspan="3" class="text-center text-muted py-5">
+                      <i class="feather icon-inbox mb-2" style="font-size:32px;display:block;opacity:.4;"></i>
+                      No se encontraron servicios
+                    </td>
+                  </tr>
+                  <tr *ngFor="let s of paged">
+                    <td class="fw-medium">{{ s.nombre }}</td>
+                    <td class="text-center">
+                      <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-1">
+                        {{ s.extension || '—' }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-icon btn-warning btn-sm me-1"
+                              title="Editar" (click)="openEdit(s)">
+                        <i class="feather icon-edit"></i>
+                      </button>
+                      <button class="btn btn-icon btn-danger btn-sm"
+                              title="Eliminar" (click)="openDelete(s)">
+                        <i class="feather icon-trash-2"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="row mt-3 align-items-center" *ngIf="totalItems > 0">
+              <div class="col-sm-12 col-md-5">
+                <small class="text-muted">
+                  Mostrando {{ startItem }}–{{ endItem }} de {{ totalItems }} registros
+                </small>
+              </div>
+              <div class="col-sm-12 col-md-7">
+                <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="goToPage(currentPage - 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-left"></i>
+                    </a>
+                  </li>
+                  <ng-container *ngFor="let p of pageNumbers">
+                    <li *ngIf="p === -1" class="page-item disabled">
+                      <span class="page-link">…</span>
+                    </li>
+                    <li *ngIf="p !== -1" class="page-item" [class.active]="p === currentPage">
+                      <a class="page-link" (click)="goToPage(p)" style="cursor:pointer;">{{ p }}</a>
+                    </li>
+                  </ng-container>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" (click)="goToPage(currentPage + 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Agregar / Editar ===== -->
+<ng-template #modalForm let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="feather icon-grid me-2"></i>
+      {{ editMode ? 'Editar servicio' : 'Nuevo servicio' }}
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row g-3">
+      <div class="col-12">
+        <label for="svc-nombre" class="form-label fw-medium">
+          Nombre del servicio <span class="text-danger">*</span>
+        </label>
+        <input id="svc-nombre" type="text" class="form-control"
+               placeholder="Ej. Recepción general"
+               [(ngModel)]="form.nombre" />
+      </div>
+      <div class="col-12">
+        <label for="svc-extension" class="form-label fw-medium">Extensión</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="feather icon-phone"></i></span>
+          <input id="svc-extension" type="text" class="form-control"
+                 placeholder="Ej. 4200"
+                 [(ngModel)]="form.extension" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary" (click)="onSave()"
+            [disabled]="saving || !form.nombre.trim()">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      {{ saving ? 'Guardando…' : 'Guardar' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- ===== MODAL: Confirmar eliminación ===== -->
+<ng-template #modalConfirm let-modal>
+  <div class="modal-header border-0 pb-0">
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body text-center pt-0 pb-4">
+    <div class="mb-3">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle"
+           style="width:64px;height:64px;">
+        <i class="feather icon-trash-2 text-danger" style="font-size:28px;"></i>
+      </div>
+    </div>
+    <h5 class="mb-1">¿Eliminar servicio?</h5>
+    <p class="text-muted mb-0">
+      Se eliminará <strong>{{ deleteTarget?.nombre }}</strong>.
+      Esta acción no se puede deshacer.
+    </p>
+  </div>
+  <div class="modal-footer border-0 justify-content-center pt-0">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
+  </div>
+</ng-template>

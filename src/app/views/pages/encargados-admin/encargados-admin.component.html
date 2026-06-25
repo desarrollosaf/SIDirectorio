@@ -1,0 +1,259 @@
+<div class="page-content">
+
+  <nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+      <li class="breadcrumb-item active">Encargados</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="card-title mb-0">Encargados de departamento</h6>
+              <p class="text-muted fs-12px mb-0 mt-1">{{ totalItems }} registros</p>
+            </div>
+            <button class="btn btn-primary btn-sm" (click)="openAdd()">
+              <i class="feather icon-plus me-1"></i> Agregar
+            </button>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 mb-0">Cargando…</p>
+          </div>
+
+          <div *ngIf="!loading">
+            <!-- Controles -->
+            <div class="row mb-3 align-items-center">
+              <div class="col-sm-6 col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="mb-0 text-nowrap">Mostrar</label>
+                  <select class="form-select form-select-sm w-auto"
+                          [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                    <option [value]="10">10</option>
+                    <option [value]="25">25</option>
+                    <option [value]="50">50</option>
+                  </select>
+                  <span class="text-nowrap">registros</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4 ms-auto">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text"><i class="feather icon-search"></i></span>
+                  <input type="search" class="form-control"
+                         placeholder="Buscar por nombre o departamento…"
+                         [(ngModel)]="searchTerm" (input)="onSearch()" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Servidor Público</th>
+                    <th>Encargado del departamento</th>
+                    <th class="text-center" style="width:80px;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="paged.length === 0">
+                    <td colspan="3" class="text-center text-muted py-5">
+                      <i class="feather icon-inbox mb-2" style="font-size:32px;display:block;opacity:.4;"></i>
+                      No se encontraron encargados
+                    </td>
+                  </tr>
+                  <tr *ngFor="let e of paged">
+                    <td>
+                      <div class="fw-medium">{{ nombreCompleto(e) }}</div>
+                      <span style="font-size:11px;color:#9ca3af;">{{ e.s_usuario?.Puesto || '—' }}</span>
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-dark border">
+                        {{ nombreDepartamento(e) }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-icon btn-danger btn-sm"
+                              title="Eliminar" (click)="openDelete(e)">
+                        <i class="feather icon-trash-2"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="row mt-3 align-items-center" *ngIf="totalItems > 0">
+              <div class="col-sm-12 col-md-5">
+                <small class="text-muted">
+                  Mostrando {{ startItem }}–{{ endItem }} de {{ totalItems }} registros
+                </small>
+              </div>
+              <div class="col-sm-12 col-md-7">
+                <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="goToPage(currentPage - 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-left"></i>
+                    </a>
+                  </li>
+                  <ng-container *ngFor="let p of pageNumbers">
+                    <li *ngIf="p === -1" class="page-item disabled">
+                      <span class="page-link">…</span>
+                    </li>
+                    <li *ngIf="p !== -1" class="page-item" [class.active]="p === currentPage">
+                      <a class="page-link" (click)="goToPage(p)" style="cursor:pointer;">{{ p }}</a>
+                    </li>
+                  </ng-container>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" (click)="goToPage(currentPage + 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Agregar encargado ===== -->
+<ng-template #modalForm let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="feather icon-user-check me-2"></i>
+      Agregar encargado
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="row g-3">
+
+      <!-- ── Servidor Público ─────────────────────────────────────────── -->
+      <div class="col-12">
+        <label for="enc-user-search" class="form-label fw-medium">
+          Servidor Público <span class="text-danger">*</span>
+        </label>
+        <div class="position-relative">
+          <div class="input-group">
+            <span class="input-group-text"><i class="feather icon-search"></i></span>
+            <input id="enc-user-search" type="text" class="form-control"
+                   placeholder="Escribe nombre o usuario para buscar…"
+                   [(ngModel)]="userSearch"
+                   (input)="onUserSearch()"
+                   autocomplete="off" />
+            <button *ngIf="selectedUsuarioId" class="btn btn-outline-secondary"
+                    type="button" (click)="clearUser()" title="Limpiar">
+              <i class="feather icon-x"></i>
+            </button>
+          </div>
+          <!-- Dropdown resultados -->
+          <div *ngIf="userDropdownOpen && filteredUsuarios.length > 0"
+               class="card shadow-sm border mt-1 w-100"
+               style="position:absolute;z-index:1060;max-height:240px;overflow-y:auto;">
+            <div class="list-group list-group-flush">
+              <button type="button"
+                      class="list-group-item list-group-item-action py-2 px-3"
+                      *ngFor="let u of filteredUsuarios"
+                      (click)="selectUsuario(u)">
+                <div class="fw-semibold lh-1">{{ u.A_Paterno }} {{ u.A_Materno }}, {{ u.Nombre }}</div>
+                <small class="text-muted">{{ u.Puesto || 'Sin puesto' }}</small>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="selectedUsuarioId" class="mt-2">
+          <span class="badge bg-primary-subtle text-primary px-3 py-2 fs-12px">
+            <i class="feather icon-check me-1" style="font-size:11px;"></i>
+            {{ selectedUsuario?.Puesto || 'Sin puesto' }} — ID {{ selectedUsuarioId }}
+          </span>
+        </div>
+        <div *ngIf="!selectedUsuarioId && userSearch.length < 2" class="form-text">
+          Escribe al menos 2 caracteres para buscar
+        </div>
+      </div>
+
+      <!-- ── Departamento ────────────────────────────────────────────── -->
+      <div class="col-12">
+        <label for="enc-departamento" class="form-label fw-medium">
+          Departamento <span class="text-danger">*</span>
+        </label>
+
+        <div *ngIf="!selectedUsuarioId" class="text-muted fs-13px py-2">
+          <i class="feather icon-info me-1"></i>
+          Selecciona primero un servidor público para ver sus departamentos
+        </div>
+
+        <div *ngIf="selectedUsuarioId && loadingDepts" class="text-muted fs-13px py-2">
+          <div class="spinner-border spinner-border-sm me-2"></div>
+          Cargando departamentos…
+        </div>
+
+        <select *ngIf="selectedUsuarioId && !loadingDepts"
+                id="enc-departamento"
+                class="form-select"
+                [(ngModel)]="selectedDepartamentoId">
+          <option [ngValue]="null">— Selecciona un departamento —</option>
+          <option *ngFor="let d of departamentos" [ngValue]="d.id_Departamento">
+            {{ d.nombre_completo || d.Nombre }}
+            <ng-container *ngIf="d.t_direccion"> — {{ d.t_direccion.nombre_completo || d.t_direccion.Nombre }}</ng-container>
+          </option>
+        </select>
+
+        <div *ngIf="selectedUsuarioId && !loadingDepts && departamentos.length === 0"
+             class="alert alert-warning py-2 mt-1 mb-0 fs-13px">
+          No se encontraron departamentos activos para esta dependencia
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary"
+            (click)="onSave()"
+            [disabled]="saving || !selectedUsuarioId || !selectedDepartamentoId">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      {{ saving ? 'Guardando…' : 'Guardar' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- ===== MODAL: Confirmar eliminación ===== -->
+<ng-template #modalConfirm let-modal>
+  <div class="modal-header border-0 pb-0">
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body text-center pt-0 pb-4">
+    <div class="mb-3">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle"
+           style="width:64px;height:64px;">
+        <i class="feather icon-trash-2 text-danger" style="font-size:28px;"></i>
+      </div>
+    </div>
+    <h5 class="mb-1">¿Eliminar encargado?</h5>
+    <p class="text-muted mb-0">
+      Se eliminará a <strong>{{ nombreCompleto(deleteTarget!) }}</strong>
+      como encargado de <strong>{{ nombreDepartamento(deleteTarget!) }}</strong>.
+    </p>
+  </div>
+  <div class="modal-footer border-0 justify-content-center pt-0">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
+  </div>
+</ng-template>

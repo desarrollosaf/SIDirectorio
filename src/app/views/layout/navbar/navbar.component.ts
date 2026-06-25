@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { ThemeModeService } from '../../../core/services/theme-mode.service';
 import { DOCUMENT, NgClass, NgFor, NgIf } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
 
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
@@ -31,7 +32,8 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private themeModeService: ThemeModeService
+    private themeModeService: ThemeModeService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -86,16 +88,21 @@ export class NavbarComponent implements OnInit {
     this.showActiveTheme(newTheme);
   }
 
-  /**
-   * Logout
-   */
+  get userName(): string {
+    return this.authService.getUser()?.name || 'Usuario';
+  }
+
+  get userRfc(): string {
+    return this.authService.getUser()?.rfc || '';
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
   onLogout(e: Event) {
     e.preventDefault();
-
-    localStorage.setItem('isLoggedin', 'false');
-    if (localStorage.getItem('isLoggedin') === 'false') {
-      this.router.navigate(['/auth/login']);
-    }
+    this.authService.logout();
   }
 
   /**

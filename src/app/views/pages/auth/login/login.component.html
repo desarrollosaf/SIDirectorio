@@ -4,38 +4,64 @@
       <div class="card">
         <div class="row">
           <div class="col-md-4 pe-md-0">
-            <div class="auth-side-wrapper" [ngStyle]="{ 'background-image': 'url(https://placehold.co/250x650)' }">
-  
+            <div
+              class="auth-side-wrapper d-flex align-items-center justify-content-center"
+              style="background-color: #1e3a5f;"
+            >
+              <img
+                src="https://administracionyfinanzasplem.gob.mx/resdirectorio/assets/img/logo/logo_congreso.svg"
+                alt="Logo Gobierno"
+                style="width: 80%; padding: 16px;"
+              />
             </div>
           </div>
           <div class="col-md-8 ps-md-0">
             <div class="auth-form-wrapper px-4 py-5">
-              <a routerLink="." class="nobleui-logo d-block mb-2">Noble<span>UI</span></a>
-              <h5 class="text-secondary fw-normal mb-4">Welcome back! Log in to your account.</h5>
-              <form class="forms-sample">
+              <h5 class="fw-semibold mb-1">Directorio Telefónico</h5>
+              <p class="text-secondary mb-4">Ingresa tus credenciales para continuar</p>
+
+              <div *ngIf="error" class="alert alert-danger py-2 mb-3">
+                {{ error }}
+              </div>
+
+              <form [formGroup]="form" (ngSubmit)="onLoggedin($event)">
                 <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" value="admin@demo.com">
+                  <label for="rfc" class="form-label">RFC</label>
+                  <input
+                    type="text"
+                    id="rfc"
+                    class="form-control"
+                    formControlName="rfc"
+                    placeholder="Ej. GANJ931118"
+                    autocomplete="username"
+                    [class.is-invalid]="form.get('rfc')?.invalid && form.get('rfc')?.touched"
+                  />
+                  <div class="invalid-feedback">Ingresa tu RFC</div>
                 </div>
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" value="12345678">
+
+                <div class="mb-4">
+                  <label for="password" class="form-label">Contraseña</label>
+                  <input
+                    type="password"
+                    id="password"
+                    class="form-control"
+                    formControlName="password"
+                    autocomplete="current-password"
+                    placeholder="Contraseña"
+                    [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+                  />
+                  <div class="invalid-feedback">Ingresa tu contraseña</div>
                 </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="authCheck">
-                  <label class="form-check-label" for="authCheck">
-                    Remember me
-                  </label>
-                </div>
-                <div>
-                  <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0" (click)="onLoggedin($event)">Login</button>
-                  <button type="button" class="btn btn-outline-primary btn-icon-text mb-2 mb-md-0">
-                    <i class="feather icon-twitter btn-icon-prepend"></i>
-                    Login with twitter
-                  </button>
-                </div>
-                <a routerLink="/auth/register" class="d-block mt-3 text-secondary">Not a user? Sign up</a>
+
+                <button type="submit" class="btn btn-primary me-2" [disabled]="loading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                  {{ loading ? 'Verificando...' : 'Iniciar sesión' }}
+                </button>
               </form>
+
+              <a routerLink="/directorio" class="d-block mt-3 text-secondary">
+                ← Regresar al directorio
+              </a>
             </div>
           </div>
         </div>
