@@ -11,7 +11,7 @@ import { AuthService } from '../../../../services/auth.service';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
-  returnUrl = '/dashboard';
+  returnUrl = '/extensiones';
   form!: FormGroup;
   loading = false;
   error: string | null = null;
@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/extensiones';
     this.form = this.fb.group({
       rfc: ['', [Validators.required]],
       password: ['', [Validators.required]],

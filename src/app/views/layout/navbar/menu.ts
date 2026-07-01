@@ -16,4 +16,9 @@ export const MENU: MenuItem[] = [
     icon: 'grid',
     link: '/servicios',
   },
+  {
+    label: 'Ubicaciones',
+    icon: 'map-pin',
+    link: '/ubicaciones',
+  },
 ];

@@ -76,5 +76,12 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "allowScripts": {
+    "@nestjs/core@11.1.11": true,
+    "@prisma/engines@7.3.0": true,
+    "fsevents@2.3.3": true,
+    "prisma@7.3.0": true,
+    "unrs-resolver@1.11.1": true
   }
 }

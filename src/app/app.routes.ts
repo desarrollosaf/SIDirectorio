@@ -75,6 +75,10 @@ export const routes: Routes = [
         path: 'servicios',
         loadComponent: () => import('./views/pages/servicios-admin/servicios-admin.component').then(c => c.ServiciosAdminComponent),
       },
+      {
+        path: 'ubicaciones',
+        loadComponent: () => import('./views/pages/ubicaciones/ubicaciones.component').then(c => c.UbicacionesComponent),
+      },
     ]
   },
   {

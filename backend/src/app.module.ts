@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { CatalogosModule } from './catalogos/catalogos.module';
 import { EncargadosModule } from './encargados/encargados.module';
 import { ServiciosModule } from './servicios/servicios.module';
+import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ServiciosModule } from './servicios/servicios.module';
     CatalogosModule,
     EncargadosModule,
     ServiciosModule,
+    UbicacionesModule,
   ],
   controllers: [
     AppController
