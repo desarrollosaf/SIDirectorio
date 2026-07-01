@@ -10,6 +10,7 @@ import { EncargadosModule } from './encargados/encargados.module';
 import { ServiciosModule } from './servicios/servicios.module';
 import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
 import { DependenciasUbicacionesModule } from './dependencias-ubicaciones/dependencias-ubicaciones.module';
+import { UsersAdminModule } from './users-admin/users-admin.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { DependenciasUbicacionesModule } from './dependencias-ubicaciones/depend
     ServiciosModule,
     UbicacionesModule,
     DependenciasUbicacionesModule,
+    UsersAdminModule,
   ],
   controllers: [
     AppController

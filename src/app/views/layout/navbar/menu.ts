@@ -26,4 +26,10 @@ export const MENU: MenuItem[] = [
     icon: 'briefcase',
     link: '/dependencias',
   },
+  {
+    label: 'Usuarios',
+    icon: 'users',
+    link: '/usuarios',
+    roles: ['superuser'],
+  },
 ];

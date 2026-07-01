@@ -7,7 +7,7 @@ export interface AuthUser {
   id: string;
   name: string;
   rfc: string;
-  role: 'admin' | 'user';
+  role: 'superuser' | 'admin' | 'user';
 }
 
 export interface LoginResponse {

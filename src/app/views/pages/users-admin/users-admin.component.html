@@ -1,0 +1,221 @@
+<div class="page-content">
+
+  <nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+      <li class="breadcrumb-item active">Usuarios</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="card-title mb-0">Gestión de Usuarios</h6>
+              <p class="text-muted fs-12px mb-0 mt-1">{{ totalItems }} usuarios encontrados</p>
+            </div>
+            <button class="btn btn-primary btn-sm" (click)="openAdd()">
+              <i class="feather icon-user-plus me-1"></i> Nuevo usuario
+            </button>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger py-2 d-flex justify-content-between align-items-center">
+            {{ error }}
+            <button class="btn-close btn-sm" (click)="error = null"></button>
+          </div>
+
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 mb-0">Cargando usuarios…</p>
+          </div>
+
+          <div *ngIf="!loading">
+            <div class="row mb-3 align-items-center">
+              <div class="col-sm-6 col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="mb-0 text-nowrap">Mostrar</label>
+                  <select class="form-select form-select-sm w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                    <option [value]="10">10</option>
+                    <option [value]="25">25</option>
+                    <option [value]="50">50</option>
+                  </select>
+                  <span class="mb-0 text-nowrap">registros</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-4 ms-auto">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text"><i class="feather icon-search"></i></span>
+                  <input type="search" class="form-control" placeholder="Buscar..." [(ngModel)]="searchTerm" (input)="onSearch()" />
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Nombre</th>
+                    <th>RFC</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th class="text-center" style="width:110px;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="paged.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">No se encontraron resultados</td>
+                  </tr>
+                  <tr *ngFor="let u of paged">
+                    <td class="fw-medium">{{ u.name || '—' }}</td>
+                    <td><code>{{ u.rfc }}</code></td>
+                    <td>{{ u.email || '—' }}</td>
+                    <td>
+                      <span class="badge px-2 py-1" [ngClass]="rolBadge(u.role)">
+                        {{ rolLabel(u.role) }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-icon btn-warning btn-sm me-1"
+                              title="Cambiar rol"
+                              (click)="openEditRole(u)">
+                        <i class="feather icon-shield"></i>
+                      </button>
+                      <button class="btn btn-icon btn-danger btn-sm"
+                              title="Eliminar"
+                              (click)="openDelete(u)">
+                        <i class="feather icon-trash-2"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row mt-3 align-items-center" *ngIf="totalItems > 0">
+              <div class="col-sm-12 col-md-5">
+                <small class="text-muted">Mostrando {{ startItem }}–{{ endItem }} de {{ totalItems }} registros</small>
+              </div>
+              <div class="col-sm-12 col-md-7">
+                <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="goToPage(currentPage - 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-left"></i>
+                    </a>
+                  </li>
+                  <ng-container *ngFor="let p of pageNumbers">
+                    <li *ngIf="p === -1" class="page-item disabled"><span class="page-link">…</span></li>
+                    <li *ngIf="p !== -1" class="page-item" [class.active]="p === currentPage">
+                      <a class="page-link" (click)="goToPage(p)" style="cursor:pointer;">{{ p }}</a>
+                    </li>
+                  </ng-container>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" (click)="goToPage(currentPage + 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Nuevo usuario ===== -->
+<ng-template #modalForm let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title"><i class="feather icon-user-plus me-2"></i>Asignar acceso</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-medium">Usuario <span class="text-danger">*</span></label>
+        <ng-select
+          [(ngModel)]="form.rfc"
+          [items]="safUsers"
+          bindValue="rfc"
+          bindLabel="name"
+          [searchFn]="buscarUsuario"
+          placeholder="Buscar por nombre o RFC…"
+          [loading]="safUsersLoading"
+          loadingText="Cargando usuarios…"
+          notFoundText="Sin resultados">
+          <ng-template ng-option-tmp let-u="item">
+            <span class="fw-medium">{{ u.name }}</span>
+            <small class="text-muted ms-2">{{ u.rfc }}</small>
+          </ng-template>
+        </ng-select>
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-medium">Rol <span class="text-danger">*</span></label>
+        <select class="form-select" [(ngModel)]="form.role">
+          <option value="admin">Administrador — puede gestionar catálogos</option>
+          <option value="superuser">Super Usuario — puede gestionar usuarios y catálogos</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="saving || !form.rfc">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      {{ saving ? 'Guardando…' : 'Asignar acceso' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- ===== MODAL: Cambiar rol ===== -->
+<ng-template #modalRole let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title"><i class="feather icon-shield me-2"></i>Cambiar rol</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p class="mb-3">
+      Usuario: <strong>{{ userTarget?.name }}</strong>
+      <code class="ms-2">{{ userTarget?.rfc }}</code>
+    </p>
+    <label class="form-label fw-medium">Nuevo rol</label>
+    <select class="form-select" [(ngModel)]="nuevoRol">
+      <option value="admin">Administrador</option>
+      <option value="superuser">Super Usuario</option>
+    </select>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="saveRole()" [disabled]="saving">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      {{ saving ? 'Guardando…' : 'Guardar' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- ===== MODAL: Confirmar eliminación ===== -->
+<ng-template #modalConfirm let-modal>
+  <div class="modal-header border-0 pb-0">
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body text-center pt-0 pb-4">
+    <div class="mb-3">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle" style="width:64px;height:64px;">
+        <i class="feather icon-user-x text-danger" style="font-size:28px;"></i>
+      </div>
+    </div>
+    <h5 class="mb-1">¿Eliminar usuario?</h5>
+    <p class="text-muted mb-0">
+      Se eliminará a <strong>{{ deleteTarget?.name }}</strong>
+      <code class="ms-1">{{ deleteTarget?.rfc }}</code>.
+    </p>
+  </div>
+  <div class="modal-footer border-0 justify-content-center pt-0">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
+  </div>
+</ng-template>

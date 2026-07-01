@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { BaseComponent } from './views/layout/base/base.component';
 import { authGuard } from './core/guards/auth.guard';
+import { superuserGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -82,6 +83,11 @@ export const routes: Routes = [
       {
         path: 'dependencias',
         loadComponent: () => import('./views/pages/dependencias-ubicaciones/dependencias-ubicaciones.component').then(c => c.DependenciasUbicacionesComponent),
+      },
+      {
+        path: 'usuarios',
+        canActivate: [superuserGuard],
+        loadComponent: () => import('./views/pages/users-admin/users-admin.component').then(c => c.UsersAdminComponent),
       },
     ]
   },

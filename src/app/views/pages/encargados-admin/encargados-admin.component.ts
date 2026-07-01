@@ -59,7 +59,7 @@ export class EncargadosAdminComponent implements OnInit {
       next: data => {
         this.catalogUsuarios = data.map(u => ({
           ...u,
-          nombreCompleto: [u.A_Paterno, u.A_Materno, u.Nombre].filter(Boolean).join(' '),
+          nombreCompleto: (u.Nombre ?? '').trim(),
         }));
       },
     });
@@ -75,13 +75,17 @@ export class EncargadosAdminComponent implements OnInit {
   }
 
   // ── Búsqueda de usuario ────────────────────────────────────────────────────
+  private norm(s: string): string {
+    return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
   onUserSearch(): void {
-    const q = this.userSearch.toLowerCase().trim();
+    const q = this.norm(this.userSearch.trim());
     this.userDropdownOpen = q.length >= 2;
     this.filteredUsuarios = q.length >= 2
       ? this.catalogUsuarios.filter(u =>
-          (u.nombreCompleto ?? '').toLowerCase().includes(q) ||
-          (u.N_Usuario ?? '').toLowerCase().includes(q),
+          this.norm(u.nombreCompleto ?? '').includes(q) ||
+          this.norm(u.N_Usuario ?? '').includes(q),
         ).slice(0, 15)
       : [];
   }
@@ -112,11 +116,11 @@ export class EncargadosAdminComponent implements OnInit {
 
   // ── Tabla ─────────────────────────────────────────────────────────────────
   applyFilter(): void {
-    const q = this.searchTerm.toLowerCase().trim();
+    const q = this.norm(this.searchTerm.trim());
     this.filtered = q
       ? this.allEncargados.filter(e =>
-          this.nombreCompleto(e).toLowerCase().includes(q) ||
-          (e.t_departamento?.nombre_completo ?? e.t_departamento?.Nombre ?? '').toLowerCase().includes(q),
+          this.norm(this.nombreCompleto(e)).includes(q) ||
+          this.norm(e.t_departamento?.nombre_completo ?? e.t_departamento?.Nombre ?? '').includes(q),
         )
       : [...this.allEncargados];
     this.totalItems = this.filtered.length;
@@ -155,7 +159,7 @@ export class EncargadosAdminComponent implements OnInit {
 
   nombreCompleto(e: Encargado): string {
     if (!e.s_usuario) return '—';
-    return [e.s_usuario.A_Paterno, e.s_usuario.A_Materno, e.s_usuario.Nombre].filter(Boolean).join(' ');
+    return (e.s_usuario.Nombre ?? '').trim();
   }
 
   nombreDepartamento(e: Encargado): string {
