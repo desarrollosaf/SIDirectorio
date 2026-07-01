@@ -9,6 +9,7 @@ import { CatalogosModule } from './catalogos/catalogos.module';
 import { EncargadosModule } from './encargados/encargados.module';
 import { ServiciosModule } from './servicios/servicios.module';
 import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
+import { DependenciasUbicacionesModule } from './dependencias-ubicaciones/dependencias-ubicaciones.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
     EncargadosModule,
     ServiciosModule,
     UbicacionesModule,
+    DependenciasUbicacionesModule,
   ],
   controllers: [
     AppController

@@ -79,6 +79,10 @@ export const routes: Routes = [
         path: 'ubicaciones',
         loadComponent: () => import('./views/pages/ubicaciones/ubicaciones.component').then(c => c.UbicacionesComponent),
       },
+      {
+        path: 'dependencias',
+        loadComponent: () => import('./views/pages/dependencias-ubicaciones/dependencias-ubicaciones.component').then(c => c.DependenciasUbicacionesComponent),
+      },
     ]
   },
   {

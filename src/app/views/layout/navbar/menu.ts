@@ -21,4 +21,9 @@ export const MENU: MenuItem[] = [
     icon: 'map-pin',
     link: '/ubicaciones',
   },
+  {
+    label: 'Dependencias',
+    icon: 'briefcase',
+    link: '/dependencias',
+  },
 ];
