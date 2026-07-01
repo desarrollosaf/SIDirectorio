@@ -63,6 +63,18 @@ export const routes: Routes = [
         path: 'extensiones',
         loadComponent: () => import('./views/pages/extensiones/extensiones.component').then(c => c.ExtensionesComponent),
       },
+      {
+        path: 'directorio-admin',
+        loadComponent: () => import('./views/pages/directorio-admin/directorio-admin.component').then(c => c.DirectorioAdminComponent),
+      },
+      {
+        path: 'encargados-admin',
+        loadComponent: () => import('./views/pages/encargados-admin/encargados-admin.component').then(c => c.EncargadosAdminComponent),
+      },
+      {
+        path: 'servicios',
+        loadComponent: () => import('./views/pages/servicios-admin/servicios-admin.component').then(c => c.ServiciosAdminComponent),
+      },
     ]
   },
   {

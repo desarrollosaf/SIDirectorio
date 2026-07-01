@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { DirectorioService, Dependencia, DirectorioResponse } from '../../../services/directorio.service';
+import { AuthService } from '../../../services/auth.service';
 
 export type DirectoryRow = {
   esTitular: boolean;
@@ -66,7 +68,9 @@ export class DirectorioComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private directorioService: DirectorioService  // ✅ Inyectamos el servicio
+    private directorioService: DirectorioService,
+    private router: Router,
+    private authService: AuthService,
   ) {
     this.form = this.fb.group({
       dependencia: [''],
@@ -363,6 +367,22 @@ export class DirectorioComponent implements OnInit {
     this.totalFiltered = sorted.length;
   }
 
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  get userName(): string {
+    return this.authService.getUser()?.name || '';
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/auth/login']);
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
 
   onDownloadPdf(): void {
     const depId = this.form.get('dependencia')?.value || 0;

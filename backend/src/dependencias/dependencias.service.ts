@@ -121,8 +121,8 @@ export class DependenciasService {
     extensiones.forEach(ext => {
       if (!ext.extension && !ext.extension_privada) return;
       extensionesMap.set(Number(ext.servidor_publico_id), {
-        extension_publica: ext.extension ?? null,
-        extension_privada: ext.extension_privada ?? null,
+        extension_publica: ext.extension || null,
+        extension_privada: ext.extension_privada || null,
         ubicacion: ext.ubicaciones ?? null,
       });
     });
@@ -159,9 +159,9 @@ export class DependenciasService {
         nombre: u.Nombre,
         cargo: u.Puesto,
         rango,
-        extension: ext?.extension_publica ?? ext?.extension_privada ?? null,
-        extension_publica: ext?.extension_publica ?? null,
-        extension_privada: ext?.extension_privada ?? null,
+        extension: ext?.extension_publica || ext?.extension_privada || null,
+        extension_publica: ext?.extension_publica || null,
+        extension_privada: ext?.extension_privada || null,
         ubicacion: ext?.ubicacion ?? null,
       });
     });
@@ -395,8 +395,8 @@ export class DependenciasService {
 
     extensiones.forEach(ext => {
       extensionesMap.set(Number(ext.servidor_publico_id), {
-        extension_publica: ext.extension ?? null,
-        extension_privada: ext.extension_privada ?? null,
+        extension_publica: ext.extension || null,
+        extension_privada: ext.extension_privada || null,
         ubicacion: ext.ubicaciones ?? null,
       });
     });
@@ -449,9 +449,9 @@ export class DependenciasService {
           : u.Nombre,
         cargo: u.Puesto,
         rango,
-        extension: ext?.extension_publica ?? ext?.extension_privada ?? null,
-        extension_publica: ext?.extension_publica ?? null,
-        extension_privada: ext?.extension_privada ?? null,
+        extension: ext?.extension_publica || ext?.extension_privada || null,
+        extension_publica: ext?.extension_publica || null,
+        extension_privada: ext?.extension_privada || null,
         ubicacion: ext?.ubicacion ?? null,
         ubicacion_id: ext?.ubicacion ? Number(ext.ubicacion.id) : null,
       });

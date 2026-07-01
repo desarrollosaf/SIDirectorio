@@ -6,18 +6,18 @@ import { ExtensionesService, ExtensionUsuario, ExtensionForm } from '../../../se
 import { CatalogosService, UsuarioCatalogo, UbicacionCatalogo } from '../../../services/catalogos.service';
 
 @Component({
-  selector: 'app-extensiones',
+  selector: 'app-directorio-admin',
   standalone: true,
   imports: [CommonModule, FormsModule, NgbModule],
-  templateUrl: './extensiones.component.html',
-  styleUrls: ['./extensiones.component.scss'],
+  templateUrl: './directorio-admin.component.html',
+  styleUrl: './directorio-admin.component.scss',
 })
-export class ExtensionesComponent implements OnInit {
+export class DirectorioAdminComponent implements OnInit {
   @ViewChild('modalForm') modalForm!: TemplateRef<any>;
   @ViewChild('modalConfirm') modalConfirm!: TemplateRef<any>;
 
   // Tabla
-  allExtensiones: ExtensionUsuario[] = [];
+  allRegistros: ExtensionUsuario[] = [];
   filtered: ExtensionUsuario[] = [];
   paged: ExtensionUsuario[] = [];
   searchTerm = '';
@@ -66,8 +66,8 @@ export class ExtensionesComponent implements OnInit {
     this.loading = true;
     this.error = null;
     this.extService.getAll().subscribe({
-      next: data => { this.allExtensiones = data; this.applyFilter(); this.loading = false; },
-      error: () => { this.error = 'No se pudo cargar la información.'; this.loading = false; },
+      next: data => { this.allRegistros = data; this.applyFilter(); this.loading = false; },
+      error: () => { this.error = 'No se pudo cargar la información del directorio.'; this.loading = false; },
     });
   }
 
@@ -148,13 +148,14 @@ export class ExtensionesComponent implements OnInit {
   applyFilter(): void {
     const q = this.searchTerm.toLowerCase().trim();
     this.filtered = q
-      ? this.allExtensiones.filter(e =>
+      ? this.allRegistros.filter(e =>
+          this.nombreCompleto(e).toLowerCase().includes(q) ||
+          (e.usuario?.Puesto ?? '').toLowerCase().includes(q) ||
           (e.extension ?? '').includes(q) ||
           (e.extension_privada ?? '').includes(q) ||
-          (e.ubicacion?.nombre ?? '').toLowerCase().includes(q) ||
-          this.nombreCompleto(e).toLowerCase().includes(q),
+          (e.ubicacion?.nombre ?? '').toLowerCase().includes(q),
         )
-      : [...this.allExtensiones];
+      : [...this.allRegistros];
     this.totalItems = this.filtered.length;
     this.currentPage = 1;
     this.paginate();
@@ -189,9 +190,14 @@ export class ExtensionesComponent implements OnInit {
     return pages;
   }
 
-  nombreCompleto(e: ExtensionUsuario): string {
-    if (!e.usuario) return '—';
+  nombreCompleto(e: ExtensionUsuario | null): string {
+    if (!e?.usuario) return '—';
     return [e.usuario.Nombre, e.usuario.A_Paterno, e.usuario.A_Materno].filter(Boolean).join(' ');
+  }
+
+  iniciales(e: ExtensionUsuario): string {
+    if (!e.usuario) return '?';
+    return `${(e.usuario.Nombre || '?')[0]}${(e.usuario.A_Paterno || '')[0]}`.toUpperCase();
   }
 
   // ── Modal ─────────────────────────────────────────────────────────────────

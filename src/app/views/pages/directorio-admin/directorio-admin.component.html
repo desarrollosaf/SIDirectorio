@@ -4,25 +4,25 @@
   <nav class="page-breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Extensiones</li>
+      <li class="breadcrumb-item active">Directorio</li>
     </ol>
   </nav>
 
   <div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
+    <div class="col-12 grid-margin stretch-card">
       <div class="card">
         <div class="card-body">
 
           <!-- Encabezado -->
-          <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
-              <h6 class="card-title mb-0">Extensiones telefónicas</h6>
-              <p class="text-muted fs-12px mb-0 mt-1">
-                {{ totalItems }} registros encontrados
+              <h6 class="card-title mb-1">Directorio telefónico</h6>
+              <p class="text-muted fs-12px mb-0">
+                Gestión de servidores públicos y sus extensiones
               </p>
             </div>
             <button class="btn btn-primary btn-sm" (click)="openAdd()">
-              <i class="feather icon-plus me-1"></i> Agregar
+              <i class="feather icon-plus me-1"></i> Agregar registro
             </button>
           </div>
 
@@ -31,39 +31,48 @@
 
           <!-- Loading -->
           <div *ngIf="loading" class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p class="text-muted mt-2 mb-0">Cargando extensiones…</p>
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 mb-0">Cargando directorio…</p>
           </div>
 
           <div *ngIf="!loading">
-            <!-- Controles de tabla -->
-            <div class="row mb-3 align-items-center">
-              <div class="col-sm-6 col-md-4">
+
+            <!-- Estadística rápida -->
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="p-3 rounded border text-center">
+                  <div class="fs-4 fw-bold text-primary">{{ totalItems }}</div>
+                  <div class="fs-12px text-muted">Total registros</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="p-3 rounded border text-center">
+                  <div class="fs-4 fw-bold text-success">{{ paged.length }}</div>
+                  <div class="fs-12px text-muted">En esta página</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controles -->
+            <div class="row mb-3 align-items-center g-2">
+              <div class="col-sm-6 col-md-auto">
                 <div class="d-flex align-items-center gap-2">
-                  <label class="mb-0 text-nowrap">Mostrar</label>
+                  <label class="mb-0 text-nowrap fs-13px">Mostrar</label>
                   <select class="form-select form-select-sm w-auto"
-                          [(ngModel)]="pageSize"
-                          (change)="onPageSizeChange()">
+                          [(ngModel)]="pageSize" (change)="onPageSizeChange()">
                     <option [value]="10">10</option>
                     <option [value]="25">25</option>
                     <option [value]="50">50</option>
                     <option [value]="100">100</option>
                   </select>
-                  <span class="mb-0 text-nowrap">registros</span>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 ms-auto">
+              <div class="col-sm-6 col-md-4 ms-md-auto">
                 <div class="input-group input-group-sm">
-                  <span class="input-group-text">
-                    <i class="feather icon-search"></i>
-                  </span>
-                  <input type="search"
-                         class="form-control"
-                         placeholder="Buscar..."
-                         [(ngModel)]="searchTerm"
-                         (input)="onSearch()" />
+                  <span class="input-group-text"><i class="feather icon-search"></i></span>
+                  <input type="search" class="form-control"
+                         placeholder="Buscar por nombre, extensión, cargo…"
+                         [(ngModel)]="searchTerm" (input)="onSearch()" />
                 </div>
               </div>
             </div>
@@ -74,59 +83,85 @@
                 <thead class="table-light">
                   <tr>
                     <th>Servidor Público</th>
-                    <th class="text-center" style="width: 140px;">Extensiones</th>
+                    <th>Cargo / Puesto</th>
+                    <th class="text-center" style="width:130px;">Ext. Personal</th>
+                    <th class="text-center" style="width:130px;">Ext. Secretarial</th>
                     <th>Secretaria/Operativo</th>
                     <th>Ubicación</th>
-                    <th class="text-center" style="width: 100px;">Acciones</th>
+                    <th class="text-center" style="width:90px;">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngIf="paged.length === 0">
-                    <td colspan="5" class="text-center text-muted py-4">
-                      No se encontraron resultados
+                    <td colspan="7" class="text-center text-muted py-5">
+                      <i class="feather icon-inbox mb-2" style="font-size:32px;display:block;opacity:.4;"></i>
+                      No se encontraron registros
                     </td>
                   </tr>
+
                   <tr *ngFor="let e of paged">
+                    <!-- Servidor Público -->
                     <td>
-                      <span class="fw-medium">{{ nombreCompleto(e) }}</span>
-                    </td>
-                    <td>
-                      <div class="d-flex flex-column gap-1">
-                        <div class="d-flex align-items-center gap-1">
-                          <small class="text-muted" style="min-width:70px;">Ext. privada:</small>
-                          <span class="badge bg-secondary-subtle text-secondary fw-semibold px-2 py-1">
-                            {{ e.extension_privada || '—' }}
-                          </span>
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="da-initials bg-primary-subtle text-primary">
+                          {{ iniciales(e) }}
                         </div>
-                        <div class="d-flex align-items-center gap-1">
-                          <small class="text-muted" style="min-width:70px;">Ext. sec:</small>
-                          <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1">
-                            {{ e.extension || '—' }}
-                          </span>
+                        <div>
+                          <div class="fw-semibold lh-1">{{ nombreCompleto(e) }}</div>
+                          <small class="text-muted">ID {{ e.usuario?.id_Usuario }}</small>
                         </div>
                       </div>
                     </td>
+
+                    <!-- Cargo -->
                     <td>
-                      <small *ngIf="e.personal_operativo">
-                        {{ e.personal_operativo.A_Paterno }} {{ e.personal_operativo.A_Materno }} {{ e.personal_operativo.Nombre }}
-                      </small>
-                      <small *ngIf="!e.personal_operativo" class="text-muted">—</small>
+                      <small class="text-secondary">{{ e.usuario?.Puesto || '—' }}</small>
                     </td>
-                    <td>
-                      <span class="badge bg-light text-dark border">
-                        <i class="feather icon-map-pin me-1" style="font-size:10px;"></i>
-                        {{ e.ubicacion?.nombre || '—' }}
+
+                    <!-- Ext Personal -->
+                    <td class="text-center">
+                      <span class="badge bg-secondary-subtle text-secondary fw-semibold px-2 py-1">
+                        {{ e.extension_privada || '—' }}
                       </span>
                     </td>
+
+                    <!-- Ext Secretarial -->
+                    <td class="text-center">
+                      <span *ngIf="e.extension" class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1">
+                        {{ e.extension }}
+                      </span>
+                      <small *ngIf="!e.extension" class="text-muted">—</small>
+                    </td>
+
+                    <!-- Personal operativo -->
+                    <td>
+                      <span *ngIf="e.personal_operativo" class="d-flex align-items-center gap-1">
+                        <div class="avatar-initial bg-success-subtle text-success rounded-circle"
+                             style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;">
+                          {{ (e.personal_operativo.Nombre || '?')[0] }}{{ (e.personal_operativo.A_Paterno || '')[0] }}
+                        </div>
+                        <small>{{ e.personal_operativo.A_Paterno }} {{ e.personal_operativo.Nombre }}</small>
+                      </span>
+                      <small *ngIf="!e.personal_operativo" class="text-muted">—</small>
+                    </td>
+
+                    <!-- Ubicación -->
+                    <td>
+                      <span *ngIf="e.ubicacion" class="d-flex align-items-center gap-1">
+                        <i class="feather icon-map-pin text-muted" style="font-size:12px;"></i>
+                        <small>{{ e.ubicacion.nombre }}</small>
+                      </span>
+                      <small *ngIf="!e.ubicacion" class="text-muted">—</small>
+                    </td>
+
+                    <!-- Acciones -->
                     <td class="text-center">
                       <button class="btn btn-icon btn-warning btn-sm me-1"
-                              title="Editar"
-                              (click)="openEdit(e)">
+                              title="Editar" (click)="openEdit(e)">
                         <i class="feather icon-edit"></i>
                       </button>
                       <button class="btn btn-icon btn-danger btn-sm"
-                              title="Eliminar"
-                              (click)="openDelete(e)">
+                              title="Eliminar" (click)="openDelete(e)">
                         <i class="feather icon-trash-2"></i>
                       </button>
                     </td>
@@ -165,20 +200,21 @@
                 </ul>
               </div>
             </div>
-          </div><!-- /!loading -->
 
+          </div><!-- /!loading -->
         </div><!-- /card-body -->
       </div><!-- /card -->
     </div>
   </div>
+
 </div>
 
 <!-- ===== MODAL: Agregar / Editar ===== -->
 <ng-template #modalForm let-modal>
   <div class="modal-header">
     <h5 class="modal-title">
-      <i class="feather icon-phone me-2"></i>
-      {{ editMode ? 'Editar extensión' : 'Nueva extensión' }}
+      <i class="feather icon-user me-2"></i>
+      {{ editMode ? 'Editar registro' : 'Agregar registro' }}
     </h5>
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
@@ -188,13 +224,13 @@
 
       <!-- ── Servidor Público ─────────────────────────────────────────── -->
       <div class="col-12">
-        <label for="ext-user-search" class="form-label fw-medium">
+        <label for="da-user-search" class="form-label fw-medium">
           Servidor Público <span class="text-danger">*</span>
         </label>
         <div class="position-relative">
           <div class="input-group">
             <span class="input-group-text"><i class="feather icon-search"></i></span>
-            <input id="ext-user-search" type="text" class="form-control"
+            <input id="da-user-search" type="text" class="form-control"
                    placeholder="Escribe nombre o usuario para buscar…"
                    [(ngModel)]="userSearch"
                    (input)="onUserSearch()"
@@ -231,18 +267,18 @@
 
       <!-- ── Extensión personal ──────────────────────────────────────── -->
       <div class="col-md-6">
-        <label for="ext-privada" class="form-label fw-medium">Extensión</label>
+        <label for="da-extension-privada" class="form-label fw-medium">Extensión</label>
         <div class="input-group">
           <span class="input-group-text"><i class="feather icon-phone-call"></i></span>
-          <input id="ext-privada" type="text" class="form-control" placeholder="Ej. 4203"
+          <input id="da-extension-privada" type="text" class="form-control" placeholder="Ej. 4203"
                  [(ngModel)]="form.extension_privada" />
         </div>
       </div>
 
       <!-- ── Ubicación ───────────────────────────────────────────────── -->
       <div class="col-md-6">
-        <label for="ext-ubicacion" class="form-label fw-medium">Ubicación</label>
-        <select id="ext-ubicacion" class="form-select" [(ngModel)]="form.ubicacion_id">
+        <label for="da-ubicacion" class="form-label fw-medium">Ubicación</label>
+        <select id="da-ubicacion" class="form-select" [(ngModel)]="form.ubicacion_id">
           <option [ngValue]="undefined">— Selecciona —</option>
           <option *ngFor="let u of catalogUbicaciones" [ngValue]="+u.id">
             {{ u.nombre }}
@@ -255,10 +291,11 @@
         <hr class="my-1" />
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch"
-                 id="ext-toggle-secretaria"
+                 id="da-toggle-secretaria"
                  [(ngModel)]="showSecretaria"
+                 [attr.aria-checked]="showSecretaria"
                  (change)="toggleSecretaria()" />
-          <label class="form-check-label fw-medium" for="ext-toggle-secretaria">
+          <label class="form-check-label fw-medium" for="da-toggle-secretaria">
             Habilitar extensión secretarial
           </label>
         </div>
@@ -268,11 +305,11 @@
       <ng-container *ngIf="showSecretaria">
 
         <div class="col-12">
-          <label for="ext-sec-search" class="form-label fw-medium">Secretaria / Personal operativo</label>
+          <label for="da-sec-search" class="form-label fw-medium">Secretaria / Personal operativo</label>
           <div class="position-relative">
             <div class="input-group">
               <span class="input-group-text"><i class="feather icon-search"></i></span>
-              <input id="ext-sec-search" type="text" class="form-control"
+              <input id="da-sec-search" type="text" class="form-control"
                      placeholder="Buscar secretaria u operativo…"
                      [(ngModel)]="secretariaSearch"
                      (input)="onSecretariaSearch()"
@@ -308,10 +345,10 @@
         </div>
 
         <div class="col-md-6">
-          <label for="ext-secretarial" class="form-label fw-medium">Extensión secretarial</label>
+          <label for="da-extension-secretarial" class="form-label fw-medium">Extensión secretarial</label>
           <div class="input-group">
             <span class="input-group-text"><i class="feather icon-phone"></i></span>
-            <input id="ext-secretarial" type="text" class="form-control" placeholder="Ej. 4200"
+            <input id="da-extension-secretarial" type="text" class="form-control" placeholder="Ej. 4200"
                    [(ngModel)]="form.extension" />
           </div>
         </div>
@@ -322,12 +359,10 @@
   </div>
 
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">
-      Cancelar
-    </button>
-    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="saving">
+    <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button class="btn btn-primary" (click)="onSave()" [disabled]="saving">
       <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
-      {{ saving ? 'Guardando…' : 'Guardar' }}
+      {{ saving ? 'Guardando…' : 'Guardar cambios' }}
     </button>
   </div>
 </ng-template>
@@ -337,22 +372,22 @@
   <div class="modal-header border-0 pb-0">
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
-  <div class="modal-body text-center pt-0 pb-4">
+  <div class="modal-body text-center pt-2 pb-4 px-4">
     <div class="mb-3">
       <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle"
            style="width:64px;height:64px;">
-        <i class="feather icon-trash-2 text-danger" style="font-size:28px;"></i>
+        <i class="feather icon-trash-2 text-danger" style="font-size:26px;"></i>
       </div>
     </div>
-    <h5 class="mb-1">¿Eliminar extensión?</h5>
+    <h5 class="mb-1">¿Eliminar registro?</h5>
     <p class="text-muted mb-0">
-      Se eliminará la extensión de
-      <strong>{{ nombreCompleto(deleteTarget!) }}</strong>.
+      Se eliminará la extensión <strong>{{ deleteTarget?.extension }}</strong>
+      de <strong>{{ nombreCompleto(deleteTarget) }}</strong>.
       Esta acción no se puede deshacer.
     </p>
   </div>
   <div class="modal-footer border-0 justify-content-center pt-0">
     <button class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
-    <button class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
+    <button class="btn btn-danger" (click)="confirmDelete()">Sí, eliminar</button>
   </div>
 </ng-template>

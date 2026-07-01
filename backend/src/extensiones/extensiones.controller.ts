@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { ExtensionesService } from './extensiones.service';
 import { CreateExtensioneDto } from './dto/create-extensione.dto';
 import { UpdateExtensioneDto } from './dto/update-extensione.dto';
@@ -8,8 +8,8 @@ export class ExtensionesController {
   constructor(private readonly extensionesService: ExtensionesService) {}
 
   @Post()
-  create(@Body() createExtensioneDto: CreateExtensioneDto) {
-    return this.extensionesService.create(createExtensioneDto);
+  create(@Body() dto: CreateExtensioneDto) {
+    return this.extensionesService.create(dto);
   }
 
   @Get()
@@ -28,11 +28,12 @@ export class ExtensionesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExtensioneDto: UpdateExtensioneDto) {
-    return this.extensionesService.update(+id, updateExtensioneDto);
+  update(@Param('id') id: string, @Body() dto: UpdateExtensioneDto) {
+    return this.extensionesService.update(+id, dto);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
     return this.extensionesService.remove(+id);
   }
