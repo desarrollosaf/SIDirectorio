@@ -6,6 +6,7 @@ export interface MenuItem {
   link?: string;
   subMenus?: SubMenus[];
   isMegaMenu?: boolean;
+  roles?: string[];
 }
 
 export interface SubMenus {

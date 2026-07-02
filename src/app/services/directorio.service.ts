@@ -89,9 +89,14 @@ export class DirectorioService {
 
 descargarPdf(depId: number): Observable<Blob> {
   return this.http.get(`${this.apiUrl}/dependencias/reporte/pdf/${depId}`, {
-    responseType: 'blob'
+    responseType: 'blob',
   });
 }
 
+descargarReporteDirectivos(depId: number): Observable<Blob> {
+  return this.http.get(`${this.apiUrl}/dependencias/reporte/directivos/${depId}`, {
+    responseType: 'blob',
+  });
+}
 
 }

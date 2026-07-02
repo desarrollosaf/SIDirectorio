@@ -9,14 +9,10 @@
       />
     </div>
     <div class="dir-topbar__actions">
-      <ng-container *ngIf="!isLoggedIn">
-        <button class="btn btn-outline-light btn-sm" (click)="goToLogin()">
-          Iniciar sesión
-        </button>
-      </ng-container>
       <ng-container *ngIf="isLoggedIn">
         <span class="dir-topbar__username">{{ userName }}</span>
-        <button class="btn btn-outline-light btn-sm" (click)="logout()">Salir</button>
+        <button class="btn btn-outline-dark btn-sm" (click)="goToExtensiones()">Extensiones</button>
+        <button class="btn btn-outline-dark btn-sm" (click)="logout()">Salir</button>
       </ng-container>
     </div>
   </div>

@@ -215,7 +215,7 @@ export class DependenciasService {
           id_Departamento: 0,
           nombre: 'Presidencia',
           usuarios: [{
-            nombre: 'DIP. VAZQUEZ RODRIGUEZ JOSE FRANCISCO',
+            nombre: 'DIP. VÁZQUEZ RODRÍGUEZ JOSÉ FRANCISCO',
             cargo: 'PRESIDENTE DE LA JUNTA DE COORDINACIÓN POLÍTICA',
             extension: '6606',
           }],
@@ -465,9 +465,11 @@ export class DependenciasService {
         {
           nombre: 'Presidencia',
           usuarios: [{
-            nombre: 'DIP. VAZQUEZ RODRIGUEZ JOSE FRANCISCO',
+            nombre: 'DIP. VÁZQUEZ RODRÍGUEZ JOSÉ FRANCISCO',
             cargo: 'PRESIDENTE DE LA JUNTA DE COORDINACIÓN POLÍTICA',
             extension: '6606',
+            extension_publica: '6606',
+            extension_privada: '',
           }],
         },
         {
@@ -476,6 +478,8 @@ export class DependenciasService {
             nombre: 'D. EN D. OLVERA HERREROS OMAR SALVADOR',
             cargo: 'SECRETARÍA EJECUTIVA',
             extension: '6609',
+            extension_publica: '6609',
+            extension_privada: '',
           }],
         },
         {
@@ -484,6 +488,8 @@ export class DependenciasService {
             nombre: 'RECEPCIÓN DE PRESIDENCIA',
             cargo: 'RECEPCIÓN',
             extension: '6606',
+            extension_publica: '6606',
+            extension_privada: '',
           }],
         },
       ],

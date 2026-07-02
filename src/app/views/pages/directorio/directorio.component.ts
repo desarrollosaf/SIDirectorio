@@ -380,6 +380,10 @@ export class DirectorioComponent implements OnInit {
     this.router.navigate(['/auth/login']);
   }
 
+  goToExtensiones(): void {
+    this.router.navigate(['/extensiones']);
+  }
+
   logout(): void {
     this.authService.logout();
   }

@@ -108,7 +108,7 @@
                     </td>
                     <td>
                       <small *ngIf="e.personal_operativo">
-                        {{ e.personal_operativo.A_Paterno }} {{ e.personal_operativo.A_Materno }} {{ e.personal_operativo.Nombre }}
+                        {{ e.personal_operativo.Nombre }}
                       </small>
                       <small *ngIf="!e.personal_operativo" class="text-muted">—</small>
                     </td>
@@ -212,8 +212,8 @@
                       class="list-group-item list-group-item-action py-2 px-3"
                       *ngFor="let u of filteredUsuarios"
                       (click)="selectUsuario(u)">
-                <div class="fw-semibold lh-1">{{ u.A_Paterno }} {{ u.A_Materno }}, {{ u.Nombre }}</div>
-                <small class="text-muted">{{ u.Puesto || 'Sin puesto' }}</small>
+                <div class="fw-semibold lh-1">{{ u.nombreCompleto }}</div>
+                <small class="text-muted">{{ u.N_Usuario }} · {{ u.Puesto || 'Sin puesto' }}</small>
               </button>
             </div>
           </div>
@@ -290,8 +290,8 @@
                         class="list-group-item list-group-item-action py-2 px-3"
                         *ngFor="let u of filteredSecretarias"
                         (click)="selectSecretaria(u)">
-                  <div class="fw-semibold lh-1">{{ u.A_Paterno }} {{ u.A_Materno }}, {{ u.Nombre }}</div>
-                  <small class="text-muted">{{ u.Puesto || 'Sin puesto' }}</small>
+                  <div class="fw-semibold lh-1">{{ u.nombreCompleto }}</div>
+                  <small class="text-muted">{{ u.N_Usuario }} · {{ u.Puesto || 'Sin puesto' }}</small>
                 </button>
               </div>
             </div>

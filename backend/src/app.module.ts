@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { CatalogosModule } from './catalogos/catalogos.module';
 import { EncargadosModule } from './encargados/encargados.module';
 import { ServiciosModule } from './servicios/servicios.module';
+import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
+import { DependenciasUbicacionesModule } from './dependencias-ubicaciones/dependencias-ubicaciones.module';
+import { UsersAdminModule } from './users-admin/users-admin.module';
+import { UsuariosSafModule } from './usuarios-saf/usuarios-saf.module';
 
 @Module({
   imports: [
@@ -18,6 +22,10 @@ import { ServiciosModule } from './servicios/servicios.module';
     CatalogosModule,
     EncargadosModule,
     ServiciosModule,
+    UbicacionesModule,
+    DependenciasUbicacionesModule,
+    UsersAdminModule,
+    UsuariosSafModule,
   ],
   controllers: [
     AppController

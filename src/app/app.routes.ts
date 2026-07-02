@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { BaseComponent } from './views/layout/base/base.component';
 import { authGuard } from './core/guards/auth.guard';
+import { superuserGuard, adminGuard, tecnicoGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -63,17 +64,41 @@ export const routes: Routes = [
         path: 'extensiones',
         loadComponent: () => import('./views/pages/extensiones/extensiones.component').then(c => c.ExtensionesComponent),
       },
-      {
-        path: 'directorio-admin',
-        loadComponent: () => import('./views/pages/directorio-admin/directorio-admin.component').then(c => c.DirectorioAdminComponent),
-      },
+
       {
         path: 'encargados-admin',
+        canActivate: [adminGuard],
         loadComponent: () => import('./views/pages/encargados-admin/encargados-admin.component').then(c => c.EncargadosAdminComponent),
       },
       {
         path: 'servicios',
+        canActivate: [adminGuard],
         loadComponent: () => import('./views/pages/servicios-admin/servicios-admin.component').then(c => c.ServiciosAdminComponent),
+      },
+      {
+        path: 'ubicaciones',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./views/pages/ubicaciones/ubicaciones.component').then(c => c.UbicacionesComponent),
+      },
+      {
+        path: 'dependencias',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./views/pages/dependencias-ubicaciones/dependencias-ubicaciones.component').then(c => c.DependenciasUbicacionesComponent),
+      },
+      {
+        path: 'usuarios',
+        canActivate: [superuserGuard],
+        loadComponent: () => import('./views/pages/users-admin/users-admin.component').then(c => c.UsersAdminComponent),
+      },
+      {
+        path: 'usuarios-saf',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./views/pages/usuarios-saf/usuarios-saf.component').then(c => c.UsuariosSafComponent),
+      },
+      {
+        path: 'reportes',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./views/pages/reportes/reportes.component').then(c => c.ReportesComponent),
       },
     ]
   },

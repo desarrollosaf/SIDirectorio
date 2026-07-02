@@ -76,7 +76,7 @@ export class ExtensionesComponent implements OnInit {
       next: data => {
         this.catalogUsuarios = data.map(u => ({
           ...u,
-          nombreCompleto: [u.A_Paterno, u.A_Materno, u.Nombre].filter(Boolean).join(' '),
+          nombreCompleto: (u.Nombre ?? '').trim(),
         }));
       },
     });
@@ -85,14 +85,18 @@ export class ExtensionesComponent implements OnInit {
     });
   }
 
+  private norm(s: string): string {
+    return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
   // ── Búsqueda servidor público ──────────────────────────────────────────────
   onUserSearch(): void {
-    const q = this.userSearch.toLowerCase().trim();
+    const q = this.norm(this.userSearch.trim());
     this.userDropdownOpen = q.length >= 2;
     this.filteredUsuarios = q.length >= 2
       ? this.catalogUsuarios.filter(u =>
-          (u.nombreCompleto ?? '').toLowerCase().includes(q) ||
-          (u.N_Usuario ?? '').toLowerCase().includes(q),
+          this.norm(u.nombreCompleto ?? '').includes(q) ||
+          this.norm(u.N_Usuario ?? '').includes(q),
         ).slice(0, 15)
       : [];
   }
@@ -112,12 +116,12 @@ export class ExtensionesComponent implements OnInit {
 
   // ── Búsqueda secretaria / personal operativo ───────────────────────────────
   onSecretariaSearch(): void {
-    const q = this.secretariaSearch.toLowerCase().trim();
+    const q = this.norm(this.secretariaSearch.trim());
     this.secretariaDropdownOpen = q.length >= 2;
     this.filteredSecretarias = q.length >= 2
       ? this.catalogUsuarios.filter(u =>
-          (u.nombreCompleto ?? '').toLowerCase().includes(q) ||
-          (u.N_Usuario ?? '').toLowerCase().includes(q),
+          this.norm(u.nombreCompleto ?? '').includes(q) ||
+          this.norm(u.N_Usuario ?? '').includes(q),
         ).slice(0, 15)
       : [];
   }
@@ -146,13 +150,14 @@ export class ExtensionesComponent implements OnInit {
 
   // ── Tabla ─────────────────────────────────────────────────────────────────
   applyFilter(): void {
-    const q = this.searchTerm.toLowerCase().trim();
+    const q = this.norm(this.searchTerm.trim());
     this.filtered = q
       ? this.allExtensiones.filter(e =>
           (e.extension ?? '').includes(q) ||
           (e.extension_privada ?? '').includes(q) ||
-          (e.ubicacion?.nombre ?? '').toLowerCase().includes(q) ||
-          this.nombreCompleto(e).toLowerCase().includes(q),
+          this.norm(e.ubicacion?.nombre ?? '').includes(q) ||
+          this.norm(this.nombreCompleto(e)).includes(q) ||
+          this.norm(e.usuario?.N_Usuario ?? '').includes(q),
         )
       : [...this.allExtensiones];
     this.totalItems = this.filtered.length;
@@ -191,7 +196,7 @@ export class ExtensionesComponent implements OnInit {
 
   nombreCompleto(e: ExtensionUsuario): string {
     if (!e.usuario) return '—';
-    return [e.usuario.Nombre, e.usuario.A_Paterno, e.usuario.A_Materno].filter(Boolean).join(' ');
+    return (e.usuario.Nombre ?? '').trim();
   }
 
   // ── Modal ─────────────────────────────────────────────────────────────────
@@ -216,14 +221,10 @@ export class ExtensionesComponent implements OnInit {
       servidor_publico_id: e.usuario?.id_Usuario,
       personal_operativo_id: e.personal_operativo?.id_Usuario ?? null,
     };
-    this.userSearch = e.usuario
-      ? [e.usuario.A_Paterno, e.usuario.A_Materno, e.usuario.Nombre].filter(Boolean).join(' ')
-      : '';
+    this.userSearch = e.usuario ? (e.usuario.Nombre ?? '').trim() : '';
     this.filteredUsuarios = [];
     this.showSecretaria = !!e.personal_operativo;
-    this.secretariaSearch = e.personal_operativo
-      ? [e.personal_operativo.A_Paterno, e.personal_operativo.A_Materno, e.personal_operativo.Nombre].filter(Boolean).join(' ')
-      : '';
+    this.secretariaSearch = e.personal_operativo ? (e.personal_operativo.Nombre ?? '').trim() : '';
     this.filteredSecretarias = [];
     this.modalRef = this.modal.open(this.modalForm, { size: 'lg', centered: true });
   }

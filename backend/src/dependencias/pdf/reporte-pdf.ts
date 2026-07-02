@@ -7,12 +7,14 @@ const PDFDoc = require('pdfkit');
 type PDFDocType = InstanceType<typeof PDFDocument>;
 
 const TABLE = {
-  startX: 50,
+  startX: 40,
   colNombre: 60,
   colExt: 430,
   rowHeight: 15,
-  tableWidth: 500,
+  tableWidth: 525,
 };
+
+const EXT_COL_W = 85;
 
 const nameWidth = 300;
 
@@ -94,11 +96,10 @@ function ensureSpace(doc: PDFDocType, neededHeight: number) {
 function drawExtHeader(doc: PDFDocType) {
   ensureSpace(doc, 16 + 10);
   const headerY = doc.y + 5;
-  const extColWidth = 80;
-  const extColX = TABLE.startX + TABLE.tableWidth - extColWidth;
+  const extColX = TABLE.startX + TABLE.tableWidth - EXT_COL_W;
   doc.rect(TABLE.startX, headerY, TABLE.tableWidth, 16).fill('#CCCCCC');
-  doc.fillColor('#000000').fontSize(10)
-    .text('EXT.', extColX, headerY + 3, { width: extColWidth, align: 'right' });
+  doc.fillColor('#000000').fontSize(9)
+    .text('EXT.', extColX, headerY + 3, { width: EXT_COL_W, align: 'right' });
   doc.y = headerY + 16;
 }
 
@@ -109,22 +110,21 @@ function renderTitular(
   extension: string,
 ) {
   ensureSpace(doc, 40);
-  const extColWidth = 80;
   const rowY = doc.y + 6;
-  const extColX = TABLE.startX + TABLE.tableWidth - extColWidth;
+  const extColX = TABLE.startX + TABLE.tableWidth - EXT_COL_W;
 
-  doc.fontSize(8).font('Helvetica-Bold').fillColor('#000000')
-    .text(titulo, TABLE.startX, rowY, { width: TABLE.tableWidth - extColWidth })
+  doc.fontSize(7).font('Helvetica-Bold').fillColor('#000000')
+    .text(titulo, TABLE.startX, rowY, { width: TABLE.tableWidth - EXT_COL_W })
     .font('Helvetica');
 
   if (extension) {
-    doc.fontSize(8).text(extension, extColX, rowY, { width: extColWidth, align: 'right', lineBreak: false });
+    doc.fontSize(7).text(extension, extColX, rowY, { width: EXT_COL_W, align: 'right', lineBreak: false });
   }
 
   doc.y = doc.y + 2;
 
   if (nombre) {
-    doc.fontSize(8).font('Helvetica').fillColor('#000000')
+    doc.fontSize(7).font('Helvetica').fillColor('#000000')
       .text(nombre, TABLE.startX, doc.y, { width: TABLE.tableWidth });
   }
 
@@ -202,16 +202,16 @@ function renderDireccion(
     }
   }
 
-  // ── Encabezado gris con EXT. — solo si no se saltó ─────────────────────
-  const extColWidth = 80;
-  const extColX = TABLE.startX + TABLE.tableWidth - extColWidth;
+  // ── Encabezado gris con EXT. ─────────────────────────────────────────────
+  const extColX = TABLE.startX + TABLE.tableWidth - EXT_COL_W;
+  const isLegislaturaGroup = !!(dir.nombre && depNombre === 'LEGISLATURA');
 
-  if (!skipHeader) {
+  if (!skipHeader || isLegislaturaGroup) {
     ensureSpace(doc, TABLE.rowHeight + 10);
     const headerY = doc.y + 5;
     doc.rect(TABLE.startX, headerY, TABLE.tableWidth, 16).fill('#CCCCCC');
-    doc.fillColor('#000000').fontSize(10)
-      .text('EXT.', extColX, headerY + 3, { width: extColWidth, align: 'right' });
+    doc.fillColor('#000000').fontSize(9)
+      .text('EXT.', extColX, headerY + 3, { width: EXT_COL_W, align: 'right' });
     doc.y = headerY + 16;
   }
 
@@ -224,7 +224,7 @@ function renderDireccion(
     if (dpto.nombre && depNombre !== 'LEGISLATURA') {
       ensureSpace(doc, 24);
       drawRowLine(doc, doc.y);
-      doc.fontSize(8).font('Helvetica-Bold').fillColor('#000000')
+      doc.fontSize(7).font('Helvetica-Bold').fillColor('#000000')
         .text(dpto.nombre, TABLE.startX + 5, doc.y + 3, { width: TABLE.tableWidth })
         .font('Helvetica');
     }
@@ -234,7 +234,6 @@ function renderDireccion(
       const deptEncargado = encargadoInfo?.nombre ?? null;
       const nameText: string = u.nombre ?? '';
 
-      // 👇 Separar en dos líneas si hay ambas
       const extText: string = u.extension
         ? u.extension
         : u.extension_privada
@@ -243,12 +242,11 @@ function renderDireccion(
 
       const nameColX = TABLE.startX + 5;
       const nameColWidth = extColX - nameColX - 10;
-      const extColWidth2 = extColX;
 
       const encargadoLine = deptEncargado ? `Encargado: ${deptEncargado}` : '';
+      doc.fontSize(7);
       const nameHeight = doc.heightOfString(nameText, { width: nameColWidth });
-      doc.fontSize(8);
-      const extHeight = doc.heightOfString(extText, { width: extColWidth, lineBreak: true });
+      const extHeight = doc.heightOfString(extText, { width: EXT_COL_W, lineBreak: true });
       const encHeight = deptEncargado ? doc.heightOfString(encargadoLine, { width: nameColWidth }) : 0;
       const totalTextHeight = Math.max(nameHeight, extHeight) + (deptEncargado ? encHeight + 2 : 0);
       const rowHeight = Math.max(TABLE.rowHeight, totalTextHeight + 8);
@@ -259,18 +257,18 @@ function renderDireccion(
       if (!esPrimerUsuario) drawRowLine(doc, rowY);
       esPrimerUsuario = false;
 
-      doc.fontSize(8).font('Helvetica').fillColor('#000000')
+      doc.fontSize(7).font('Helvetica').fillColor('#000000')
         .text(nameText, nameColX, rowY + 4, { width: nameColWidth, lineBreak: false });
 
       if (deptEncargado) {
         const encY = rowY + 6 + nameHeight + 2;
-        doc.fontSize(7).font('Helvetica-Bold').fillColor('#000000')
+        doc.fontSize(6).font('Helvetica-Bold').fillColor('#000000')
           .text(encargadoLine, nameColX, encY, { width: nameColWidth, lineBreak: false });
       }
 
-      doc.fontSize(8).font('Helvetica').fillColor('#000000')
+      doc.fontSize(7).font('Helvetica').fillColor('#000000')
         .text(extText, extColX, rowY + 4, {
-          width: extColWidth,
+          width: EXT_COL_W,
           align: 'right',
           lineBreak: true
         });
@@ -291,7 +289,7 @@ export function generarReporteDependenciasPDF(
 ) {
   const doc: PDFDocType = new PDFDoc({
     size: 'LETTER',
-    margins: { top: CONTENT_TOP, bottom: CONTENT_BOTTOM_MARGIN, left: 50, right: 50 },
+    margins: { top: CONTENT_TOP, bottom: CONTENT_BOTTOM_MARGIN, left: 40, right: 40 },
   });
 
   res.setHeader('Content-Type', 'application/pdf');
@@ -395,7 +393,7 @@ export function generarReporteDependenciasPDF(
         dir.departamentos?.some((d: any) => Array.isArray(d.usuarios) && d.usuarios.length > 0)
       );
 
-      if (tieneUsuarios) drawExtHeader(doc);
+      if (tieneUsuarios && depNombre !== 'LEGISLATURA') drawExtHeader(doc);
 
       dep.direcciones.forEach((dir: any) => {
         renderDireccion(doc, dir, depNombre, usableWidth, encargadosMap, true);
@@ -408,7 +406,7 @@ export function generarReporteDependenciasPDF(
     doc.addPage();
 
     ensureSpace(doc, 40);
-    doc.fontSize(14).font('Helvetica-Bold').fillColor('#000000')
+    doc.fontSize(13).font('Helvetica-Bold').fillColor('#000000')
       .text('SERVICIOS', TABLE.startX, doc.y, { width: TABLE.tableWidth, align: 'center' })
       .font('Helvetica');
 
@@ -417,11 +415,10 @@ export function generarReporteDependenciasPDF(
     const headerY = doc.y;
     doc.rect(TABLE.startX, headerY, TABLE.tableWidth, TABLE.rowHeight).fill('#CCCCCC');
 
-    const extColWidth = 80;
-    const extColX = TABLE.startX + TABLE.tableWidth - extColWidth;
+    const srvExtColX = TABLE.startX + TABLE.tableWidth - EXT_COL_W;
 
-    doc.fillColor('#000000').fontSize(10).font('Helvetica-Bold')
-      .text('Ext.', extColX, headerY + 6, { width: extColWidth, align: 'right' })
+    doc.fillColor('#000000').fontSize(9).font('Helvetica-Bold')
+      .text('Ext.', srvExtColX, headerY + 6, { width: EXT_COL_W, align: 'right' })
       .font('Helvetica');
 
     doc.y = headerY + TABLE.rowHeight;
@@ -435,23 +432,24 @@ export function generarReporteDependenciasPDF(
           : '';
 
       const nameColX = TABLE.startX + 5;
-      const nameColWidth = extColX - nameColX - 10;
+      const nameColWidth = srvExtColX - nameColX - 10;
+      doc.fontSize(7);
       const nameHeight = doc.heightOfString(nameText, { width: nameColWidth });
-      const extHeight = doc.heightOfString(extText, { width: extColWidth });  // 👈
-      const rowHeight = Math.max(TABLE.rowHeight, Math.max(nameHeight, extHeight) + 8);  // 👈 max entre nombre y ext
+      const extHeight = doc.heightOfString(extText, { width: EXT_COL_W });
+      const rowHeight = Math.max(TABLE.rowHeight, Math.max(nameHeight, extHeight) + 8);
 
       ensureSpace(doc, rowHeight + 2);
       const rowY = doc.y;
       drawRowLine(doc, rowY);
 
-      doc.fontSize(8).font('Helvetica').fillColor('#000000')
+      doc.fontSize(7).font('Helvetica').fillColor('#000000')
         .text(nameText, nameColX, rowY + 4, { width: nameColWidth, lineBreak: true });
 
-      doc.fontSize(8).fillColor('#000000')
-        .text(extText, extColX, rowY + 4, {  // 👈 rowY + 4 igual que el nombre
-          width: extColWidth,
+      doc.fontSize(7).fillColor('#000000')
+        .text(extText, srvExtColX, rowY + 4, {
+          width: EXT_COL_W,
           align: 'right',
-          lineBreak: true,  // 👈 permitir salto
+          lineBreak: true,
         });
 
       doc.y = rowY + rowHeight;

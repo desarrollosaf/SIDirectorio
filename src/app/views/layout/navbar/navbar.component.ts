@@ -42,7 +42,8 @@ export class NavbarComponent implements OnInit {
       this.showActiveTheme(this.currentTheme);
     });
 
-    this.menuItems = MENU;
+    const userRole = this.authService.getUser()?.role ?? 'user';
+    this.menuItems = MENU.filter(item => !item.roles || item.roles.includes(userRole));
 
     /**
      * Close the header menu after a route change on tablet and mobile devices

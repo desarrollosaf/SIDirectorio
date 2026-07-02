@@ -170,7 +170,7 @@
                       class="list-group-item list-group-item-action py-2 px-3"
                       *ngFor="let u of filteredUsuarios"
                       (click)="selectUsuario(u)">
-                <div class="fw-semibold lh-1">{{ u.A_Paterno }} {{ u.A_Materno }}, {{ u.Nombre }}</div>
+                <div class="fw-semibold lh-1">{{ u.nombreCompleto }}</div>
                 <small class="text-muted">{{ u.Puesto || 'Sin puesto' }}</small>
               </button>
             </div>
