@@ -24,7 +24,7 @@ export interface Encargado {
 
 @Injectable({ providedIn: 'root' })
 export class EncargadosService {
-  private readonly api = 'http://localhost:3000/api';
+  private readonly api = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api';
 
   constructor(private http: HttpClient) {}
 

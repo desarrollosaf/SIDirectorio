@@ -25,7 +25,7 @@ export interface UbicacionForm {
 
 @Injectable({ providedIn: 'root' })
 export class UbicacionesService {
-  private readonly api = 'http://localhost:3000/api/ubicaciones';
+  private readonly api = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api/ubicaciones';
 
   constructor(private http: HttpClient) {}
 

@@ -48,7 +48,7 @@ export interface DirectorioResponse {
   providedIn: 'root'
 })
 export class DirectorioService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api';
   // private apiUrl = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api';
 
   constructor(private http: HttpClient) { }

@@ -25,7 +25,7 @@ export interface CreateAdminUserDto {
 
 @Injectable({ providedIn: 'root' })
 export class UsersAdminService {
-  private readonly api = 'http://localhost:3000/api/users-admin';
+  private readonly api = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api/users-admin';
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
