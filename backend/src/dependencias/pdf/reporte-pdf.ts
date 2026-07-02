@@ -393,7 +393,7 @@ export function generarReporteDependenciasPDF(
         dir.departamentos?.some((d: any) => Array.isArray(d.usuarios) && d.usuarios.length > 0)
       );
 
-      if (tieneUsuarios) drawExtHeader(doc);
+      if (tieneUsuarios && depNombre !== 'LEGISLATURA') drawExtHeader(doc);
 
       dep.direcciones.forEach((dir: any) => {
         renderDireccion(doc, dir, depNombre, usableWidth, encargadosMap, true);

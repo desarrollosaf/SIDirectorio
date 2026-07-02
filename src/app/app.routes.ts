@@ -64,11 +64,7 @@ export const routes: Routes = [
         path: 'extensiones',
         loadComponent: () => import('./views/pages/extensiones/extensiones.component').then(c => c.ExtensionesComponent),
       },
-      {
-        path: 'directorio-admin',
-        canActivate: [adminGuard],
-        loadComponent: () => import('./views/pages/directorio-admin/directorio-admin.component').then(c => c.DirectorioAdminComponent),
-      },
+
       {
         path: 'encargados-admin',
         canActivate: [adminGuard],

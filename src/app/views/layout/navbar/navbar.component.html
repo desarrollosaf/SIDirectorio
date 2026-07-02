@@ -4,31 +4,24 @@
       <div class="navbar-content">
 
         <!-- Logo -->
-        <a routerLink="/directorio-admin" class="navbar-brand d-flex align-items-center gap-2">
-          <i class="feather icon-book-open" style="font-size:22px;"></i>
-          <span>Directorio<span style="color:var(--bs-primary);">SAF</span></span>
-        </a>
+        <span class="navbar-brand">
+          <img
+            src="https://administracionyfinanzasplem.gob.mx/resdirectorio/assets/img/logo/logo_congreso.svg"
+            alt="Logo Congreso"
+            style="height:50px;width:auto;object-fit:contain;"
+          />
+        </span>
 
         <!-- Logo mini (móvil) -->
         <div class="logo-mini-wrapper">
-          <span class="fw-bold" style="font-size:18px;">D</span>
+          <img
+            src="https://administracionyfinanzasplem.gob.mx/resdirectorio/assets/img/logo/logo_congreso.svg"
+            alt="Logo Congreso"
+            style="height:32px;width:auto;object-fit:contain;"
+          />
         </div>
 
         <ul class="navbar-nav ms-auto">
-
-          <!-- Theme switcher -->
-          <li class="theme-switcher-wrapper nav-item">
-            <input type="checkbox" (change)="onThemeCheckboxChange($event)" value="" id="theme-switcher">
-            <label for="theme-switcher">
-              <div class="box">
-                <div class="ball"></div>
-                <div class="icons">
-                  <i class="feather icon-sun"></i>
-                  <i class="feather icon-moon"></i>
-                </div>
-              </div>
-            </label>
-          </li>
 
           <!-- Perfil / usuario -->
           <li class="nav-item nav-profile" ngbDropdown>
@@ -40,18 +33,7 @@
               <span class="d-none d-md-inline-block fs-13px">{{ userName }}</span>
             </a>
             <div ngbDropdownMenu aria-labelledby="profileDropdown">
-              <div class="d-flex flex-column align-items-center border-bottom px-4 py-3">
-                <div class="avatar-circle mb-2 d-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
-                     style="width:56px;height:56px;font-size:20px;">
-                  {{ userName[0] || 'U' }}
-                </div>
-                <p class="fw-semibold mb-0">{{ userName }}</p>
-                <small class="text-muted">{{ userRfc }}</small>
-                <span class="badge mt-1" [class.bg-primary]="isAdmin" [class.bg-secondary]="!isAdmin">
-                  {{ isAdmin ? 'Administrador' : 'Usuario' }}
-                </span>
-              </div>
-              <ul class="list-unstyled p-1">
+              <ul class="list-unstyled p-1 mb-0">
                 <li>
                   <a routerLink="/directorio" class="dropdown-item py-2 d-flex align-items-center">
                     <i class="feather icon-globe me-2 icon-md"></i>
