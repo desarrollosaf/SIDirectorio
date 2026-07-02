@@ -1,0 +1,163 @@
+<div class="page-content">
+
+  <nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+      <li class="breadcrumb-item active">Corrección de Nombres</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="card-title mb-0">Corrección de Nombres</h6>
+              <p class="text-muted fs-12px mb-0 mt-1">{{ totalItems }} usuarios encontrados — edita Nombre, Grado Abreviado y Rango</p>
+            </div>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger py-2 d-flex justify-content-between align-items-center">
+            {{ error }}
+            <button class="btn-close btn-sm" (click)="error = null"></button>
+          </div>
+
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 mb-0">Cargando usuarios…</p>
+          </div>
+
+          <div *ngIf="!loading">
+            <div class="row mb-3 align-items-center">
+              <div class="col-sm-6 col-md-4">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="mb-0 text-nowrap">Mostrar</label>
+                  <select class="form-select form-select-sm w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                    <option [value]="25">25</option>
+                    <option [value]="50">50</option>
+                    <option [value]="100">100</option>
+                  </select>
+                  <span class="mb-0 text-nowrap">registros</span>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-5 ms-auto">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text"><i class="feather icon-search"></i></span>
+                  <input type="search" class="form-control"
+                         placeholder="Buscar por nombre o RFC…"
+                         [(ngModel)]="searchTerm"
+                         (input)="onSearch()" />
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>RFC</th>
+                    <th>Nombre</th>
+                    <th>Grado Abreviado</th>
+                    <th class="text-center">Rango</th>
+                    <th class="text-center" style="width:110px;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="paged.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">No se encontraron resultados</td>
+                  </tr>
+                  <tr *ngFor="let u of paged">
+                    <td><code>{{ u.rfc || '—' }}</code></td>
+                    <td class="fw-medium">{{ u.nombre }}</td>
+                    <td>{{ u.grado_abreviado || '—' }}</td>
+                    <td class="text-center">{{ u.rango ?? '—' }}</td>
+                    <td class="text-center">
+                      <button class="btn btn-warning btn-sm" (click)="openEdit(u)">
+                        <i class="feather icon-edit me-1"></i>Editar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row mt-3 align-items-center" *ngIf="totalItems > 0">
+              <div class="col-sm-12 col-md-5">
+                <small class="text-muted">Mostrando {{ startItem }}–{{ endItem }} de {{ totalItems }} registros</small>
+              </div>
+              <div class="col-sm-12 col-md-7">
+                <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="goToPage(currentPage - 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-left"></i>
+                    </a>
+                  </li>
+                  <ng-container *ngFor="let p of pageNumbers">
+                    <li *ngIf="p === -1" class="page-item disabled"><span class="page-link">…</span></li>
+                    <li *ngIf="p !== -1" class="page-item" [class.active]="p === currentPage">
+                      <a class="page-link" (click)="goToPage(p)" style="cursor:pointer;">{{ p }}</a>
+                    </li>
+                  </ng-container>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" (click)="goToPage(currentPage + 1)" style="cursor:pointer;">
+                      <i class="feather icon-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== MODAL: Editar usuario ===== -->
+<ng-template #modalEdit let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title"><i class="feather icon-edit me-2"></i>Editar usuario</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-2">
+      <span class="text-muted">RFC: </span>
+      <code class="ms-1">{{ editTarget?.rfc }}</code>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger py-2 mb-3">{{ error }}</div>
+
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label fw-medium">Nombre <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" [(ngModel)]="form.nombre" placeholder="Nombre completo" />
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label fw-medium">Grado Abreviado</label>
+        <input type="text" class="form-control" [(ngModel)]="form.grado_abreviado" placeholder="Ej: LIC., ING., DR." />
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label fw-medium">Rango</label>
+        <select class="form-select" [(ngModel)]="form.rango">
+          <option [ngValue]="null">— Sin rango —</option>
+          <option [ngValue]="1">1</option>
+          <option [ngValue]="2">2</option>
+          <option [ngValue]="3">3</option>
+          <option [ngValue]="4">4</option>
+          <option [ngValue]="5">5</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving || !form.nombre.trim()">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+      {{ saving ? 'Guardando…' : 'Guardar cambios' }}
+    </button>
+  </div>
+</ng-template>

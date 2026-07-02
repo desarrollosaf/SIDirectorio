@@ -1,4 +1,4 @@
 export class CreateUserAdminDto {
   rfc!: string;
-  role!: 'superuser' | 'admin';
+  role!: 'superuser' | 'admin' | 'tecnico';
 }

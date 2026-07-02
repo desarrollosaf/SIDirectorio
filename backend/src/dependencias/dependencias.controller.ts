@@ -3,6 +3,7 @@ import { DependenciasService } from './dependencias.service';
 import { CreateDependenciaDto } from './dto/create-dependencia.dto';
 import { UpdateDependenciaDto } from './dto/update-dependencia.dto';
 import { generarReporteDependenciasPDF } from './pdf/reporte-pdf';
+import { generarReporteDirectivosPDF } from './pdf/reporte-directivos';
 import { Response } from 'express';
 
 
@@ -28,16 +29,24 @@ export class DependenciasController {
     const resultado = await this.dependenciasService.findExtensionespdf(+id);
 
     if (!resultado) {
-      return res.status(404).json({
-        message: 'No se encontraron dependencias',
-      });
+      return res.status(404).json({ message: 'No se encontraron dependencias' });
     }
 
-    generarReporteDependenciasPDF(
-      resultado.dependencias,
-      resultado.servicios,
-      res,
-    );
+    generarReporteDependenciasPDF(resultado.dependencias, resultado.servicios, res);
+  }
+
+  @Get('reporte/directivos/:id')
+  async generarReporteDirectivos(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const resultado = await this.dependenciasService.findExtensionespdf(+id);
+
+    if (!resultado) {
+      return res.status(404).json({ message: 'No se encontraron dependencias' });
+    }
+
+    generarReporteDirectivosPDF(resultado.dependencias, res);
   }
 
 

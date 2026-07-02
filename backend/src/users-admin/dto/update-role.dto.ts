@@ -1,3 +1,3 @@
 export class UpdateRoleDto {
-  role!: 'superuser' | 'admin';
+  role!: 'superuser' | 'admin' | 'tecnico';
 }

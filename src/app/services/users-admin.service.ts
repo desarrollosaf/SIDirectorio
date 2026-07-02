@@ -8,7 +8,7 @@ export interface AdminUser {
   name: string | null;
   rfc: string | null;
   email: string | null;
-  role: 'superuser' | 'admin' | 'user';
+  role: 'superuser' | 'admin' | 'tecnico' | 'user';
   created_at: string | null;
 }
 
@@ -20,7 +20,7 @@ export interface SafUser {
 
 export interface CreateAdminUserDto {
   rfc: string;
-  role: 'superuser' | 'admin';
+  role: 'superuser' | 'admin' | 'tecnico';
 }
 
 @Injectable({ providedIn: 'root' })
@@ -45,11 +45,12 @@ export class UsersAdminService {
     return this.http.post(this.api, dto, { headers: this.headers });
   }
 
-  updateRole(rfc: string, role: 'superuser' | 'admin'): Observable<any> {
+  updateRole(rfc: string, role: 'superuser' | 'admin' | 'tecnico'): Observable<any> {
     return this.http.patch(`${this.api}/${rfc}/role`, { role }, { headers: this.headers });
   }
 
   remove(rfc: string): Observable<any> {
     return this.http.delete(`${this.api}/${rfc}`, { headers: this.headers });
   }
+
 }

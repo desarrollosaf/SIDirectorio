@@ -35,7 +35,7 @@ export class UsersAdminComponent implements OnInit {
   form: CreateAdminUserDto = this.emptyForm();
 
   userTarget: AdminUser | null = null;
-  nuevoRol: 'superuser' | 'admin' = 'admin';
+  nuevoRol: 'superuser' | 'admin' | 'tecnico' = 'admin';
 
   deleteTarget: AdminUser | null = null;
 
@@ -100,13 +100,17 @@ export class UsersAdminComponent implements OnInit {
   }
 
   rolLabel(role: string): string {
-    return role === 'superuser' ? 'Super Usuario' : role === 'admin' ? 'Administrador' : 'Usuario';
+    if (role === 'superuser') return 'Super Usuario';
+    if (role === 'admin') return 'Administrador';
+    if (role === 'tecnico') return 'Técnico';
+    return 'Usuario';
   }
 
   rolBadge(role: string): string {
-    return role === 'superuser' ? 'bg-danger-subtle text-danger' :
-           role === 'admin'     ? 'bg-primary-subtle text-primary' :
-                                  'bg-secondary-subtle text-secondary';
+    if (role === 'superuser') return 'bg-danger-subtle text-danger';
+    if (role === 'admin') return 'bg-primary-subtle text-primary';
+    if (role === 'tecnico') return 'bg-warning-subtle text-warning';
+    return 'bg-secondary-subtle text-secondary';
   }
 
   openAdd(): void {
@@ -133,7 +137,7 @@ export class UsersAdminComponent implements OnInit {
 
   openEditRole(u: AdminUser): void {
     this.userTarget = u;
-    this.nuevoRol = u.role === 'user' ? 'admin' : u.role as 'superuser' | 'admin';
+    this.nuevoRol = u.role === 'user' ? 'admin' : u.role as 'superuser' | 'admin' | 'tecnico';
     this.modalRef = this.modal.open(this.modalRole, { size: 'sm', centered: true });
   }
 

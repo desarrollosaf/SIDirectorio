@@ -11,6 +11,7 @@ import { ServiciosModule } from './servicios/servicios.module';
 import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
 import { DependenciasUbicacionesModule } from './dependencias-ubicaciones/dependencias-ubicaciones.module';
 import { UsersAdminModule } from './users-admin/users-admin.module';
+import { UsuariosSafModule } from './usuarios-saf/usuarios-saf.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UsersAdminModule } from './users-admin/users-admin.module';
     UbicacionesModule,
     DependenciasUbicacionesModule,
     UsersAdminModule,
+    UsuariosSafModule,
   ],
   controllers: [
     AppController

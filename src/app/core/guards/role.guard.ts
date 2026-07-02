@@ -36,3 +36,4 @@ export const guardRoles = (allowed: string[]): CanActivateFn =>
 
 export const superuserGuard: CanActivateFn = guardRoles(['superuser']);
 export const adminGuard: CanActivateFn = guardRoles(['superuser', 'admin']);
+export const tecnicoGuard: CanActivateFn = guardRoles(['superuser', 'admin', 'tecnico']);

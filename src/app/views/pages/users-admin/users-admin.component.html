@@ -18,7 +18,7 @@
               <p class="text-muted fs-12px mb-0 mt-1">{{ totalItems }} usuarios encontrados</p>
             </div>
             <button class="btn btn-primary btn-sm" (click)="openAdd()">
-              <i class="feather icon-user-plus me-1"></i> Nuevo usuario
+              <i class="feather icon-user-plus me-1"></i> Agregar acceso
             </button>
           </div>
 
@@ -61,7 +61,7 @@
                     <th>RFC</th>
                     <th>Email</th>
                     <th>Rol</th>
-                    <th class="text-center" style="width:110px;">Acciones</th>
+                    <th class="text-center" style="width:200px;">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -77,16 +77,14 @@
                         {{ rolLabel(u.role) }}
                       </span>
                     </td>
-                    <td class="text-center">
-                      <button class="btn btn-icon btn-warning btn-sm me-1"
-                              title="Cambiar rol"
+                    <td class="text-center text-nowrap">
+                      <button class="btn btn-warning btn-sm me-1"
                               (click)="openEditRole(u)">
-                        <i class="feather icon-shield"></i>
+                        <i class="feather icon-shield me-1"></i>Editar rol
                       </button>
-                      <button class="btn btn-icon btn-danger btn-sm"
-                              title="Eliminar"
+                      <button class="btn btn-outline-danger btn-sm"
                               (click)="openDelete(u)">
-                        <i class="feather icon-trash-2"></i>
+                        <i class="feather icon-trash-2 me-1"></i>Eliminar
                       </button>
                     </td>
                   </tr>
@@ -125,6 +123,8 @@
       </div>
     </div>
   </div>
+
+
 </div>
 
 <!-- ===== MODAL: Nuevo usuario ===== -->
@@ -156,8 +156,9 @@
       <div class="col-12">
         <label class="form-label fw-medium">Rol <span class="text-danger">*</span></label>
         <select class="form-select" [(ngModel)]="form.role">
-          <option value="admin">Administrador — puede gestionar catálogos</option>
-          <option value="superuser">Super Usuario — puede gestionar usuarios y catálogos</option>
+          <option value="tecnico">Técnico</option>
+          <option value="admin">Administrador</option>
+          <option value="superuser">Super Usuario</option>
         </select>
       </div>
     </div>
@@ -184,6 +185,7 @@
     </p>
     <label class="form-label fw-medium">Nuevo rol</label>
     <select class="form-select" [(ngModel)]="nuevoRol">
+      <option value="tecnico">Técnico</option>
       <option value="admin">Administrador</option>
       <option value="superuser">Super Usuario</option>
     </select>
