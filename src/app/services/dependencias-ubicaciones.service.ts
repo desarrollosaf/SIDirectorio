@@ -16,7 +16,7 @@ export interface DependenciaConUbicaciones {
 
 @Injectable({ providedIn: 'root' })
 export class DependenciasUbicacionesService {
-  private readonly api = 'http://localhost:3000/api/dependencias-ubicaciones';
+  private readonly api = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api/dependencias-ubicaciones';
 
   constructor(private http: HttpClient) {}
 

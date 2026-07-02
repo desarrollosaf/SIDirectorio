@@ -20,7 +20,7 @@ export interface UpdateUsuarioSafDto {
 
 @Injectable({ providedIn: 'root' })
 export class UsuariosSafService {
-  private readonly api = 'http://localhost:3000/api/usuarios-saf';
+  private readonly api = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api/usuarios-saf';
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

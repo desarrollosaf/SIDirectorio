@@ -30,7 +30,7 @@ export interface ExtensionForm {
 
 @Injectable({ providedIn: 'root' })
 export class ExtensionesService {
-  private readonly api = 'http://localhost:3000/api';
+  private readonly api = 'https://administracionyfinanzasplem.gob.mx/directorio/backend/api';
 
   constructor(private http: HttpClient) {}
 
