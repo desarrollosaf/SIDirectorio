@@ -1,10 +1,8 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { prisma } from '../../prisma-users-database/prisma/prisma';
 import { prismaDirectorio } from '../../prisma-directorio-database/prisma/prisma';
 import { CreateUserAdminDto } from './dto/create-user-admin.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { CreateRoleCatalogDto } from './dto/create-role-catalog.dto';
-import { UpdateRoleCatalogDto } from './dto/update-role-catalog.dto';
 
 function serializeBigInt(data: any) {
   return JSON.parse(
@@ -115,73 +113,4 @@ export class UsersAdminService {
     return { message: `Acceso de ${rfcUpper} eliminado` };
   }
 
-  // ── Catálogo de roles ──────────────────────────────────────────────────────
-
-  async findAllRoles() {
-    return serializeBigInt(
-      await prismaDirectorio.roles_catalog.findMany({
-        where: { deleted_at: null },
-        orderBy: { id: 'asc' },
-      }),
-    );
-  }
-
-  async createRole(dto: CreateRoleCatalogDto) {
-    const name = dto.name.toLowerCase().replace(/\s+/g, '_');
-
-    const existing = await prismaDirectorio.roles_catalog.findFirst({
-      where: { name },
-    });
-    if (existing && !existing.deleted_at) {
-      throw new ConflictException('Ya existe un rol con ese nombre');
-    }
-
-    if (existing) {
-      return serializeBigInt(
-        await prismaDirectorio.roles_catalog.update({
-          where: { id: existing.id },
-          data: { label: dto.label, description: dto.description ?? null, deleted_at: null, updated_at: new Date() },
-        }),
-      );
-    }
-
-    return serializeBigInt(
-      await prismaDirectorio.roles_catalog.create({
-        data: { name, label: dto.label, description: dto.description ?? null, created_at: new Date(), updated_at: new Date() },
-      }),
-    );
-  }
-
-  async updateRoleCatalog(id: number, dto: UpdateRoleCatalogDto) {
-    const existing = await prismaDirectorio.roles_catalog.findFirst({
-      where: { id, deleted_at: null },
-    });
-    if (!existing) throw new NotFoundException('Rol no encontrado');
-
-    return serializeBigInt(
-      await prismaDirectorio.roles_catalog.update({
-        where: { id },
-        data: { label: dto.label, description: dto.description ?? null, updated_at: new Date() },
-      }),
-    );
-  }
-
-  async removeRole(id: number) {
-    const existing = await prismaDirectorio.roles_catalog.findFirst({
-      where: { id, deleted_at: null },
-    });
-    if (!existing) throw new NotFoundException('Rol no encontrado');
-
-    const PROTECTED = ['superuser', 'admin', 'tecnico'];
-    if (PROTECTED.includes(existing.name)) {
-      throw new BadRequestException('No se puede eliminar un rol del sistema');
-    }
-
-    await prismaDirectorio.roles_catalog.update({
-      where: { id },
-      data: { deleted_at: new Date() },
-    });
-
-    return { message: `Rol "${existing.label}" eliminado` };
-  }
 }

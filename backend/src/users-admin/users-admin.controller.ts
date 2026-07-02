@@ -2,8 +2,6 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post
 import { UsersAdminService } from './users-admin.service';
 import { CreateUserAdminDto } from './dto/create-user-admin.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { CreateRoleCatalogDto } from './dto/create-role-catalog.dto';
-import { UpdateRoleCatalogDto } from './dto/update-role-catalog.dto';
 import { JwtAuthGuard, Roles } from '../common/guards/jwt-auth.guard';
 import { Reflector } from '@nestjs/core';
 
@@ -39,26 +37,4 @@ export class UsersAdminController {
     return this.service.remove(rfc);
   }
 
-  // ── Catálogo de roles ──────────────────────────────────────────────────────
-
-  @Get('roles')
-  findAllRoles() {
-    return this.service.findAllRoles();
-  }
-
-  @Post('roles')
-  createRole(@Body() dto: CreateRoleCatalogDto) {
-    return this.service.createRole(dto);
-  }
-
-  @Patch('roles/:id')
-  updateRoleCatalog(@Param('id') id: string, @Body() dto: UpdateRoleCatalogDto) {
-    return this.service.updateRoleCatalog(+id, dto);
-  }
-
-  @Delete('roles/:id')
-  @HttpCode(HttpStatus.OK)
-  removeRole(@Param('id') id: string) {
-    return this.service.removeRole(+id);
-  }
 }
